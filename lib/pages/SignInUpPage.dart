@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/services.dart/authenitaction.dart';
-import 'package:fluttermessenger/services.dart/database.dart';
+import 'package:fluttermessenger/services/authenitaction.dart';
+import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
 class SignInUpPage extends StatefulWidget{

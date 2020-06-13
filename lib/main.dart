@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/pages/RootPage.dart';
-import 'package:fluttermessenger/services.dart/authenitaction.dart';
-import 'package:fluttermessenger/services.dart/database.dart';
+import 'package:fluttermessenger/services/authenitaction.dart';
+import 'package:fluttermessenger/services/database.dart';
 
 void main() {
   runApp(MyApp());
