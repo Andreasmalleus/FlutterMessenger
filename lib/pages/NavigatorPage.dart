@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/pages/GroupPage.dart';
-import 'package:fluttermessenger/pages/HomePage.dart';
+import 'package:fluttermessenger/pages/GroupsPage.dart';
+import 'package:fluttermessenger/pages/ChatsPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 
@@ -18,10 +18,6 @@ class NavigatorPage extends StatefulWidget{
 class _NavigatorPageState extends State<NavigatorPage>{
 
   int _selectedIndex = 0;
-  final List<Type> pages = [
-    HomePage,
-    GroupsPage
-  ];
 
   void _onTap(int index){
     setState(() {
@@ -39,7 +35,7 @@ class _NavigatorPageState extends State<NavigatorPage>{
           child: TickerMode(//removes animations
             enabled: _selectedIndex == 0,
             child: MaterialApp(
-              home: HomePage(
+              home: ChatsPage(
                 auth: widget.auth,
                 database: widget.database,
                 logOutCallback: widget.logOutCallback,

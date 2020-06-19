@@ -7,22 +7,22 @@ import 'package:fluttermessenger/widgets/CustomDrawer.dart';
 import 'MessagePage.dart';
 
 
-class HomePage extends StatefulWidget {
+class ChatsPage extends StatefulWidget {
 
   final BaseAuth auth;
   final VoidCallback logOutCallback;
   final BaseDb database;
-  HomePage({this.auth, this.logOutCallback, this.database});
+  ChatsPage({this.auth, this.logOutCallback, this.database});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  _ChatsPageState createState() => _ChatsPageState();
 }
 
 //TODO Add friends && search
 //TODO remove friends
 //TODO ADD 2 person chat
 
-class _HomePageState extends State<HomePage> {
+class _ChatsPageState extends State<ChatsPage> {
   List<User> users = [];
   User sender;
   String lastMessage = "";
@@ -76,7 +76,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        title: Text("Home"),
+        title: Text("Chats"),
       ),
       drawer: CustomDrawer(),
       body: Column(
