@@ -96,9 +96,9 @@ class _HomePageState extends State<HomePage> {
             itemCount: users.length,
             itemBuilder: (BuildContext context, int i){
               return GestureDetector(
-                onTap: () => Navigator.push(context, 
+                onTap: () => Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute(
-                    builder: (context)=> new MessagePage(
+                    builder: (context)=> MessagePage(
                       callback: _lastMessageCallback,
                       database: widget.database,
                       receiver: users[i],

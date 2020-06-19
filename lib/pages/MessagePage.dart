@@ -180,6 +180,7 @@ class _MessagePageState extends State<MessagePage>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      bottomNavigationBar: null,
       appBar: AppBar(
         centerTitle: true,
         title: Text(widget.receiver.username),
