@@ -13,6 +13,8 @@ abstract class BaseDb{
 
   Future<Map> getAllMessages();
 
+  Future<String> getLastMessage();
+
   Future<void> addFriends(String firstUserId, String secondUserId);
 
   Future<void> updateFriends(String firstUserId, String secondUserId);
@@ -26,6 +28,9 @@ class Database implements BaseDb{
   final DatabaseReference _userRef = FirebaseDatabase.instance.reference().child("users");
   final DatabaseReference _messageRef = FirebaseDatabase.instance.reference().child("messages");
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
+  final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
+  final DatabaseReference _groupsRef = FirebaseDatabase.instance.reference().child("groups");
+
 
 
   Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
@@ -95,6 +100,14 @@ class Database implements BaseDb{
     }).catchError((error)  => print("getAllMessages error: $error"));
     print("All messages received");
     return messages;
+  }
+
+  Future<String> getLastMessage() async {
+    String message = "";
+    await _messageRef.orderByKey().limitToLast(1).once().then((DataSnapshot snapshot) => {
+      snapshot.value.forEach((key, value) => message = value["message"])
+    });
+    return message;
   }
 
   Future<void> addFriends(String firstUserId, String secondUserId)async{

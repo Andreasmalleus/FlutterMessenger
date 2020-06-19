@@ -4,6 +4,8 @@ import 'package:fluttermessenger/pages/SignInUpPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 
+import 'NavigatorPage.dart';
+
 enum AuthStatus {
   NOT_DETERMINED,
   NOT_LOGGED_IN,
@@ -69,7 +71,7 @@ class _RootPageState extends State<RootPage>{
         );
       case AuthStatus.LOGGED_IN:
         if(_userId.length > 0 && _userId != null){
-          return HomePage(
+          return NavigatorPage(
             auth: widget.auth,
             logOutCallback : logOutCallback,
             database: widget.database,

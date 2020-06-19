@@ -28,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   String lastMessage = "";
   User currentUser;
 
-  void _lastMessageCallback(String last){
+  void _lastMessageCallback(String last) async{
     setState(() {
       lastMessage = last;
     });
@@ -63,6 +63,7 @@ class _HomePageState extends State<HomePage> {
     await widget.database.addFriends(firstUser, secondUser);
   }
 
+
   @override
   void initState(){
     super.initState();
@@ -74,6 +75,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blueAccent,
         title: Text("Home"),
       ),
       drawer: CustomDrawer(),
