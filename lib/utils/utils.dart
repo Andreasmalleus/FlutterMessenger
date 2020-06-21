@@ -16,14 +16,9 @@ String getDateInHoursAndMinutes(){
 }
 
 String formatDateToHoursAndMinutes(String date){
-  return DateFormat.Hm().format(formatStringToDateTime(date)).toString();
+  return DateFormat.Hm().format(dateFormat.parse(date)).toString();
 }
 
 String formatDate(String date){
   return dateFormat.format(dateFormat.parse(date));
-}
-
-DateTime formatStringToDateTime(String date){
-  DateTime formattedString = dateFormat.parse(date);
-  return formattedString;
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 
 abstract class BaseDb{
@@ -7,11 +8,11 @@ abstract class BaseDb{
 
   Future<List> getAllUsers();
 
-  Future<User> getCurrentUserObject(String id);
+  Future<User> getUserObject(String id);
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time);
+  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
 
-  Future<Map> getAllMessages();
+  Future<Map> getAllMessages(String key);
 
   Future<String> getLastMessage();
 
@@ -22,6 +23,15 @@ abstract class BaseDb{
   Future<List> getFriendsIds(String userId);
 
   Future<List> getFriends(String userId);
+
+  Future<void> createChat(String firstUserId, String secondUserId);
+
+  Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId);
+
+  Future<List> getChats(String userId);
+
+  void updateLastMessageAndTime(String key, String message, String time);
+
 }
 
 class Database implements BaseDb{
@@ -29,9 +39,6 @@ class Database implements BaseDb{
   final DatabaseReference _messageRef = FirebaseDatabase.instance.reference().child("messages");
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
-  final DatabaseReference _groupsRef = FirebaseDatabase.instance.reference().child("groups");
-
-
 
   Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
     await _userRef.child(userId).set({
@@ -61,7 +68,7 @@ class Database implements BaseDb{
     return users;
   }
 
-  Future<User> getCurrentUserObject(String id)async{
+  Future<User> getUserObject(String id)async{
     User user;
     await _userRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) =>{
       snapshot.value.forEach((key,value)=> {
@@ -76,8 +83,8 @@ class Database implements BaseDb{
     return user;
   }
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time) async{
-    await _messageRef.push().set({
+  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
+    await _messageRef.child(key).push().set({
       "text" : text,
       "sender" : {
         "id": sender.id,
@@ -93,9 +100,9 @@ class Database implements BaseDb{
     print("Message added");
   }
 
-  Future<Map> getAllMessages() async{
+  Future<Map> getAllMessages(String key) async{
     Map<dynamic, dynamic> messages;
-    await _messageRef.once().then((DataSnapshot snapshot) => {
+    await _messageRef.child(key).once().then((DataSnapshot snapshot) => {
       messages = snapshot.value
     }).catchError((error)  => print("getAllMessages error: $error"));
     print("All messages received");
@@ -156,4 +163,74 @@ class Database implements BaseDb{
     }
     return friends;
   }
+
+  Future<void> createChat(String firstUserId, String secondUserId) async{
+    String key = _chatsRef.push().key;
+    await _chatsRef.child(key).set({
+      "lastMessage" : "ye",
+      "lastMessageTime" : "14.05",
+      "participants" : {
+        firstUserId : true,
+        secondUserId : true
+      }
+    });
+    print("created $key");
+  }
+
+  Future<void> addKeyToFriends(String key){
+
+  }
+
+  Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId) async{
+    List<String> chatIds = List<String>();
+    await _chatsRef.once().then((DataSnapshot snapshot) => {
+      snapshot.value.forEach((id, value) => {
+        value["participants"].forEach((key, value) => {
+          if(key == currentUserId){
+            print("found $id"),
+            chatIds.add(id)
+          }
+        })
+      })
+    });
+    return chatIds;
+  }
+
+  
+
+  Future<List> getChats(String userId) async{
+    List<String> chatIds = await getChatsIdsWhereCurrentUserIs(userId);
+    List<Chat> chats = List<Chat>();
+    Chat chat;
+    for(var id in chatIds){
+        await _chatsRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
+        snapshot.value.forEach((key,val) =>{
+          val["participants"].forEach((id, value) => {
+            if(id != userId){
+              chat = Chat(
+                id: key,
+                lastMessage: val["lastMessage"],
+                lastMessageTime: val["lastMessageTime"],
+                participant: id
+            ),
+            }
+          }),
+          chats.add(chat)
+        })
+      });
+    }
+    print("All chats received");
+    return chats;
+  } 
+
+  
+
+  Future<void> updateLastMessageAndTime(String key, String message, String time){
+    _chatsRef.child(key).update({
+      "lastMessage" : message,
+      "lastMessageTime" : time
+    }).catchError((error) => print("updateLastMessageAndTime: $error"));
+    print("Chat updated");
+  }
+
 }

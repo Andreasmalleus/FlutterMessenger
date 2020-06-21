@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
@@ -27,6 +28,7 @@ class _ChatsPageState extends State<ChatsPage> {
   User sender;
   String lastMessage = "";
   User currentUser;
+  List<Chat> chats = [];
 
   void _lastMessageCallback(String last) async{
     setState(() {
@@ -45,7 +47,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
   void getCurrentUser() async{
     FirebaseUser dbUser = await widget.auth.getCurrentUser();
-    User user = await widget.database.getCurrentUserObject(dbUser.uid);
+    User user = await widget.database.getUserObject(dbUser.uid);
     setState(() {
       currentUser = user;
     });
@@ -53,14 +55,22 @@ class _ChatsPageState extends State<ChatsPage> {
 
   void mapUsersToList() async{
     FirebaseUser currentUser = await widget.auth.getCurrentUser();
-    List<User> dbUsers = await widget.database.getFriends(currentUser.uid);
+    List<Chat> listOfChats = await widget.database.getChats(currentUser.uid);
+    List<User> chatUsers = await widget.database.getAllUsers();
+    print(listOfChats);
     setState(() {
-      users = dbUsers;
+      users = chatUsers;
+      chats = listOfChats;
     });
   } 
 
+
   void _addFriends(String firstUser, String secondUser) async{
     await widget.database.addFriends(firstUser, secondUser);
+  }
+
+  void _addChat(String firstUser, String secondUser) async{
+    await widget.database.createChat(firstUser, secondUser);
   }
 
 
@@ -91,9 +101,14 @@ class _ChatsPageState extends State<ChatsPage> {
               _addFriends(currentUser.id, "lVHt2VOcrTVZZCgYYApfl3wnOAy2")
             },
             child: Text("Create friendship"),),
+          RaisedButton(
+            onPressed: () => {
+              _addChat(currentUser.id, "lVHt2VOcrTVZZCgYYApfl3wnOAy2")
+            },
+            child: Text("Create chat"),),
           ListView.builder(
             shrinkWrap: true,
-            itemCount: users.length,
+            itemCount: chats.length,
             itemBuilder: (BuildContext context, int i){
               return GestureDetector(
                 onTap: () => Navigator.of(context, rootNavigator: true).push(
@@ -103,14 +118,15 @@ class _ChatsPageState extends State<ChatsPage> {
                       database: widget.database,
                       receiver: users[i],
                       sender: currentUser,
+                      chatKey: chats[i].id
                       ))),
                 child: Container(
                   height: 75,
                   child: Card(
                     child: ListTile(
                     leading: Icon(Icons.android, size: 35,),
-                    title: Text(users[i].username),
-                    subtitle: Text(lastMessage),
+                    title: Text(chats[i].id),
+                    subtitle: Text(chats[i].lastMessage + " " + chats[i].lastMessageTime),
                     trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                     ),
                     ),

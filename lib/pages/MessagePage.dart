@@ -7,11 +7,12 @@ import 'package:fluttermessenger/utils/utils.dart';
 
 class MessagePage extends StatefulWidget{
 
-  MessagePage({this.callback,this.database, this.receiver, this.sender});
+  MessagePage({this.callback,this.database, this.receiver, this.sender, this.chatKey});
   final BaseDb database;
   final User receiver;
   final User sender;
   final void Function(String) callback;
+  final String chatKey;
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -25,7 +26,7 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   void mapMessagesToList() async{
-    Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages();
+    Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.chatKey);
     if(dbMessages != null){
       dbMessages.forEach((key, value) {
         User sender = User(
@@ -53,7 +54,6 @@ class _MessagePageState extends State<MessagePage>{
     });
     String lastMessage = messages[0].text;
     lastMessageCallback(lastMessage);
-
   }
 
   Widget _buildMessage(Message message, bool isMe){ 
@@ -88,7 +88,7 @@ class _MessagePageState extends State<MessagePage>{
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                formatDateToHoursAndMinutes(message.time),
+                message.time,
                 style: TextStyle(
                   color: Colors.black, 
                   fontWeight: FontWeight.bold, 
@@ -165,8 +165,10 @@ class _MessagePageState extends State<MessagePage>{
       sender,
       message.isLiked,
       message.isRead,
-      getCurrentDate()
+      getCurrentDate(),
+      widget.chatKey
       );
+    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, message.time);
     lastMessageCallback(message.text);
     textField.clear();
   }
