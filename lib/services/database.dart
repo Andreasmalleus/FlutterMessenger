@@ -4,27 +4,30 @@ import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 
 abstract class BaseDb{
-  Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl);
+
+  DatabaseReference getChatRef();
+
+  void addUser(String userId,String email, String username, String createdAt, String imageUrl);
 
   Future<List> getAllUsers();
 
   Future<User> getUserObject(String id);
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
+  void addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
 
   Future<Map> getAllMessages(String key);
 
   Future<String> getLastMessage();
 
-  Future<void> addFriends(String firstUserId, String secondUserId);
+  void addFriends(String firstUserId, String secondUserId);
 
-  Future<void> updateFriends(String firstUserId, String secondUserId);
+  void updateFriends(String firstUserId, String secondUserId);
     
   Future<List> getFriendsIds(String userId);
 
   Future<List> getFriends(String userId);
 
-  Future<void> createChat(String firstUserId, String secondUserId);
+  void createChat(String firstUserId, String secondUserId);
 
   Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId);
 
@@ -40,7 +43,11 @@ class Database implements BaseDb{
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
 
-  Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
+  DatabaseReference getChatRef(){
+    return _chatsRef;
+  }
+
+  void addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
     await _userRef.child(userId).set({
       "email" : email,
       "username" : username,
@@ -83,7 +90,7 @@ class Database implements BaseDb{
     return user;
   }
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
+  void addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
     await _messageRef.child(key).push().set({
       "text" : text,
       "sender" : {
@@ -117,7 +124,7 @@ class Database implements BaseDb{
     return message;
   }
 
-  Future<void> addFriends(String firstUserId, String secondUserId)async{
+  void addFriends(String firstUserId, String secondUserId)async{
     String first = firstUserId;
     String second = secondUserId;
     for(var i= 0; i < 2; i++){
@@ -129,7 +136,7 @@ class Database implements BaseDb{
     }
   }
 
-  Future<void> updateFriends(String firstUserId, String secondUserId)async{
+  void updateFriends(String firstUserId, String secondUserId)async{
     
   }
 
@@ -164,11 +171,11 @@ class Database implements BaseDb{
     return friends;
   }
 
-  Future<void> createChat(String firstUserId, String secondUserId) async{
+  void createChat(String firstUserId, String secondUserId) async{
     String key = _chatsRef.push().key;
     await _chatsRef.child(key).set({
-      "lastMessage" : "ye",
-      "lastMessageTime" : "14.05",
+      "lastMessage" : "",
+      "lastMessageTime" : "",
       "participants" : {
         firstUserId : true,
         secondUserId : true
@@ -225,7 +232,7 @@ class Database implements BaseDb{
 
   
 
-  Future<void> updateLastMessageAndTime(String key, String message, String time){
+  void updateLastMessageAndTime(String key, String message, String time){
     _chatsRef.child(key).update({
       "lastMessage" : message,
       "lastMessageTime" : time

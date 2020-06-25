@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
@@ -29,12 +30,6 @@ class _ChatsPageState extends State<ChatsPage> {
   String lastMessage = "";
   User currentUser;
   List<Chat> chats = [];
-
-  void _lastMessageCallback(String last) async{
-    setState(() {
-      lastMessage = last;
-    });
-  }
 
   void _signOut() async{
     try {
@@ -106,34 +101,58 @@ class _ChatsPageState extends State<ChatsPage> {
               _addChat(currentUser.id, "lVHt2VOcrTVZZCgYYApfl3wnOAy2")
             },
             child: Text("Create chat"),),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: chats.length,
-            itemBuilder: (BuildContext context, int i){
-              return GestureDetector(
-                onTap: () => Navigator.of(context, rootNavigator: true).push(
-                  MaterialPageRoute(
-                    builder: (context)=> MessagePage(
-                      callback: _lastMessageCallback,
-                      database: widget.database,
-                      receiver: users[i],
-                      sender: currentUser,
-                      chatKey: chats[i].id
-                      ))),
-                child: Container(
-                  height: 75,
-                  child: Card(
-                    child: ListTile(
-                    leading: Icon(Icons.android, size: 35,),
-                    title: Text(chats[i].id),
-                    subtitle: Text(chats[i].lastMessage + " " + chats[i].lastMessageTime),
-                    trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
-                    ),
-                    ),
-                )
-              );
-            }
-          ),
+          StreamBuilder(
+            stream: widget.database.getChatRef().onValue,
+            builder: (context, snapshot) {
+              if(snapshot.hasData && snapshot.data.snapshot.value != null){
+                Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
+                List<Chat> chats = List<Chat>();
+                map.forEach((key,val) =>{
+                  val["participants"].forEach((id, value) => {
+                    if(id != currentUser.id){
+                      chats.add(
+                        Chat(
+                          id: key,
+                          lastMessage: val["lastMessage"],
+                          lastMessageTime: val["lastMessageTime"],
+                          participant: id
+                        ),
+                      )
+                      }
+                    }),
+                });
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount:  chats.length,
+                  itemBuilder: (BuildContext ctx, int i){
+                    return GestureDetector(
+                      onTap: () => Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context)=> MessagePage(
+                            database: widget.database,
+                            receiver: users[i],
+                            sender: currentUser,
+                            chatKey: chats[i].id
+                            ))),
+                      child: Container(
+                        height: 75,
+                        child: Card(
+                          child: ListTile(
+                          leading: Icon(Icons.android, size: 35,),
+                          title: Text(chats[i].id),
+                          subtitle: Text(chats[i].lastMessage + " " + chats[i].lastMessageTime),
+                          trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
+                          ),
+                          ),
+                      )
+                    );             
+                }
+                );
+              }else{
+                return Container(child: Text("No data"),);
+              }
+            },
+          )
         ]
       ),
     );

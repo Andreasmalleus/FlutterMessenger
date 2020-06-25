@@ -7,11 +7,10 @@ import 'package:fluttermessenger/utils/utils.dart';
 
 class MessagePage extends StatefulWidget{
 
-  MessagePage({this.callback,this.database, this.receiver, this.sender, this.chatKey});
+  MessagePage({this.database, this.receiver, this.sender, this.chatKey});
   final BaseDb database;
   final User receiver;
   final User sender;
-  final void Function(String) callback;
   final String chatKey;
 
   @override
@@ -20,10 +19,6 @@ class MessagePage extends StatefulWidget{
 
 class _MessagePageState extends State<MessagePage>{
   List<Message> messages = [];
-
-  void lastMessageCallback(String text){
-    widget.callback(text);
-  }
 
   void mapMessagesToList() async{
     Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.chatKey);
@@ -52,8 +47,6 @@ class _MessagePageState extends State<MessagePage>{
     setState(() {
       messages.sort((a,b) => b.time.compareTo(a.time));
     });
-    String lastMessage = messages[0].text;
-    lastMessageCallback(lastMessage);
   }
 
   Widget _buildMessage(Message message, bool isMe){ 
@@ -169,7 +162,6 @@ class _MessagePageState extends State<MessagePage>{
       widget.chatKey
       );
     widget.database.updateLastMessageAndTime(widget.chatKey, message.text, message.time);
-    lastMessageCallback(message.text);
     textField.clear();
   }
 
