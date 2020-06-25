@@ -85,14 +85,9 @@ class _ChatsPageState extends State<ChatsPage> {
         backgroundColor: Colors.blueAccent,
         title: Text("Chats"),
       ),
-      drawer: CustomDrawer(),
+      drawer: CustomDrawer(auth: widget.auth, logOutCallback: widget.logOutCallback),
       body: Column(
         children: <Widget>[
-          RaisedButton(
-            onPressed: () => {
-              _signOut()
-            },
-            child: Text("Log out"),),
           Row(
             children: <Widget>[
               RaisedButton(
