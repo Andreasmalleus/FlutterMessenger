@@ -21,6 +21,8 @@ abstract class BaseDb{
 
   void addFriends(String firstUserId, String secondUserId);
 
+  void unFriend(String firstUserId, String secondUserId);
+
   void updateFriends(String firstUserId, String secondUserId);
     
   Future<List> getFriendsIds(String userId);
@@ -134,6 +136,17 @@ class Database implements BaseDb{
       first = secondUserId;
       second = firstUserId;
     }
+  }
+
+  void unFriend(String firstUserId, String secondUserId) async{
+    String first = firstUserId;
+    String second = secondUserId;
+    for(var i= 0; i < 2; i++){
+      await _friendsRef.child(first).child(second).remove();
+      first = secondUserId;
+      second = firstUserId;
+    }
+    print("Friend removed");
   }
 
   void updateFriends(String firstUserId, String secondUserId)async{

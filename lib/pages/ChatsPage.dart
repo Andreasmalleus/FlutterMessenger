@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
@@ -22,7 +21,6 @@ class ChatsPage extends StatefulWidget {
 
 //TODO Add friends && search
 //TODO remove friends
-//TODO ADD 2 person chat
 
 class _ChatsPageState extends State<ChatsPage> {
   List<User> users = [];
@@ -61,11 +59,15 @@ class _ChatsPageState extends State<ChatsPage> {
 
 
   void _addFriends(String firstUser, String secondUser) async{
-    await widget.database.addFriends(firstUser, secondUser);
+    widget.database.addFriends(firstUser, secondUser);
+  }
+
+  void _removeFriends(String firstUser, String secondUser) async{
+    widget.database.unFriend(firstUser, secondUser);
   }
 
   void _addChat(String firstUser, String secondUser) async{
-    await widget.database.createChat(firstUser, secondUser);
+    widget.database.createChat(firstUser, secondUser);
   }
 
 
@@ -91,11 +93,20 @@ class _ChatsPageState extends State<ChatsPage> {
               _signOut()
             },
             child: Text("Log out"),),
-          RaisedButton(
-            onPressed: () => {
-              _addFriends(currentUser.id, "lVHt2VOcrTVZZCgYYApfl3wnOAy2")
-            },
-            child: Text("Create friendship"),),
+          Row(
+            children: <Widget>[
+              RaisedButton(
+                onPressed: () => {
+                  _addFriends(currentUser.id, "aa")
+                },
+                child: Text("Create friendship"),),
+                RaisedButton(
+                onPressed: () => {
+                  _removeFriends(currentUser.id, "aa")
+                },
+                child: Text("Remove friendship"),),
+            ],
+          ),
           RaisedButton(
             onPressed: () => {
               _addChat(currentUser.id, "lVHt2VOcrTVZZCgYYApfl3wnOAy2")
