@@ -7,11 +7,12 @@ import 'package:fluttermessenger/utils/utils.dart';
 
 class MessagePage extends StatefulWidget{
 
-  MessagePage({this.database, this.receiver, this.sender, this.chatKey});
+  MessagePage({this.database, this.receiver, this.sender, this.chatKey, this.check});
   final BaseDb database;
   final String receiver;
   final User sender;
   final String chatKey;
+  final bool check;
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -161,7 +162,7 @@ class _MessagePageState extends State<MessagePage>{
       getCurrentDate(),
       widget.chatKey
       );
-    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, getCurrentDate());
+    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, getCurrentDate(), widget.check);
     textField.clear();
   }
 

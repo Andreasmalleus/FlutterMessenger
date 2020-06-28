@@ -37,7 +37,7 @@ abstract class BaseDb{
 
   Future<List> getChats(String userId);
 
-  void updateLastMessageAndTime(String key, String message, String time);
+  void updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
   void createGroup(List<String> ids);
 
@@ -247,13 +247,21 @@ class Database implements BaseDb{
     print("All chats received");
     return chats;
   } 
-  
-  void updateLastMessageAndTime(String key, String message, String time){
-    _chatsRef.child(key).update({
-      "lastMessage" : message,
-      "lastMessageTime" : time
-    }).catchError((error) => print("updateLastMessageAndTime: $error"));
-    print("Chat updated");
+
+  void updateLastMessageAndTime(String key, String message, String time, bool typeCheck){
+    if(typeCheck){
+      _chatsRef.child(key).update({
+        "lastMessage" : message,
+        "lastMessageTime" : time
+      }).catchError((error) => print("updateLastMessageAndTime: $error"));
+      print("Chat updated");
+    }else{
+      _groupRef.child(key).update({
+        "lastMessage" : message,
+        "lastMessageTime" : time
+      }).catchError((error) => print("updateLastMessageAndTime: $error"));
+      print("Group updated");
+    }
   }
 
   void createGroup(List<String> ids){

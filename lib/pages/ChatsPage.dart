@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/pages/AccountPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -62,12 +63,24 @@ class _ChatsPageState extends State<ChatsPage> {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () => {},
+            ),
+            IconButton(
+            icon: Icon(Icons.android),
+            onPressed: () => {
+              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                builder: (context) => AccountPage(
+                  database: widget.database,
+                  auth : widget.auth,
+                  logOutCallback: widget.logOutCallback,
+                ),
+              ))
+            },
             )
         ],
         title: Text("Chats"),
         centerTitle: true,
       ),
-      drawer: CustomDrawer(auth: widget.auth, logOutCallback: widget.logOutCallback),
+      drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
           Row(
@@ -120,7 +133,8 @@ class _ChatsPageState extends State<ChatsPage> {
                             database: widget.database,
                             receiver: chats[i].id,
                             sender: currentUser,
-                            chatKey: chats[i].id
+                            chatKey: chats[i].id,
+                            check: true,
                             ))),
                       child: Container(
                         height: 75,
@@ -128,7 +142,16 @@ class _ChatsPageState extends State<ChatsPage> {
                           child: ListTile(
                           leading: Icon(Icons.android, size: 35,),
                           title: Text(chats[i].id),
-                          subtitle: Text(chats[i].lastMessage + " " + formatDateToHoursAndMinutes(chats[i].lastMessageTime)),
+                          subtitle: Text(
+                            ((){
+                              if(chats[i].lastMessage !=  null && chats[i].lastMessageTime != null){
+                                String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
+                                return chats[i].lastMessage + " " + formattedDate;
+                              }else{
+                                return "";
+                            }
+                          }())
+                            ),
                           trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                           ),
                           ),

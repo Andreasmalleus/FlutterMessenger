@@ -4,8 +4,10 @@ import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
+import 'package:fluttermessenger/utils/utils.dart';
 import 'package:fluttermessenger/widgets/CustomDrawer.dart';
 
+import 'AccountPage.dart';
 import 'MessagePage.dart';
 
 class GroupsPage extends StatefulWidget{
@@ -35,8 +37,8 @@ class _GroupsPageState extends State<GroupsPage>{
 
   void _createGroup() async{
     List<String> ids = List<String>();
-    ids.add("üks");
-    ids.add("kaks");
+    ids.add(currentUser.id);
+    ids.add("randomId");
     widget.database.createGroup(ids);
   }
 
@@ -48,8 +50,29 @@ class _GroupsPageState extends State<GroupsPage>{
 
   Widget build(BuildContext context){
     return Scaffold(
-      appBar: AppBar(title:Text("GroupsPage")),
-      drawer: CustomDrawer(auth: widget.auth, logOutCallback: widget.logOutCallback),
+      appBar: AppBar(
+        title:Text("GroupsPage"),
+        centerTitle: true,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => {},
+            ),
+            IconButton(
+            icon: Icon(Icons.android),
+            onPressed: () => {
+              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                builder: (context) => AccountPage(
+                  database: widget.database,
+                  auth : widget.auth,
+                  logOutCallback: widget.logOutCallback,
+                ),
+              ))
+            },
+            )
+        ],
+        ),
+      drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
           Center(
@@ -91,7 +114,8 @@ class _GroupsPageState extends State<GroupsPage>{
                           database: widget.database,
                           receiver: groups[i].id,
                           sender: currentUser,
-                          chatKey: groups[i].id
+                          chatKey: groups[i].id,
+                          check: false,
                           ))),
                     child: Container(
                       height: 75,
@@ -102,7 +126,8 @@ class _GroupsPageState extends State<GroupsPage>{
                         subtitle: Text(
                           ((){
                             if(groups[i].lastMessage !=  null && groups[i].lastMessageTime != null){
-                              return groups[i].lastMessage + " " + groups[i].lastMessageTime;
+                              String formattedDate = formatDateToHoursAndMinutes(groups[i].lastMessageTime);
+                              return groups[i].lastMessage + " " + formattedDate;
                             }else{
                               return "";
                             }
