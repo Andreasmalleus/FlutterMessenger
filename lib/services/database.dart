@@ -5,6 +5,8 @@ import 'package:fluttermessenger/models/userModel.dart';
 
 abstract class BaseDb{
 
+  DatabaseReference getGroupRef();
+
   DatabaseReference getChatRef();
 
   void addUser(String userId,String email, String username, String createdAt, String imageUrl);
@@ -37,6 +39,8 @@ abstract class BaseDb{
 
   void updateLastMessageAndTime(String key, String message, String time);
 
+  void createGroup(List<String> ids);
+
 }
 
 class Database implements BaseDb{
@@ -44,6 +48,11 @@ class Database implements BaseDb{
   final DatabaseReference _messageRef = FirebaseDatabase.instance.reference().child("messages");
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
+  final DatabaseReference _groupRef = FirebaseDatabase.instance.reference().child("groups");
+
+  DatabaseReference getGroupRef(){
+    return _groupRef;
+  }
 
   DatabaseReference getChatRef(){
     return _chatsRef;
@@ -197,10 +206,6 @@ class Database implements BaseDb{
     print("created $key");
   }
 
-  Future<void> addKeyToFriends(String key){
-
-  }
-
   Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId) async{
     List<String> chatIds = List<String>();
     await _chatsRef.once().then((DataSnapshot snapshot) => {
@@ -242,9 +247,7 @@ class Database implements BaseDb{
     print("All chats received");
     return chats;
   } 
-
   
-
   void updateLastMessageAndTime(String key, String message, String time){
     _chatsRef.child(key).update({
       "lastMessage" : message,
@@ -252,5 +255,24 @@ class Database implements BaseDb{
     }).catchError((error) => print("updateLastMessageAndTime: $error"));
     print("Chat updated");
   }
+
+  void createGroup(List<String> ids){
+    String key = _groupRef.push().key;
+    _groupRef.child(key).set({
+      {
+        "lastMessage" : "",
+        "lastMessageTime" : "",
+      }
+    });
+
+    ids.forEach((id) {
+      _groupRef.child(key).child("participants/$id").set(
+        true
+        );
+    });
+    print("Group created");
+  }
+
+
 
 }

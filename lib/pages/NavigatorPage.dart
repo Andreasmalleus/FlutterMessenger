@@ -47,7 +47,12 @@ class _NavigatorPageState extends State<NavigatorPage>{
           offstage: _selectedIndex != 1,
           child: TickerMode(
             enabled: _selectedIndex == 1,
-            child: MaterialApp(home: GroupsPage()),
+            child: MaterialApp(
+              home: GroupsPage(
+                auth: widget.auth,
+                database: widget.database,
+                logOutCallback: widget.logOutCallback,
+              )),
           ),
         ),
         ],

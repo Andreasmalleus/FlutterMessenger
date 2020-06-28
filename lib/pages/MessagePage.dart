@@ -9,7 +9,7 @@ class MessagePage extends StatefulWidget{
 
   MessagePage({this.database, this.receiver, this.sender, this.chatKey});
   final BaseDb database;
-  final User receiver;
+  final String receiver;
   final User sender;
   final String chatKey;
 
@@ -177,7 +177,7 @@ class _MessagePageState extends State<MessagePage>{
       bottomNavigationBar: null,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.receiver.username),
+        title: Text(widget.receiver),
         elevation: 0.0,//removes the shadow
         actions: <Widget>[
           IconButton(

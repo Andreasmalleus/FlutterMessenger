@@ -20,23 +20,11 @@ class ChatsPage extends StatefulWidget {
 }
 
 //TODO Add friends && search
-//TODO remove friends
 
 class _ChatsPageState extends State<ChatsPage> {
   List<User> users = [];
-  User sender;
   String lastMessage = "";
   User currentUser;
-  List<Chat> chats = [];
-
-  void _signOut() async{
-    try {
-      await widget.auth.signOut();
-      widget.logOutCallback();
-    } catch (e) {
-      print(e);
-    }
-  }
 
   void getCurrentUser() async{
     FirebaseUser dbUser = await widget.auth.getCurrentUser();
@@ -45,18 +33,6 @@ class _ChatsPageState extends State<ChatsPage> {
       currentUser = user;
     });
   }
-
-  void mapUsersToList() async{
-    FirebaseUser currentUser = await widget.auth.getCurrentUser();
-    List<Chat> listOfChats = await widget.database.getChats(currentUser.uid);
-    List<User> chatUsers = await widget.database.getAllUsers();
-    print(listOfChats);
-    setState(() {
-      users = chatUsers;
-      chats = listOfChats;
-    });
-  } 
-
 
   void _addFriends(String firstUser, String secondUser) async{
     widget.database.addFriends(firstUser, secondUser);
@@ -70,11 +46,9 @@ class _ChatsPageState extends State<ChatsPage> {
     widget.database.createChat(firstUser, secondUser);
   }
 
-
   @override
   void initState(){
     super.initState();
-      mapUsersToList();
       getCurrentUser();
   }
 
@@ -136,7 +110,7 @@ class _ChatsPageState extends State<ChatsPage> {
                         MaterialPageRoute(
                           builder: (context)=> MessagePage(
                             database: widget.database,
-                            receiver: users[i],
+                            receiver: chats[i].id,
                             sender: currentUser,
                             chatKey: chats[i].id
                             ))),
