@@ -81,7 +81,7 @@ class _MessagePageState extends State<MessagePage>{
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                message.time,
+                formatDateToHoursAndMinutes(message.time),
                 style: TextStyle(
                   color: Colors.black, 
                   fontWeight: FontWeight.bold, 
@@ -146,7 +146,7 @@ class _MessagePageState extends State<MessagePage>{
       isLiked: false,
       isRead: false,
       sender: sender,
-      time: getDateInHoursAndMinutes()
+      time: getCurrentDate()
     );
     if(value != "" && value != null){
       setState(() {
@@ -161,7 +161,7 @@ class _MessagePageState extends State<MessagePage>{
       getCurrentDate(),
       widget.chatKey
       );
-    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, message.time);
+    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, getCurrentDate());
     textField.clear();
   }
 

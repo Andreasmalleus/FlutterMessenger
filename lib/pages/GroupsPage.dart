@@ -4,6 +4,7 @@ import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
+import 'package:fluttermessenger/widgets/CustomDrawer.dart';
 
 import 'MessagePage.dart';
 
@@ -48,6 +49,7 @@ class _GroupsPageState extends State<GroupsPage>{
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(title:Text("GroupsPage")),
+      drawer: CustomDrawer(auth: widget.auth, logOutCallback: widget.logOutCallback),
       body: Column(
         children: <Widget>[
           Center(

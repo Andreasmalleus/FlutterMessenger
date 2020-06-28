@@ -4,6 +4,7 @@ import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
+import 'package:fluttermessenger/utils/utils.dart';
 import 'package:fluttermessenger/widgets/CustomDrawer.dart';
 import 'MessagePage.dart';
 
@@ -57,7 +58,14 @@ class _ChatsPageState extends State<ChatsPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () => {},
+            )
+        ],
         title: Text("Chats"),
+        centerTitle: true,
       ),
       drawer: CustomDrawer(auth: widget.auth, logOutCallback: widget.logOutCallback),
       body: Column(
@@ -120,7 +128,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           child: ListTile(
                           leading: Icon(Icons.android, size: 35,),
                           title: Text(chats[i].id),
-                          subtitle: Text(chats[i].lastMessage + " " + chats[i].lastMessageTime),
+                          subtitle: Text(chats[i].lastMessage + " " + formatDateToHoursAndMinutes(chats[i].lastMessageTime)),
                           trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                           ),
                           ),
