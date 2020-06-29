@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/pages/SignInUpPage.dart';
-import 'package:fluttermessenger/services/authenitaction.dart';
 
 class CustomDrawer extends StatelessWidget{
 

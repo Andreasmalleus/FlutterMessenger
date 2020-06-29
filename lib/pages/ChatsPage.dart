@@ -24,9 +24,10 @@ class ChatsPage extends StatefulWidget {
 //TODO Add friends && search
 
 class _ChatsPageState extends State<ChatsPage> {
-  List<User> users = [];
   String lastMessage = "";
   User currentUser;
+  List<Chat> temp = [];
+  String searchResult = "";
 
   void getCurrentUser() async{
     FirebaseUser dbUser = await widget.auth.getCurrentUser();
@@ -36,15 +37,15 @@ class _ChatsPageState extends State<ChatsPage> {
     });
   }
 
-  void _addFriends(String firstUser, String secondUser) async{
+  void _addFriends(String firstUser, String secondUser){
     widget.database.addFriends(firstUser, secondUser);
   }
 
-  void _removeFriends(String firstUser, String secondUser) async{
+  void _removeFriends(String firstUser, String secondUser){
     widget.database.unFriend(firstUser, secondUser);
   }
 
-  void _addChat(String firstUser, String secondUser) async{
+  void _addChat(String firstUser, String secondUser){
     widget.database.createChat(firstUser, secondUser);
   }
 
@@ -57,6 +58,7 @@ class _ChatsPageState extends State<ChatsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, //keybaord resizes widget
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
         actions: <Widget>[
@@ -75,7 +77,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 ),
               ))
             },
-            )
+            ) 
         ],
         title: Text("Chats"),
         centerTitle: true,
@@ -83,6 +85,16 @@ class _ChatsPageState extends State<ChatsPage> {
       drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
+          Container(
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black))),
+            child: TextField(
+              textAlign: TextAlign.center,
+              decoration: InputDecoration.collapsed(hintText: "Search chats here..."),
+              onChanged: (value) => setState((){
+                searchResult = value;
+              })
+            ),
+          ),
           Row(
             children: <Widget>[
               RaisedButton(
@@ -108,56 +120,59 @@ class _ChatsPageState extends State<ChatsPage> {
               if(snapshot.hasData && snapshot.data.snapshot.value != null){
                 Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
                 List<Chat> chats = List<Chat>();
+                Chat chat;
                 map.forEach((key,val) =>{
                   val["participants"].forEach((id, value) => {
                     if(id != currentUser.id){
-                      chats.add(
-                        Chat(
+                      chat =  Chat(
                           id: key,
                           lastMessage: val["lastMessage"],
                           lastMessageTime: val["lastMessageTime"],
                           participant: id
                         ),
-                      )
-                      }
-                    }),
+                        chats.add(chat)
+                    }
+                  }),
                 });
+                temp = chats;
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount:  chats.length,
                   itemBuilder: (BuildContext ctx, int i){
-                    return GestureDetector(
-                      onTap: () => Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(
-                          builder: (context)=> MessagePage(
-                            database: widget.database,
-                            receiver: chats[i].id,
-                            sender: currentUser,
-                            chatKey: chats[i].id,
-                            check: true,
-                            ))),
-                      child: Container(
-                        height: 75,
-                        child: Card(
-                          child: ListTile(
-                          leading: Icon(Icons.android, size: 35,),
-                          title: Text(chats[i].id),
-                          subtitle: Text(
-                            ((){
-                              if(chats[i].lastMessage !=  null && chats[i].lastMessageTime != null){
-                                String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
-                                return chats[i].lastMessage + " " + formattedDate;
-                              }else{
-                                return "";
-                            }
-                          }())
+                    if(chats[i].id.contains(searchResult)){
+                      return GestureDetector(
+                        onTap: () => Navigator.of(context, rootNavigator: true).push(
+                          MaterialPageRoute(
+                            builder: (context)=> MessagePage(
+                              database: widget.database,
+                              receiver: chats[i].id,
+                              sender: currentUser,
+                              chatKey: chats[i].id,
+                              check: true,
+                              ))),
+                        child: Container(
+                          height: 75,
+                          child: Card(
+                            child: ListTile(
+                            leading: Icon(Icons.android, size: 35,),
+                            title: Text(chats[i].id),
+                            subtitle: Text(
+                              ((){
+                                if(chats[i].lastMessage !=  null && chats[i].lastMessageTime != null){
+                                  String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
+                                  return chats[i].lastMessage + " " + formattedDate;
+                                }else{
+                                  return "";
+                              }
+                            }())
+                              ),
+                            trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                             ),
-                          trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
-                          ),
-                          ),
-                      )
-                    );             
-                }
+                            ),
+                        )
+                      );             
+                    }
+                  }
                 );
               }else{
                 return Container(child: Text("No data"),);

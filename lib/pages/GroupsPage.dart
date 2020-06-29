@@ -26,6 +26,7 @@ class _GroupsPageState extends State<GroupsPage>{
 
   User currentUser;
   List<User> users = [];
+  String searchResult = "";
 
   void getCurrentUser() async{
     FirebaseUser dbUser = await widget.auth.getCurrentUser();
@@ -50,8 +51,9 @@ class _GroupsPageState extends State<GroupsPage>{
 
   Widget build(BuildContext context){
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title:Text("GroupsPage"),
+        title: Text("GroupsPage"),
         centerTitle: true,
         actions: <Widget>[
           IconButton(
@@ -75,6 +77,16 @@ class _GroupsPageState extends State<GroupsPage>{
       drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
+           Container(
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black))),
+            child: TextField(
+              textAlign: TextAlign.center,
+              decoration: InputDecoration.collapsed(hintText: "Search groups here..."),
+              onChanged: (value) => setState((){
+                searchResult = value;
+              })
+            ),
+          ),
           Center(
             child: RaisedButton(
               child: Text("Create group"),
@@ -90,54 +102,56 @@ class _GroupsPageState extends State<GroupsPage>{
                 Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
                 List<Group> groups = List<Group>();
                 List<String> participants = List<String>();
+                Group group;
                 map.forEach((key, value) {
                   value["participants"].forEach((participantId, boolean){
                     participants.add(participantId);
                   });
-                  groups.add(
-                    Group(
+                  group = Group(
                       id: key,
                       lastMessage: value["lastMessage"],
                       lastMessageTime: value["lastMessageTime"],
                       participants: participants
-                    )
                   );
+                  groups.add(group);
                 });
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: groups.length,
                 itemBuilder: (BuildContext context, int i){
-                  return GestureDetector(
-                    onTap: () => Navigator.of(context, rootNavigator: true).push(
-                      MaterialPageRoute(
-                        builder: (context)=> MessagePage(
-                          database: widget.database,
-                          receiver: groups[i].id,
-                          sender: currentUser,
-                          chatKey: groups[i].id,
-                          check: false,
-                          ))),
-                    child: Container(
-                      height: 75,
-                      child: Card(
-                        child: ListTile(
-                        leading: Icon(Icons.android, size: 35,),
-                        title: Text(groups[i].id),
-                        subtitle: Text(
-                          ((){
-                            if(groups[i].lastMessage !=  null && groups[i].lastMessageTime != null){
-                              String formattedDate = formatDateToHoursAndMinutes(groups[i].lastMessageTime);
-                              return groups[i].lastMessage + " " + formattedDate;
-                            }else{
-                              return "";
-                            }
-                          }())
+                  if(groups[i].id.contains(searchResult)){
+                    return GestureDetector(
+                      onTap: () => Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (context)=> MessagePage(
+                            database: widget.database,
+                            receiver: groups[i].id,
+                            sender: currentUser,
+                            chatKey: groups[i].id,
+                            check: false,
+                            ))),
+                      child: Container(
+                        height: 75,
+                        child: Card(
+                          child: ListTile(
+                          leading: Icon(Icons.android, size: 35,),
+                          title: Text(groups[i].id),
+                          subtitle: Text(
+                            ((){
+                              if(groups[i].lastMessage !=  null && groups[i].lastMessageTime != null){
+                                String formattedDate = formatDateToHoursAndMinutes(groups[i].lastMessageTime);
+                                return groups[i].lastMessage + " " + formattedDate;
+                              }else{
+                                return "";
+                              }
+                            }())
+                            ),
+                          trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                           ),
-                        trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
-                        ),
-                        ),
-                    )
-                  );          
+                          ),
+                      )
+                    );          
+                  }
                 }
               );
               }else{
