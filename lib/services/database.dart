@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
@@ -9,37 +12,43 @@ abstract class BaseDb{
 
   DatabaseReference getChatRef();
 
-  void addUser(String userId,String email, String username, String createdAt, String imageUrl);
+  DatabaseReference getMessageRef();
+
+  Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl);
 
   Future<List> getAllUsers();
 
   Future<User> getUserObject(String id);
 
-  void addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
+  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
 
   Future<Map> getAllMessages(String key);
 
   Future<String> getLastMessage();
 
-  void addFriends(String firstUserId, String secondUserId);
+  Future<void> addFriends(String firstUserId, String secondUserId);
 
-  void unFriend(String firstUserId, String secondUserId);
+  Future<void> unFriend(String firstUserId, String secondUserId);
 
-  void updateFriends(String firstUserId, String secondUserId);
+  Future<void> updateFriends(String firstUserId, String secondUserId);
     
   Future<List> getFriendsIds(String userId);
 
   Future<List> getFriends(String userId);
 
-  void createChat(String firstUserId, String secondUserId);
+  Future<void> createChat(String firstUserId, String secondUserId);
 
   Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId);
 
   Future<List> getChats(String userId);
 
-  void updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
+  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
-  void createGroup(List<String> ids);
+  Future<void> createGroup(List<String> ids);
+
+  Future<void> uploadImage(File file, String userId);
+
+  Future<String> fetchImageUrl(String userId);
 
 }
 
@@ -49,6 +58,8 @@ class Database implements BaseDb{
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
   final DatabaseReference _groupRef = FirebaseDatabase.instance.reference().child("groups");
+  final StorageReference _storageRef = FirebaseStorage.instance.ref();
+  
 
   DatabaseReference getGroupRef(){
     return _groupRef;
@@ -58,7 +69,11 @@ class Database implements BaseDb{
     return _chatsRef;
   }
 
-  void addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
+  DatabaseReference getMessageRef(){
+    return _messageRef;
+  }
+
+  Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 
     await _userRef.child(userId).set({
       "email" : email,
       "username" : username,
@@ -101,7 +116,7 @@ class Database implements BaseDb{
     return user;
   }
 
-  void addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
+  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
     await _messageRef.child(key).push().set({
       "text" : text,
       "sender" : {
@@ -135,7 +150,7 @@ class Database implements BaseDb{
     return message;
   }
 
-  void addFriends(String firstUserId, String secondUserId)async{
+  Future<void> addFriends(String firstUserId, String secondUserId)async{
     String first = firstUserId;
     String second = secondUserId;
     for(var i= 0; i < 2; i++){
@@ -147,7 +162,7 @@ class Database implements BaseDb{
     }
   }
 
-  void unFriend(String firstUserId, String secondUserId) async{
+  Future<void> unFriend(String firstUserId, String secondUserId) async{
     String first = firstUserId;
     String second = secondUserId;
     for(var i= 0; i < 2; i++){
@@ -158,7 +173,7 @@ class Database implements BaseDb{
     print("Friend removed");
   }
 
-  void updateFriends(String firstUserId, String secondUserId)async{
+  Future<void> updateFriends(String firstUserId, String secondUserId)async{
     
   }
 
@@ -193,7 +208,7 @@ class Database implements BaseDb{
     return friends;
   }
 
-  void createChat(String firstUserId, String secondUserId) async{
+  Future<void> createChat(String firstUserId, String secondUserId) async{
     String key = _chatsRef.push().key;
     await _chatsRef.child(key).set({
       "lastMessage" : "",
@@ -248,15 +263,15 @@ class Database implements BaseDb{
     return chats;
   } 
 
-  void updateLastMessageAndTime(String key, String message, String time, bool typeCheck){
+  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck) async{
     if(typeCheck){
-      _chatsRef.child(key).update({
+      await _chatsRef.child(key).update({
         "lastMessage" : message,
         "lastMessageTime" : time
       }).catchError((error) => print("updateLastMessageAndTime: $error"));
       print("Chat updated");
     }else{
-      _groupRef.child(key).update({
+      await _groupRef.child(key).update({
         "lastMessage" : message,
         "lastMessageTime" : time
       }).catchError((error) => print("updateLastMessageAndTime: $error"));
@@ -264,9 +279,9 @@ class Database implements BaseDb{
     }
   }
 
-  void createGroup(List<String> ids){
+  Future<void> createGroup(List<String> ids) async{
     String key = _groupRef.push().key;
-    _groupRef.child(key).set({
+    await _groupRef.child(key).set({
       {
         "lastMessage" : "",
         "lastMessageTime" : "",
@@ -281,6 +296,16 @@ class Database implements BaseDb{
     print("Group created");
   }
 
+  Future<void> uploadImage(File file, String userId) async{
+    StorageUploadTask uploadTask = _storageRef.child("$userId/images/profileImage").putFile(file);
+    StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    String url = await downloadUrl.ref.getDownloadURL();
+    print("download url is $url");
+  }
 
+  Future<String> fetchImageUrl(String userId) async{
+    String url = await _storageRef.child("$userId/images/profileImage").getDownloadURL();
+    return url;
+  }
 
 }

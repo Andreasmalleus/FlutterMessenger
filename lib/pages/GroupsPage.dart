@@ -68,6 +68,7 @@ class _GroupsPageState extends State<GroupsPage>{
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
+                  user: currentUser
                 ),
               ))
             },

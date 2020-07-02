@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/userModel.dart';
@@ -9,8 +12,9 @@ class AccountPage extends StatefulWidget{
   final BaseAuth auth;
   final BaseDb database;
   final VoidCallback logOutCallback;
+  final User user;
 
-  AccountPage({this.database, this.auth, this.logOutCallback});
+  AccountPage({this.database, this.auth, this.logOutCallback, this.user});
 
   @override
   _AccountPageState createState() => _AccountPageState();
@@ -19,14 +23,20 @@ class AccountPage extends StatefulWidget{
 
 class _AccountPageState extends State<AccountPage>{
 
-  User currentUser;
+  File file;
+  String imageUrl = "https://firebasestorage.googleapis.com/v0/b/flutter-messenger-a7479.appspot.com/o/S4o5foWffcMphs5rcBO6g9esApA3%2Fimages%2FprofileImage?alt=media&token=0f859596-cb13-4020-b853-c64fb80203b5";
 
-  void getCurrentUser() async{
-    FirebaseUser dbUser = await widget.auth.getCurrentUser();
-    User user = await widget.database.getUserObject(dbUser.uid);
+  void fetchUserImage() async{
+    String url = "";
+    try{
+      url = await widget.database.fetchImageUrl(widget.user.id);
+    }catch(e){
+      print(e);
+    }
     setState(() {
-      currentUser = user;
+      imageUrl = url;
     });
+    print(imageUrl);
   }
 
   void _signOut() async {
@@ -38,15 +48,24 @@ class _AccountPageState extends State<AccountPage>{
     }
   }
 
+  void _uploadImage() async{
+    try{
+      file = await FilePicker.getFile(type: FileType.image);
+      await widget.database.uploadImage(file, widget.user.id);
+    }catch(e){
+      print(e);
+    }
+  }
+
   @override
   void initState(){
-    getCurrentUser();
+    fetchUserImage();
     super.initState();
   }
 
   Widget build(BuildContext context){
-    if(currentUser != null){
-return Scaffold(
+    if(widget.user.id != null){
+    return Scaffold(
       appBar: AppBar(
         title: Text("Account page"),
         centerTitle: true,
@@ -56,13 +75,18 @@ return Scaffold(
           Row(
             children: <Widget>[
             Container(
-              child: Icon(
-                Icons.android,
-                size: 75,
-                )
+              child: 
+                imageUrl != ""
+                ?  
+                CircleAvatar(
+                  radius: 60,
+                  backgroundImage: NetworkImage(imageUrl),
+                )                 
+                :
+                Icon(Icons.android)
               ),
             Container(
-              child: Text(currentUser.username),
+              child: Text(widget.user.username),
             )
           ],),
           Container(child: Text("Account settings"),),
@@ -71,7 +95,7 @@ return Scaffold(
               border: Border(bottom: BorderSide(color: Colors.black))
             ),
             child: TextField(
-              decoration: InputDecoration.collapsed(hintText: currentUser.username),
+              decoration: InputDecoration.collapsed(hintText: widget.user.username),
             ),
           ),
           Container(
@@ -79,7 +103,7 @@ return Scaffold(
               border: Border(bottom: BorderSide(color: Colors.black))
             ),
             child: TextField(
-              decoration: InputDecoration.collapsed(hintText: currentUser.email),
+              decoration: InputDecoration.collapsed(hintText: widget.user.email),
             ),
           ),
           Container(
@@ -91,8 +115,15 @@ return Scaffold(
               
               onPressed: () => _signOut
               ),
-          )
-
+          ),
+          Container(
+            child: RaisedButton(
+              child: Text("Upload profile image"),
+              onPressed: () => {
+                _uploadImage()
+              },
+            ),
+          ),
       ],),
     );
     }else{

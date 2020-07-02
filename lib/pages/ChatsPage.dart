@@ -74,6 +74,7 @@ class _ChatsPageState extends State<ChatsPage> {
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
+                  user: currentUser
                 ),
               ))
             },
@@ -124,13 +125,13 @@ class _ChatsPageState extends State<ChatsPage> {
                 map.forEach((key,val) =>{
                   val["participants"].forEach((id, value) => {
                     if(id != currentUser.id){
-                      chat =  Chat(
-                          id: key,
-                          lastMessage: val["lastMessage"],
-                          lastMessageTime: val["lastMessageTime"],
-                          participant: id
-                        ),
-                        chats.add(chat)
+                      chat = Chat(
+                        id: key,
+                        lastMessage: val["lastMessage"],
+                        lastMessageTime: val["lastMessageTime"],
+                        participant: id
+                      ),
+                      chats.add(chat)
                     }
                   }),
                 });
