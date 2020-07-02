@@ -105,16 +105,18 @@ class _GroupsPageState extends State<GroupsPage>{
                 List<String> participants = List<String>();
                 Group group;
                 map.forEach((key, value) {
-                  value["participants"].forEach((participantId, boolean){
-                    participants.add(participantId);
-                  });
-                  group = Group(
+                  if(value["participants"].containsKey(currentUser.id)){
+                    value["participants"].forEach((participantId, boolean){
+                      participants.add(participantId);
+                    });
+                    group = Group(
                       id: key,
                       lastMessage: value["lastMessage"],
                       lastMessageTime: value["lastMessageTime"],
                       participants: participants
-                  );
-                  groups.add(group);
+                    );
+                    groups.add(group);
+                    }
                 });
               return ListView.builder(
                 shrinkWrap: true,
@@ -139,7 +141,7 @@ class _GroupsPageState extends State<GroupsPage>{
                           title: Text(groups[i].id),
                           subtitle: Text(
                             ((){
-                              if(groups[i].lastMessage !=  null && groups[i].lastMessageTime != null){
+                              if(groups[i].lastMessage !=  "" && groups[i].lastMessageTime != ""){
                                 String formattedDate = formatDateToHoursAndMinutes(groups[i].lastMessageTime);
                                 return groups[i].lastMessage + " " + formattedDate;
                               }else{

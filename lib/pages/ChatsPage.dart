@@ -123,17 +123,19 @@ class _ChatsPageState extends State<ChatsPage> {
                 List<Chat> chats = List<Chat>();
                 Chat chat;
                 map.forEach((key,val) =>{
-                  val["participants"].forEach((id, value) => {
-                    if(id != currentUser.id){
-                      chat = Chat(
-                        id: key,
-                        lastMessage: val["lastMessage"],
-                        lastMessageTime: val["lastMessageTime"],
-                        participant: id
-                      ),
-                      chats.add(chat)
-                    }
-                  }),
+                  if(val["participants"].containsKey(currentUser.id)){
+                    val["participants"].forEach((id, value) => {
+                        if(id != currentUser.id){
+                          chat = Chat(
+                            id: key,
+                            lastMessage: val["lastMessage"],
+                            lastMessageTime: val["lastMessageTime"],
+                            participant: id
+                          ),
+                          chats.add(chat)
+                        }
+                    })
+                  }
                 });
                 temp = chats;
                 return ListView.builder(

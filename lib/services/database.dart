@@ -280,19 +280,20 @@ class Database implements BaseDb{
   }
 
   Future<void> createGroup(List<String> ids) async{
+    print(ids.toString());
     String key = _groupRef.push().key;
-    await _groupRef.child(key).set({
+    print(key);
+    await _groupRef.child(key).set(
       {
         "lastMessage" : "",
         "lastMessageTime" : "",
       }
-    });
-
-    ids.forEach((id) {
+    );
+    for(String id in ids){
       _groupRef.child(key).child("participants/$id").set(
         true
-        );
-    });
+      );
+    }
     print("Group created");
   }
 
