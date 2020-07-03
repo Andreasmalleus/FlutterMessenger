@@ -36,7 +36,6 @@ class _AccountPageState extends State<AccountPage>{
     setState(() {
       imageUrl = url;
     });
-    print(imageUrl);
   }
 
   void _signOut() async {
@@ -49,12 +48,16 @@ class _AccountPageState extends State<AccountPage>{
   }
 
   void _uploadImage() async{
+    String url = "";
     try{
       file = await FilePicker.getFile(type: FileType.image);
-      await widget.database.uploadImage(file, widget.user.id);
+      url = await widget.database.uploadImage(file, widget.user.id);
     }catch(e){
       print(e);
     }
+    setState(() {
+      imageUrl = url;
+    });
   }
 
   @override
@@ -112,7 +115,6 @@ class _AccountPageState extends State<AccountPage>{
           Container(
             child: RaisedButton(
               child: Text("Sign out", style: TextStyle(color: Colors.red),),
-              
               onPressed: () => _signOut
               ),
           ),

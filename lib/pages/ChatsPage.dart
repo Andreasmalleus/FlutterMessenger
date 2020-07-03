@@ -15,7 +15,8 @@ class ChatsPage extends StatefulWidget {
   final BaseAuth auth;
   final VoidCallback logOutCallback;
   final BaseDb database;
-  ChatsPage({this.auth, this.logOutCallback, this.database});
+  final VoidCallback toggleBottomAppBarVisibility;
+  ChatsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility});
 
   @override
   _ChatsPageState createState() => _ChatsPageState();
@@ -23,7 +24,7 @@ class ChatsPage extends StatefulWidget {
 
 //TODO Add friends && search
 
-class _ChatsPageState extends State<ChatsPage> {
+class _ChatsPageState extends State<ChatsPage>{
   String lastMessage = "";
   User currentUser;
   List<Chat> temp = [];
@@ -49,10 +50,44 @@ class _ChatsPageState extends State<ChatsPage> {
     widget.database.createChat(firstUser, secondUser);
   }
 
+  void _showSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.redAccent,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25.0),
+              topRight: Radius.circular(25.0)
+            )
+          ),
+          height: MediaQuery.of(context).size.height * 0.75,
+          child: Column( 
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text("Add Friends"),
+              RaisedButton(
+                child: Text("Close"),
+                onPressed: () => {
+                  Navigator.pop(context),
+                  widget.toggleBottomAppBarVisibility()
+                }
+              )
+            ],
+          )
+        );
+      },
+    );
+  }
+
   @override
   void initState(){
     super.initState();
-      getCurrentUser();
+    getCurrentUser();
   }
 
   @override
@@ -64,7 +99,10 @@ class _ChatsPageState extends State<ChatsPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () => {},
+            onPressed: () => {
+              _showSheet(),
+              widget.toggleBottomAppBarVisibility()
+            },
             ),
             IconButton(
             icon: Icon(Icons.android),
@@ -148,7 +186,7 @@ class _ChatsPageState extends State<ChatsPage> {
                           MaterialPageRoute(
                             builder: (context)=> MessagePage(
                               database: widget.database,
-                              receiver: chats[i].id,
+                              receiver: chats[i].participant,
                               sender: currentUser,
                               chatKey: chats[i].id,
                               check: true,
@@ -181,7 +219,7 @@ class _ChatsPageState extends State<ChatsPage> {
                 return Container(child: Text("No data"),);
               }
             },
-          )
+          ),
         ]
       ),
     );

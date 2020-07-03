@@ -15,7 +15,8 @@ class GroupsPage extends StatefulWidget{
   final BaseAuth auth;
   final VoidCallback logOutCallback;
   final BaseDb database;
-  GroupsPage({this.auth, this.logOutCallback, this.database});
+  final VoidCallback toggleBottomAppBarVisibility;
+  GroupsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility});
 
   @override
   _GroupsPageState createState() => _GroupsPageState();
@@ -40,8 +41,42 @@ class _GroupsPageState extends State<GroupsPage>{
     List<String> ids = List<String>();
     ids.add(currentUser.id);
     ids.add("randomId");
-    widget.database.createGroup(ids);
+    widget.database.createGroup(ids, "grupiNimi");
   }
+
+void _showSheet() {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: false,
+    backgroundColor: Colors.transparent,
+    builder: (BuildContext context) {
+      return Container(
+        decoration: BoxDecoration(
+          color: Colors.redAccent,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(25.0),
+            topRight: Radius.circular(25.0)
+          )
+        ),
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column( 
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("Add Friends"),
+            RaisedButton(
+              child: Text("Close"),
+              onPressed: () => {
+                Navigator.pop(context),
+                widget.toggleBottomAppBarVisibility()
+              }
+            )
+          ],
+        )
+      );
+    },
+  );
+}
 
   @override
   void initState(){
@@ -58,7 +93,10 @@ class _GroupsPageState extends State<GroupsPage>{
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () => {},
+            onPressed: () => {
+              _showSheet(),
+              widget.toggleBottomAppBarVisibility()
+            },
             ),
             IconButton(
             icon: Icon(Icons.android),
@@ -111,6 +149,7 @@ class _GroupsPageState extends State<GroupsPage>{
                     });
                     group = Group(
                       id: key,
+                      name: value["name"],
                       lastMessage: value["lastMessage"],
                       lastMessageTime: value["lastMessageTime"],
                       participants: participants
@@ -128,7 +167,7 @@ class _GroupsPageState extends State<GroupsPage>{
                         MaterialPageRoute(
                           builder: (context)=> MessagePage(
                             database: widget.database,
-                            receiver: groups[i].id,
+                            receiver: groups[i].name,
                             sender: currentUser,
                             chatKey: groups[i].id,
                             check: false,
@@ -138,7 +177,7 @@ class _GroupsPageState extends State<GroupsPage>{
                         child: Card(
                           child: ListTile(
                           leading: Icon(Icons.android, size: 35,),
-                          title: Text(groups[i].id),
+                          title: Text(groups[i].name),
                           subtitle: Text(
                             ((){
                               if(groups[i].lastMessage !=  "" && groups[i].lastMessageTime != ""){
