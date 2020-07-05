@@ -2,17 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/pages/UserPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
 class MessagePage extends StatefulWidget{
 
-  MessagePage({this.database, this.receiver, this.sender, this.chatKey, this.check});
   final BaseDb database;
   final String receiver;
   final User sender;
   final String chatKey;
   final bool check;
+  
+  MessagePage({this.database, this.receiver, this.sender, this.chatKey, this.check});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -178,7 +180,15 @@ class _MessagePageState extends State<MessagePage>{
       bottomNavigationBar: null,
       appBar: AppBar(
         centerTitle: true,
-        title: Text(widget.receiver),
+        title: GestureDetector(
+          child: Text(widget.receiver),
+          onTap: () => Navigator.push(context, (MaterialPageRoute(builder: (context) => UserPage(
+            userId: widget.receiver,
+            database: widget.database,
+            currentUser: widget.sender,
+            chatKey: widget.chatKey,
+          )))),
+        ),
         elevation: 0.0,//removes the shadow
         actions: <Widget>[
           IconButton(

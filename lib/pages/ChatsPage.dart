@@ -115,12 +115,6 @@ class _ChatsPageState extends State<ChatsPage>{
                   }
                 ),
                 RaisedButton(
-                  onPressed: () => {
-                    _removeFriend("aa")
-                  },
-                  child: Text("Unfriend"),
-                ),
-                RaisedButton(
                   child: Text("Close"),
                   onPressed: () => {
                     Navigator.pop(context),
@@ -193,6 +187,7 @@ class _ChatsPageState extends State<ChatsPage>{
                 Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
                 List<Chat> chats = List<Chat>();
                 Chat chat;
+
                 map.forEach((key,val) =>{
                   if(val["participants"].containsKey(widget.currentUser.id)){
                     val["participants"].forEach((id, value) => {
@@ -204,7 +199,7 @@ class _ChatsPageState extends State<ChatsPage>{
                             participant: id
                           ),
                           chats.add(chat)
-                        }
+                        },
                     })
                   }
                 });
@@ -212,44 +207,59 @@ class _ChatsPageState extends State<ChatsPage>{
                   shrinkWrap: true,
                   itemCount:  chats.length,
                   itemBuilder: (BuildContext ctx, int i){
-                    if(chats[i].id.contains(searchResult)){
-                      return GestureDetector(
-                        onTap: () => Navigator.of(context, rootNavigator: true).push(
-                          MaterialPageRoute(
-                            builder: (context)=> MessagePage(
-                              database: widget.database,
-                              receiver: chats[i].participant,
-                              sender: widget.currentUser,
-                              chatKey: chats[i].id,
-                              check: true,
-                              ))),
-                        child: Container(
-                          height: 75,
-                          child: Card(
-                            child: ListTile(
-                              leading: Icon(Icons.android, size: 35,),
-                              title: Text(chats[i].id),
-                              subtitle: Text(
-                                ((){
-                                  if(chats[i].lastMessage != "" && chats[i].lastMessageTime != ""){
-                                    String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
-                                    return chats[i].lastMessage + " " + formattedDate;
-                                  }else{
-                                    return "";
-                                }
-                              }())
+                    return FutureBuilder(
+                      future: widget.database.getUserObject(chats[i].participant),
+                      builder: (BuildContext ctx, AsyncSnapshot snapshot){
+                        if(snapshot.hasData && snapshot.data != null){
+                          User user = snapshot.data;
+                          if(user.username.contains(searchResult)){
+                            return GestureDetector(
+                              onTap: () => Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                  builder: (context)=> MessagePage(
+                                    database: widget.database,
+                                    receiver: user.id,
+                                    sender: widget.currentUser,
+                                    chatKey: chats[i].id,
+                                    check: true,
+                                    ))),
+                              child: Container(
+                                height: 75,
+                                child: Card(
+                                  child: ListTile(
+                                    leading: user.imageUrl != "" ? 
+                                    CircleAvatar(
+                                      backgroundImage: NetworkImage(user.imageUrl),
+                                    )
+                                    :
+                                    Icon(Icons.android, size: 35,),
+                                    title: Text(user.username),
+                                    subtitle: Text(
+                                      ((){
+                                        if(chats[i].lastMessage != "" && chats[i].lastMessageTime != ""){
+                                          String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
+                                          return chats[i].lastMessage + " " + formattedDate;
+                                        }else{
+                                          return "";
+                                      }
+                                    }())
+                                      ),
+                                    trailing: IconButton(
+                                      icon: Icon(
+                                        Icons.more_vert
+                                      ), 
+                                      onPressed: () =>{ }
+                                    ),
+                                  ),
                                 ),
-                              trailing: IconButton(
-                                icon: Icon(
-                                  Icons.more_vert
-                                ), 
-                                onPressed: () =>{ }
-                              ),
-                            ),
-                          ),
-                        )
-                      );             
-                    }
+                              )
+                            );             
+                          }
+                        }else{
+                          return Container(child: Text("No data"),);
+                        }
+                      }
+                    );
                   }
                 );
               }else{

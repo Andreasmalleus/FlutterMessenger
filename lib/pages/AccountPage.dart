@@ -23,19 +23,7 @@ class AccountPage extends StatefulWidget{
 class _AccountPageState extends State<AccountPage>{
 
   File file;
-  String imageUrl = "https://firebasestorage.googleapis.com/v0/b/flutter-messenger-a7479.appspot.com/o/S4o5foWffcMphs5rcBO6g9esApA3%2Fimages%2FprofileImage?alt=media&token=0f859596-cb13-4020-b853-c64fb80203b5";
-
-  void fetchUserImage() async{
-    String url = "";
-    try{
-      url = await widget.database.fetchImageUrl(widget.user.id);
-    }catch(e){
-      print(e);
-    }
-    setState(() {
-      imageUrl = url;
-    });
-  }
+  String imageUrl = "";
 
   void _signOut() async {
     try{
@@ -50,19 +38,20 @@ class _AccountPageState extends State<AccountPage>{
     String url = "";
     try{
       file = await FilePicker.getFile(type: FileType.image);
-      url = await widget.database.uploadImage(file, widget.user.id);
+      url = await widget.database.uploadImageToStorage(file, widget.user.id);
+      widget.database.uploadImageToDataBase(url, widget.user.id);
     }catch(e){
       print(e);
     }
     setState(() {
-      imageUrl = url;
+       imageUrl = url;
     });
   }
 
   @override
   void initState(){
-    fetchUserImage();
     super.initState();
+    imageUrl = widget.user.imageUrl;
   }
 
   Widget build(BuildContext context){

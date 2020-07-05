@@ -43,6 +43,8 @@ abstract class BaseDb{
 
   Future<List> getChats(String userId);
 
+  Future<void> removeChat(String userId);
+
   Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
   Future<void> createGroup(List<String> ids,String groupName);
@@ -51,9 +53,11 @@ abstract class BaseDb{
   
   Future<List> getGroups(String userId);
 
-  Future<String> uploadImage(File file, String userId);
+  Future<String> uploadImageToStorage(File file, String userId);
 
   Future<String> fetchImageUrl(String userId);
+
+  Future<void> uploadImageToDataBase(String url, String userId);
 
 }
 
@@ -112,6 +116,7 @@ class Database implements BaseDb{
       snapshot.value.forEach((key,value)=> {
         user = User(
           id: key,
+          imageUrl: value["imageUrl"],
           createdAt: value["createdAt"],
           username: value["username"],
           email: value["email"]
@@ -270,6 +275,11 @@ class Database implements BaseDb{
     return chats;
   } 
 
+  Future<void> removeChat(String chatId) async{
+    await _chatsRef.child(chatId).remove().catchError((e) => print("removeChat error: $e"));
+    print("Chat removed");
+  } 
+
   Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck) async{
     if(typeCheck){
       await _chatsRef.child(key).update({
@@ -343,7 +353,7 @@ class Database implements BaseDb{
     return groups;
   } 
 
-  Future<String> uploadImage(File file, String userId) async{
+  Future<String> uploadImageToStorage(File file, String userId) async{
     StorageUploadTask uploadTask = _storageRef.child("users/$userId/images/profileImage").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
@@ -354,6 +364,12 @@ class Database implements BaseDb{
   Future<String> fetchImageUrl(String userId) async{
     String url = await _storageRef.child("users/$userId/images/profileImage").getDownloadURL();
     return url;
+  }
+
+  Future<void> uploadImageToDataBase(String url, String userId) async {
+    await _userRef.child(userId).update({
+      "imageUrl" : url
+    }).catchError((e) => print("uploadImageToDataBase: $e"));
   }
 
 }
