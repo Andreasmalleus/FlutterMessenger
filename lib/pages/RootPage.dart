@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/SignInUpPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
@@ -25,6 +26,7 @@ class RootPage extends StatefulWidget{
 class _RootPageState extends State<RootPage>{
   AuthStatus status = AuthStatus.NOT_DETERMINED;
   String _userId = "";
+  User currentUser;
 
   void loginCallBack(){
     widget.auth.getCurrentUser().then((user) => {
@@ -45,12 +47,15 @@ class _RootPageState extends State<RootPage>{
   @override
   void initState(){
     widget.auth.getCurrentUser().then((user) => {
-      setState((){
-        if(user != null){
-          _userId = user.uid;
-        }
-        status = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
-      })
+      widget.database.getUserObject(user.uid).then((userObject) => {
+        setState((){
+          if(user != null){
+            _userId = user.uid;
+          }
+          status = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+          currentUser = userObject;
+        })
+      }),
     });
     super.initState();
   }
@@ -73,6 +78,7 @@ class _RootPageState extends State<RootPage>{
             auth: widget.auth,
             logOutCallback : logOutCallback,
             database: widget.database,
+            currentUser : currentUser
           );
         }else{
           return waitingScreen();

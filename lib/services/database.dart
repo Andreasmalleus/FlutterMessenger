@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
+import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 
 abstract class BaseDb{
@@ -45,6 +46,10 @@ abstract class BaseDb{
   Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
   Future<void> createGroup(List<String> ids,String groupName);
+
+  Future<List> getGroupsIdsWhereCurrentUserIs(String currentUserId);
+  
+  Future<List> getGroups(String userId);
 
   Future<String> uploadImage(File file, String userId);
 
@@ -181,7 +186,9 @@ class Database implements BaseDb{
     List<String> ids =List<String>();
     await _friendsRef.orderByKey().equalTo(userId).once().then((DataSnapshot snapshot) => {
       snapshot.value.forEach((key,value) => {
-        value.forEach((key,value) => ids.add(key))
+        value.forEach((id,value) => {
+            ids.add(id),
+        }),
       }),
     });
     return ids;
@@ -195,7 +202,7 @@ class Database implements BaseDb{
       await _userRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
         snapshot.value.forEach((key,value) =>{
           user = User(
-            id: value["id"],
+            id: key,
             username: value["username"],
             email: value["email"],
             createdAt: value["createdAt"],
@@ -297,6 +304,44 @@ class Database implements BaseDb{
     }
     print("Group created");
   }
+
+    Future<List> getGroupsIdsWhereCurrentUserIs(String currentUserId) async{
+    List<String> groupIds = List<String>();
+    await _groupRef.once().then((DataSnapshot snapshot) => {
+      snapshot.value.forEach((id, value) => {
+        value["participants"].forEach((key, value) => {
+            print("found $id"),
+            groupIds.add(id)
+        })
+      })
+    });
+    return groupIds;
+  }
+
+  Future<List> getGroups(String userId) async{
+    List<String> groupIds = await getGroupsIdsWhereCurrentUserIs(userId);
+    List<String> participantIds = List<String>();
+    List<Group> groups = List<Group>();
+    Group group;
+    for(var id in groupIds){
+        await _chatsRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
+        snapshot.value.forEach((key,val) =>{
+          val["participants"].forEach((id, value) => {
+            participantIds.add(id),
+              group = Group(
+                id: key,
+                lastMessage: val["lastMessage"],
+                lastMessageTime: val["lastMessageTime"],
+                participants: participantIds
+            ),
+          }),
+          groups.add(group)
+        })
+      });
+    }
+    print("All chats received");
+    return groups;
+  } 
 
   Future<String> uploadImage(File file, String userId) async{
     StorageUploadTask uploadTask = _storageRef.child("users/$userId/images/profileImage").putFile(file);

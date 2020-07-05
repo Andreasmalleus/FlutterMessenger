@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
@@ -16,7 +15,8 @@ class GroupsPage extends StatefulWidget{
   final VoidCallback logOutCallback;
   final BaseDb database;
   final VoidCallback toggleBottomAppBarVisibility;
-  GroupsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility});
+  final User currentUser;
+  GroupsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUser});
 
   @override
   _GroupsPageState createState() => _GroupsPageState();
@@ -25,63 +25,126 @@ class GroupsPage extends StatefulWidget{
 
 class _GroupsPageState extends State<GroupsPage>{
 
-  User currentUser;
   List<User> users = [];
   String searchResult = "";
+  String userSearchResult = "";
+  List<String> groupParticipants = List<String>();
+  String groupName = "";
 
-  void getCurrentUser() async{
-    FirebaseUser dbUser = await widget.auth.getCurrentUser();
-    User user = await widget.database.getUserObject(dbUser.uid);
-    setState(() {
-      currentUser = user;
+
+  void _createGroup() async{
+    groupParticipants.add(widget.currentUser.id);
+    widget.database.createGroup(groupParticipants, groupName);
+  }
+
+  void getAllUsers() async{
+    List<User> dbUsers = await widget.database.getAllUsers();
+    dbUsers.removeWhere((user) => user.id == widget.currentUser.id);
+    setState((){
+      users = dbUsers;
     });
   }
 
-  void _createGroup() async{
-    List<String> ids = List<String>();
-    ids.add(currentUser.id);
-    ids.add("randomId");
-    widget.database.createGroup(ids, "grupiNimi");
+  void _showSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(25.0),
+                  topRight: Radius.circular(25.0)
+                )
+              ),
+              height: MediaQuery.of(context).size.height * 0.75,
+              child: Column( 
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text("Create a group"),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    child: TextField(
+                      onChanged: (value) => setModalState((){
+                        userSearchResult = value;
+                      }),
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: "Search users"
+                      ),
+                    ),
+                  ),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: users.length,
+                    itemBuilder: (BuildContext context, int i){
+                      if(users[i].username.contains(userSearchResult) && !groupParticipants.contains(users[i].id) && userSearchResult != ""){
+                        return Container(
+                          //TODO clicking on card navigates to user Page
+                          child: Card(
+                            child: ListTile(
+                              leading: Icon(Icons.android),
+                              title: Text(users[i].username),
+                              trailing: IconButton(icon: Icon(Icons.add_box), onPressed: () => setModalState((){
+                                groupParticipants.add(users[i].id);
+                              })),
+                            ),
+                          ),
+                        );
+                     }else{
+                       return Container(
+                         width: 0,
+                         height: 0,
+                       );
+                     }
+                    }
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.35,
+                    child: TextField(
+                      onChanged: (value) => setModalState((){
+                        groupName = value;
+                        }),
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: "Group name"
+                      ),
+                    ),
+                  ),
+                  RaisedButton(
+                    child: Text("Create a group"),
+                    onPressed: () => {
+                      _createGroup()
+                    },
+                  ),
+                  RaisedButton(
+                    child: Text("Close"),
+                    onPressed: () => {
+                      Navigator.pop(context),
+                      setModalState((){
+                        groupParticipants.clear();
+                      }),
+                      widget.toggleBottomAppBarVisibility()
+                    }
+                  )
+                ],
+              )
+            );
+          }
+        );
+      },
+    );
   }
-
-void _showSheet() {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    isDismissible: false,
-    backgroundColor: Colors.transparent,
-    builder: (BuildContext context) {
-      return Container(
-        decoration: BoxDecoration(
-          color: Colors.redAccent,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25.0),
-            topRight: Radius.circular(25.0)
-          )
-        ),
-        height: MediaQuery.of(context).size.height * 0.75,
-        child: Column( 
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text("Add Friends"),
-            RaisedButton(
-              child: Text("Close"),
-              onPressed: () => {
-                Navigator.pop(context),
-                widget.toggleBottomAppBarVisibility()
-              }
-            )
-          ],
-        )
-      );
-    },
-  );
-}
 
   @override
   void initState(){
+    getAllUsers();
     super.initState();
-      getCurrentUser();
   }
 
   Widget build(BuildContext context){
@@ -106,13 +169,13 @@ void _showSheet() {
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
-                  user: currentUser
+                  user: widget.currentUser
                 ),
               ))
             },
             )
         ],
-        ),
+      ),
       drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
@@ -126,14 +189,6 @@ void _showSheet() {
               })
             ),
           ),
-          Center(
-            child: RaisedButton(
-              child: Text("Create group"),
-              onPressed: () => {
-                _createGroup()
-              },
-            ),
-          ),
           StreamBuilder(
             stream: widget.database.getGroupRef().onValue,
             builder: (context, snapshot){
@@ -143,7 +198,7 @@ void _showSheet() {
                 List<String> participants = List<String>();
                 Group group;
                 map.forEach((key, value) {
-                  if(value["participants"].containsKey(currentUser.id)){
+                  if(value["participants"].containsKey(widget.currentUser.id)){
                     value["participants"].forEach((participantId, boolean){
                       participants.add(participantId);
                     });
@@ -168,7 +223,7 @@ void _showSheet() {
                           builder: (context)=> MessagePage(
                             database: widget.database,
                             receiver: groups[i].name,
-                            sender: currentUser,
+                            sender: widget.currentUser,
                             chatKey: groups[i].id,
                             check: false,
                             ))),

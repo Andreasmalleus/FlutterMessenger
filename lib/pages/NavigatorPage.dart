@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/GroupsPage.dart';
 import 'package:fluttermessenger/pages/ChatsPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
@@ -9,7 +10,8 @@ class NavigatorPage extends StatefulWidget{
   final BaseAuth auth;
   final VoidCallback logOutCallback;
   final BaseDb database;
-  NavigatorPage({this.auth, this.logOutCallback, this.database});
+  final User currentUser;
+  NavigatorPage({this.auth, this.logOutCallback, this.database, this.currentUser});
 
   @override
   _NavigatorPageState createState() => _NavigatorPageState();
@@ -47,6 +49,7 @@ class _NavigatorPageState extends State<NavigatorPage>{
                 database: widget.database,
                 logOutCallback: widget.logOutCallback,
                 toggleBottomAppBarVisibility: toggleBottomAppBarVisibility,
+                currentUser: widget.currentUser
               )
             ),
           ),
@@ -61,6 +64,7 @@ class _NavigatorPageState extends State<NavigatorPage>{
                 database: widget.database,
                 logOutCallback: widget.logOutCallback,
                 toggleBottomAppBarVisibility: toggleBottomAppBarVisibility,
+                currentUser: widget.currentUser
               )),
           ),
         ),

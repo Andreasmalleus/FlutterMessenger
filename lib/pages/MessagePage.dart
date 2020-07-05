@@ -197,16 +197,23 @@ class _MessagePageState extends State<MessagePage>{
                 alignment: FractionalOffset.bottomCenter,
                 child: Container(
                   margin: EdgeInsets.only(top: 5.0),
-                  child: ListView.builder(
-                    reverse: true,
-                    padding: EdgeInsets.only(top: 15.0),
-                    shrinkWrap: true,
-                    itemCount: messages.length,
-                    itemBuilder: (BuildContext context, int i){
-                      final Message message = messages[i];
-                      final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
-                      return _buildMessage(message, isMe);
-                    }),
+                  child: ((){
+                    if(messages.isEmpty){
+                      return Container(child: Text("Add your first message"),);
+                    }else{
+                    return ListView.builder(
+                      reverse: true,
+                      padding: EdgeInsets.only(top: 15.0),
+                      shrinkWrap: true,
+                      itemCount: messages.length,
+                      itemBuilder: (BuildContext context, int i){
+                        final Message message = messages[i];
+                        final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
+                        return _buildMessage(message, isMe);
+                      }
+                    );
+                    }
+                  }())
                 ),
               ),
             ),
