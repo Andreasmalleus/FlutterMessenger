@@ -94,6 +94,7 @@ class _ChatsPageState extends State<ChatsPage>{
                   shrinkWrap: true,
                   itemCount: users.length,
                   itemBuilder: (BuildContext context, int i){
+                    //TODO needs some fixing
                     if(users[i].username.contains(userSearchResult) && userSearchResult != ""){
                       return Container(
                         //TODO clicking on card navigates to user Page
@@ -187,7 +188,6 @@ class _ChatsPageState extends State<ChatsPage>{
                 Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
                 List<Chat> chats = List<Chat>();
                 Chat chat;
-
                 map.forEach((key,val) =>{
                   if(val["participants"].containsKey(widget.currentUser.id)){
                     val["participants"].forEach((id, value) => {
@@ -218,10 +218,10 @@ class _ChatsPageState extends State<ChatsPage>{
                                 MaterialPageRoute(
                                   builder: (context)=> MessagePage(
                                     database: widget.database,
-                                    receiver: user.id,
+                                    user: user,
                                     sender: widget.currentUser,
-                                    chatKey: chats[i].id,
-                                    check: true,
+                                    typeKey: chats[i].id,
+                                    isChat: true,
                                     ))),
                               child: Container(
                                 height: 75,
@@ -256,14 +256,20 @@ class _ChatsPageState extends State<ChatsPage>{
                             );             
                           }
                         }else{
-                          return Container(child: Text("No data"),);
+                          return Container(
+                            width: 0,
+                            height: 0,
+                          );
                         }
                       }
                     );
                   }
                 );
               }else{
-                return Container(child: Text("No data"),);
+                return Container(
+                  width: 0,
+                  height: 0,
+                );
               }
             },
           ),

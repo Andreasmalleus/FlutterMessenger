@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/UserPage.dart';
@@ -9,12 +10,13 @@ import 'package:fluttermessenger/utils/utils.dart';
 class MessagePage extends StatefulWidget{
 
   final BaseDb database;
-  final String receiver;
+  final User user;
+  final Group group;
   final User sender;
-  final String chatKey;
-  final bool check;
+  final String typeKey;
+  final bool isChat;
   
-  MessagePage({this.database, this.receiver, this.sender, this.chatKey, this.check});
+  MessagePage({this.database, this.user, this.group, this.sender, this.typeKey, this.isChat});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -24,7 +26,7 @@ class _MessagePageState extends State<MessagePage>{
   List<Message> messages = [];
 
   void mapMessagesToList() async{
-    Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.chatKey);
+    Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.typeKey);
     if(dbMessages != null){
       dbMessages.forEach((key, value) {
         User sender = User(
@@ -162,9 +164,9 @@ class _MessagePageState extends State<MessagePage>{
       message.isLiked,
       message.isRead,
       getCurrentDate(),
-      widget.chatKey
+      widget.typeKey
       );
-    widget.database.updateLastMessageAndTime(widget.chatKey, message.text, getCurrentDate(), widget.check);
+    widget.database.updateLastMessageAndTime(widget.typeKey, message.text, getCurrentDate(), widget.isChat);
     textField.clear();
   }
 
@@ -181,12 +183,12 @@ class _MessagePageState extends State<MessagePage>{
       appBar: AppBar(
         centerTitle: true,
         title: GestureDetector(
-          child: Text(widget.receiver),
+          child: Text(widget.isChat ? widget.user.username : widget.group.name),
           onTap: () => Navigator.push(context, (MaterialPageRoute(builder: (context) => UserPage(
-            userId: widget.receiver,
+            userId: widget.user.id,
             database: widget.database,
             currentUser: widget.sender,
-            chatKey: widget.chatKey,
+            chatKey: widget.typeKey,
           )))),
         ),
         elevation: 0.0,//removes the shadow

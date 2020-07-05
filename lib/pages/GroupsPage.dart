@@ -222,10 +222,10 @@ class _GroupsPageState extends State<GroupsPage>{
                         MaterialPageRoute(
                           builder: (context)=> MessagePage(
                             database: widget.database,
-                            receiver: groups[i].id,
+                            group: groups[i],
                             sender: widget.currentUser,
-                            chatKey: groups[i].id,
-                            check: false,
+                            typeKey: groups[i].id,
+                            isChat: false,
                             ))),
                       child: Container(
                         height: 75,

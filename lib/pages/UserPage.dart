@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/database.dart';
 
+//TODO create a page that fits for both groups and chats
+
 class UserPage extends StatefulWidget{
 
   final String userId;
