@@ -207,6 +207,7 @@ class _GroupsPageState extends State<GroupsPage>{
                       name: value["name"],
                       lastMessage: value["lastMessage"],
                       lastMessageTime: value["lastMessageTime"],
+                      imageUrl: value["imageUrl"],
                       participants: participants
                     );
                     groups.add(group);

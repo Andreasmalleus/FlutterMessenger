@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/utils/utils.dart';
 
 abstract class BaseDb{
 
@@ -305,6 +306,8 @@ class Database implements BaseDb{
         "name" : name,
         "lastMessage" : "",
         "lastMessageTime" : "",
+        "imageUrl" : "",
+        "createdAt" : getCurrentDate(),
       }
     );
     for(String id in ids){

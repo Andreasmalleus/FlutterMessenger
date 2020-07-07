@@ -58,8 +58,8 @@ class _AccountPageState extends State<AccountPage>{
     if(widget.user.id != null){
     return Scaffold(
       appBar: AppBar(
-        title: Text("Account page"),
-        centerTitle: true,
+        title: Text(widget.user.username),
+        centerTitle: true, 
       ),
       body: Column(
         children: <Widget>[
@@ -74,7 +74,7 @@ class _AccountPageState extends State<AccountPage>{
                   backgroundImage: NetworkImage(imageUrl),
                 )                 
                 :
-                Icon(Icons.android)
+                Icon(Icons.android, size: 30,)
               ),
             Container(
               child: Text(widget.user.username),

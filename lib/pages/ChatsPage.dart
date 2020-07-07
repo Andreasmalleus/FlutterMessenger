@@ -47,10 +47,6 @@ class _ChatsPageState extends State<ChatsPage>{
     widget.database.addFriends(widget.currentUser.id, userId);
   }
 
-  void _removeFriend(String userId){
-    widget.database.unFriend(widget.currentUser.id, userId);
-  }
-
   void _addChat(String userId){
     widget.database.createChat(widget.currentUser.id, userId);
   }
@@ -97,7 +93,6 @@ class _ChatsPageState extends State<ChatsPage>{
                     //TODO needs some fixing
                     if(users[i].username.contains(userSearchResult) && userSearchResult != ""){
                       return Container(
-                        //TODO clicking on card navigates to user Page
                         child: Card(
                           child: ListTile(
                             leading: Icon(Icons.android),
@@ -111,6 +106,11 @@ class _ChatsPageState extends State<ChatsPage>{
                             },),
                           ),
                         ),
+                      );
+                    }else{
+                      return Container(
+                        width: 0,
+                        height: 0,
                       );
                     }
                   }

@@ -3,6 +3,7 @@ class Group{
   String name;
   String lastMessage;
   String lastMessageTime;
+  String imageUrl;
   List<String> participants;
 
   Group({
@@ -10,6 +11,7 @@ class Group{
     this.name,
     this.lastMessage,
     this.lastMessageTime,
+    this.imageUrl,
     this.participants,
   });
 }

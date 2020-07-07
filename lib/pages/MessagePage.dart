@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/UserPage.dart';
+import 'package:fluttermessenger/pages/UserGroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
@@ -184,12 +184,24 @@ class _MessagePageState extends State<MessagePage>{
         centerTitle: true,
         title: GestureDetector(
           child: Text(widget.isChat ? widget.user.username : widget.group.name),
-          onTap: () => Navigator.push(context, (MaterialPageRoute(builder: (context) => UserPage(
-            userId: widget.user.id,
-            database: widget.database,
-            currentUser: widget.sender,
-            chatKey: widget.typeKey,
-          )))),
+          onTap: () => {
+            widget.isChat ? 
+              Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
+              user: widget.user,
+              database: widget.database,
+              currentUser: widget.sender,
+              typeKey: widget.typeKey,
+              isChat: true,
+              ))))
+            :
+              Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
+              group: widget.group,
+              database: widget.database,
+              currentUser: widget.sender,
+              typeKey: widget.typeKey,
+              isChat: false,
+              ))))
+          },
         ),
         elevation: 0.0,//removes the shadow
         actions: <Widget>[
