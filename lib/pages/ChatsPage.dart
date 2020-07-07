@@ -15,8 +15,8 @@ class ChatsPage extends StatefulWidget {
   final VoidCallback logOutCallback;
   final BaseDb database;
   final VoidCallback toggleBottomAppBarVisibility;
-  final User currentUser;
-  ChatsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUser});
+  final String currentUserId;
+  ChatsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUserId});
 
   @override
   _ChatsPageState createState() => _ChatsPageState();
@@ -30,25 +30,23 @@ class _ChatsPageState extends State<ChatsPage>{
   List<User> friends = List<User>();
 
   void getAllUsers() async{
-    List<User> dbFriends = await widget.database.getFriends(widget.currentUser.id);
+    List<User> dbFriends = await widget.database.getFriends(widget.currentUserId);
     List<User> dbUsers = await widget.database.getAllUsers();
     for(User friend in dbFriends){
       dbUsers.removeWhere((user) => user.id == friend.id);
-      print(friend.id);
-
     }
-    dbUsers.removeWhere((user) => user.id == widget.currentUser.id);
+    dbUsers.removeWhere((user) => user.id == widget.currentUserId);
     setState((){
       users = dbUsers;
     });
   }
 
   void _addFriends(String userId){
-    widget.database.addFriends(widget.currentUser.id, userId);
+    widget.database.addFriends(widget.currentUserId, userId);
   }
 
   void _addChat(String userId){
-    widget.database.createChat(widget.currentUser.id, userId);
+    widget.database.createChat(widget.currentUserId, userId);
   }
 
   void _showSheet() {
@@ -135,6 +133,7 @@ class _ChatsPageState extends State<ChatsPage>{
   void initState(){
     super.initState();
     getAllUsers();
+    print(widget.currentUserId);
   }
 
   @override
@@ -159,7 +158,7 @@ class _ChatsPageState extends State<ChatsPage>{
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
-                  user: widget.currentUser
+                  userId: widget.currentUserId
                 ),
               ))
             },
@@ -189,9 +188,9 @@ class _ChatsPageState extends State<ChatsPage>{
                 List<Chat> chats = List<Chat>();
                 Chat chat;
                 map.forEach((key,val) =>{
-                  if(val["participants"].containsKey(widget.currentUser.id)){
+                  if(val["participants"].containsKey(widget.currentUserId)){
                     val["participants"].forEach((id, value) => {
-                        if(id != widget.currentUser.id){
+                        if(id != widget.currentUserId){
                           chat = Chat(
                             id: key,
                             lastMessage: val["lastMessage"],
@@ -207,7 +206,7 @@ class _ChatsPageState extends State<ChatsPage>{
                   shrinkWrap: true,
                   itemCount:  chats.length,
                   itemBuilder: (BuildContext ctx, int i){
-                    return FutureBuilder(
+                    return FutureBuilder<User>(
                       future: widget.database.getUserObject(chats[i].participant),
                       builder: (BuildContext ctx, AsyncSnapshot snapshot){
                         if(snapshot.hasData && snapshot.data != null){
@@ -219,7 +218,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                   builder: (context)=> MessagePage(
                                     database: widget.database,
                                     user: user,
-                                    sender: widget.currentUser,
+                                    senderId: widget.currentUserId,
                                     typeKey: chats[i].id,
                                     isChat: true,
                                     ))),

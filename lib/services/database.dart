@@ -16,6 +16,8 @@ abstract class BaseDb{
 
   DatabaseReference getMessageRef();
 
+  DatabaseReference getUserRef();
+
   Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl);
 
   Future<List> getAllUsers();
@@ -81,6 +83,10 @@ class Database implements BaseDb{
 
   DatabaseReference getMessageRef(){
     return _messageRef;
+  }
+
+  DatabaseReference getUserRef(){
+    return _userRef;
   }
 
   Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl) async{ 

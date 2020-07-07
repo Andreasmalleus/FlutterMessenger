@@ -15,8 +15,8 @@ class GroupsPage extends StatefulWidget{
   final VoidCallback logOutCallback;
   final BaseDb database;
   final VoidCallback toggleBottomAppBarVisibility;
-  final User currentUser;
-  GroupsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUser});
+  final String currentUserId;
+  GroupsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUserId});
 
   @override
   _GroupsPageState createState() => _GroupsPageState();
@@ -33,13 +33,13 @@ class _GroupsPageState extends State<GroupsPage>{
 
 
   void _createGroup() async{
-    groupParticipants.add(widget.currentUser.id);
+    groupParticipants.add(widget.currentUserId);
     widget.database.createGroup(groupParticipants, groupName);
   }
 
   void getAllUsers() async{
     List<User> dbUsers = await widget.database.getAllUsers();
-    dbUsers.removeWhere((user) => user.id == widget.currentUser.id);
+    dbUsers.removeWhere((user) => user.id == widget.currentUserId);
     setState((){
       users = dbUsers;
     });
@@ -169,7 +169,7 @@ class _GroupsPageState extends State<GroupsPage>{
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
-                  user: widget.currentUser
+                  userId: widget.currentUserId
                 ),
               ))
             },
@@ -198,7 +198,7 @@ class _GroupsPageState extends State<GroupsPage>{
                 List<String> participants = List<String>();
                 Group group;
                 map.forEach((key, value) {
-                  if(value["participants"].containsKey(widget.currentUser.id)){
+                  if(value["participants"].containsKey(widget.currentUserId)){
                     value["participants"].forEach((participantId, boolean){
                       participants.add(participantId);
                     });
@@ -224,7 +224,7 @@ class _GroupsPageState extends State<GroupsPage>{
                           builder: (context)=> MessagePage(
                             database: widget.database,
                             group: groups[i],
-                            sender: widget.currentUser,
+                            senderId: widget.currentUserId,
                             typeKey: groups[i].id,
                             isChat: false,
                             ))),

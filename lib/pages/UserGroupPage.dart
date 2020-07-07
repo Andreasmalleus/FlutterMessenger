@@ -11,12 +11,12 @@ class UserGroupPage extends StatefulWidget{
   final User user;
   final Group group;
   final BaseDb database;
-  final User currentUser;
+  final String currentUserId;
   final String typeKey;
   final bool isChat;
   
 
-  UserGroupPage({this.user, this.database,this.currentUser, this.typeKey, this.isChat, this.group});
+  UserGroupPage({this.user, this.database,this.currentUserId, this.typeKey, this.isChat, this.group});
 
   @override
   _UserGroupPageState createState() => _UserGroupPageState();
@@ -26,7 +26,7 @@ class UserGroupPage extends StatefulWidget{
 class _UserGroupPageState extends State<UserGroupPage>{
 
   void _unfriend() async{
-    await widget.database.unFriend(widget.currentUser.id, widget.user.id);
+    await widget.database.unFriend(widget.currentUserId, widget.user.id);
     await widget.database.removeChat(widget.typeKey);
     _navigateToChatsPage();
   }

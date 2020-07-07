@@ -26,7 +26,6 @@ class RootPage extends StatefulWidget{
 class _RootPageState extends State<RootPage>{
   AuthStatus status = AuthStatus.NOT_DETERMINED;
   String _userId = "";
-  User currentUser;
 
   void loginCallBack(){
     widget.auth.getCurrentUser().then((user) => {
@@ -47,15 +46,14 @@ class _RootPageState extends State<RootPage>{
   @override
   void initState(){
     widget.auth.getCurrentUser().then((user) => {
-      widget.database.getUserObject(user.uid).then((userObject) => {
-        setState((){
-          if(user != null){
+      if(user != null){
+          setState((){
             _userId = user.uid;
-          }
-          status = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
-          currentUser = userObject;
-        })
-      }),
+          })
+      },
+      setState((){
+        status = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+      })
     });
     super.initState();
   }
@@ -78,7 +76,7 @@ class _RootPageState extends State<RootPage>{
             auth: widget.auth,
             logOutCallback : logOutCallback,
             database: widget.database,
-            currentUser : currentUser
+            currentUserId : _userId
           );
         }else{
           return waitingScreen();

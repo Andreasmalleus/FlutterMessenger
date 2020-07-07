@@ -12,11 +12,11 @@ class MessagePage extends StatefulWidget{
   final BaseDb database;
   final User user;
   final Group group;
-  final User sender;
+  final String senderId;
   final String typeKey;
   final bool isChat;
   
-  MessagePage({this.database, this.user, this.group, this.sender, this.typeKey, this.isChat});
+  MessagePage({this.database, this.user, this.group, this.senderId, this.typeKey, this.isChat});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -50,6 +50,7 @@ class _MessagePageState extends State<MessagePage>{
     });
     }
     setState(() {
+      //TODO sort messages by time
       messages.sort((a,b) => b.time.compareTo(a.time));
     });
   }
@@ -144,8 +145,9 @@ class _MessagePageState extends State<MessagePage>{
     );
   }
 
-  void _sendMessage(value){
-    User sender = widget.sender;
+  void _sendMessage(value) async{
+    User sender = await widget.database.getUserObject(widget.senderId);
+    print(sender.username.toString());
     Message message = Message(
       text: value,
       isLiked: false,
@@ -189,7 +191,7 @@ class _MessagePageState extends State<MessagePage>{
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
               user: widget.user,
               database: widget.database,
-              currentUser: widget.sender,
+              currentUserId: widget.senderId,
               typeKey: widget.typeKey,
               isChat: true,
               ))))
@@ -197,7 +199,7 @@ class _MessagePageState extends State<MessagePage>{
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
               group: widget.group,
               database: widget.database,
-              currentUser: widget.sender,
+              currentUserId: widget.senderId,
               typeKey: widget.typeKey,
               isChat: false,
               ))))
@@ -232,7 +234,7 @@ class _MessagePageState extends State<MessagePage>{
                       itemCount: messages.length,
                       itemBuilder: (BuildContext context, int i){
                         final Message message = messages[i];
-                        final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
+                        final isMe = message.sender.id == widget.senderId; //to differentiate which shows up on which side
                         return _buildMessage(message, isMe);
                       }
                     );
