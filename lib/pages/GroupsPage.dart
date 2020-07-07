@@ -232,7 +232,7 @@ class _GroupsPageState extends State<GroupsPage>{
                         height: 75,
                         child: Card(
                           child: ListTile(
-                          leading: Icon(Icons.android, size: 35,),
+                          leading: groups[i].imageUrl != "" ? groups[i].imageUrl : Icon(Icons.android, size: 35),
                           title: Text(groups[i].name),
                           subtitle: Text(
                             ((){
