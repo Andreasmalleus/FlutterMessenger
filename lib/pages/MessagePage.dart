@@ -24,6 +24,7 @@ class MessagePage extends StatefulWidget{
 
 class _MessagePageState extends State<MessagePage>{
   List<Message> messages = [];
+  User user;
 
   void mapMessagesToList() async{
     Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.typeKey);
@@ -52,6 +53,13 @@ class _MessagePageState extends State<MessagePage>{
     setState(() {
       //TODO sort messages by time
       messages.sort((a,b) => b.time.compareTo(a.time));
+    });
+  }
+
+  void getUser() async {
+    User dbUser = await widget.database.getUserObject(widget.senderId);
+    setState((){
+      user = dbUser;
     });
   }
 
@@ -147,7 +155,6 @@ class _MessagePageState extends State<MessagePage>{
 
   void _sendMessage(value) async{
     User sender = await widget.database.getUserObject(widget.senderId);
-    print(sender.username.toString());
     Message message = Message(
       text: value,
       isLiked: false,
@@ -175,6 +182,7 @@ class _MessagePageState extends State<MessagePage>{
   @override
   void initState(){
     mapMessagesToList();
+    getUser();
     super.initState();
   }
 
@@ -185,7 +193,18 @@ class _MessagePageState extends State<MessagePage>{
       appBar: AppBar(
         centerTitle: true,
         title: GestureDetector(
-          child: Text(widget.isChat ? widget.user.username : widget.group.name),
+          child: Row(
+            children: <Widget>[
+            widget.user.imageUrl != "" 
+            ? 
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: NetworkImage(widget.user.imageUrl),
+            )
+            :
+            Icon(Icons.android),
+            Text(widget.isChat ? widget.user.username : widget.group.name),
+            ],),
           onTap: () => {
             widget.isChat ? 
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
