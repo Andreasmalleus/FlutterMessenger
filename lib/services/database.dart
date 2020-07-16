@@ -30,6 +30,12 @@ abstract class BaseDb{
 
   Future<String> getLastMessage();
 
+  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
+
+  Future<void> likeMessage(String chatId, String messageId);
+
+  Future<void> dislikeMessage(String chatId, String messageId);
+
   Future<void> addFriends(String firstUserId, String secondUserId);
 
   Future<void> unFriend(String firstUserId, String secondUserId);
@@ -47,8 +53,6 @@ abstract class BaseDb{
   Future<List> getChats(String userId);
 
   Future<void> removeChat(String userId);
-
-  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
   Future<void> createGroup(List<String> ids,String groupName);
 
@@ -173,6 +177,35 @@ class Database implements BaseDb{
     return message;
   }
 
+  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck) async{
+    if(typeCheck){
+      await _chatsRef.child(key).update({
+        "lastMessage" : message,
+        "lastMessageTime" : time
+      }).catchError((error) => print("updateLastMessageAndTime: $error"));
+      print("Chat updated");
+    }else{
+      await _groupRef.child(key).update({
+        "lastMessage" : message,
+        "lastMessageTime" : time
+      }).catchError((error) => print("updateLastMessageAndTime: $error"));
+      print("Group updated");
+    }
+  }
+
+  Future<void> likeMessage(String chatId, String messageId) async{
+    await _messageRef.child(chatId).child(messageId).update({
+      "isLiked" : true
+    });
+  }
+
+  Future<void> dislikeMessage(String chatId, String messageId) async {
+    await _messageRef.child(chatId).child(messageId).update({
+      "isLiked" : false
+    });
+  }
+
+
   Future<void> addFriends(String firstUserId, String secondUserId)async{
     String first = firstUserId;
     String second = secondUserId;
@@ -292,22 +325,6 @@ class Database implements BaseDb{
     await _chatsRef.child(chatId).remove().catchError((e) => print("removeChat error: $e"));
     print("Chat removed");
   } 
-
-  Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck) async{
-    if(typeCheck){
-      await _chatsRef.child(key).update({
-        "lastMessage" : message,
-        "lastMessageTime" : time
-      }).catchError((error) => print("updateLastMessageAndTime: $error"));
-      print("Chat updated");
-    }else{
-      await _groupRef.child(key).update({
-        "lastMessage" : message,
-        "lastMessageTime" : time
-      }).catchError((error) => print("updateLastMessageAndTime: $error"));
-      print("Group updated");
-    }
-  }
 
   Future<void> createGroup(List<String> ids, String name) async{
     print(ids.toString());

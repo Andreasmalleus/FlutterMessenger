@@ -85,7 +85,11 @@ class _MessagePageState extends State<MessagePage>{
           icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
           color: message.isLiked ? Colors.red : Colors.black,
           iconSize: 25.0,
-          onPressed: (){
+          onPressed: () async {
+            message.isLiked 
+            ? 
+            await widget.database.dislikeMessage(widget.typeKey,message.id) 
+            : await widget.database.likeMessage(widget.typeKey, message.id);
           },
         )
       ],
@@ -217,6 +221,7 @@ class _MessagePageState extends State<MessagePage>{
                               email: value["sender"]["email"]
                             );
                             message = Message(
+                              id: key,
                               time: value["time"],
                               sender: sender,
                               text: value["text"],
