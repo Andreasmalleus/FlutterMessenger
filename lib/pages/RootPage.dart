@@ -3,6 +3,7 @@ import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/SignInUpPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
+import 'package:provider/provider.dart';
 
 import 'NavigatorPage.dart';
 
@@ -28,11 +29,11 @@ class _RootPageState extends State<RootPage>{
   String _userId = "";
 
   void loginCallBack(){
-    widget.auth.getCurrentUser().then((user) => {
-      setState((){
-        status = AuthStatus.LOGGED_IN;
-        _userId = user.uid.toString();
-      })
+    widget.auth.getCurrentUser().then((firebaseUser) => {
+        setState((){
+          status = AuthStatus.LOGGED_IN;
+          _userId = firebaseUser.uid;
+        })
     });
   }
 
@@ -45,19 +46,19 @@ class _RootPageState extends State<RootPage>{
 
   @override
   void initState(){
-    widget.auth.getCurrentUser().then((user) => {
-      if(user != null){
+    widget.auth.getCurrentUser().then((firebaseUser) => {
+      if(firebaseUser != null){
           setState((){
-            _userId = user.uid;
+            _userId = firebaseUser.uid;
           })
       },
       setState((){
-        status = user?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
+        status = firebaseUser?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
       })
     });
     super.initState();
   }
-
+  
   @override
   Widget build(BuildContext context){
     switch (status) {
@@ -72,11 +73,17 @@ class _RootPageState extends State<RootPage>{
         );
       case AuthStatus.LOGGED_IN:
         if(_userId.length > 0 && _userId != null){
-          return NavigatorPage(
-            auth: widget.auth,
-            logOutCallback : logOutCallback,
-            database: widget.database,
-            currentUserId : _userId
+          return MultiProvider(
+            providers: [
+              StreamProvider<User>.value(
+                value: widget.database.streamUser(_userId)
+              ),
+            ],
+              child: NavigatorPage(
+              auth: widget.auth,
+              logOutCallback : logOutCallback,
+              database: widget.database,
+            ),
           );
         }else{
           return waitingScreen();

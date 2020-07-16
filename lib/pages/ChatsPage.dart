@@ -5,7 +5,9 @@ import 'package:fluttermessenger/pages/AccountPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
+import 'package:fluttermessenger/widgets/CustomBottomSheet.dart';
 import 'package:fluttermessenger/widgets/CustomDrawer.dart';
+import 'package:provider/provider.dart';
 import 'MessagePage.dart';
 
 
@@ -15,8 +17,7 @@ class ChatsPage extends StatefulWidget {
   final VoidCallback logOutCallback;
   final BaseDb database;
   final VoidCallback toggleBottomAppBarVisibility;
-  final String currentUserId;
-  ChatsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility, this.currentUserId});
+  ChatsPage({this.auth, this.logOutCallback, this.database, this.toggleBottomAppBarVisibility});
 
   @override
   _ChatsPageState createState() => _ChatsPageState();
@@ -28,25 +29,29 @@ class _ChatsPageState extends State<ChatsPage>{
   String userSearchResult = "";
   List<User> users = List<User>();
   List<User> friends = List<User>();
+  User currentUser;
+  String id = "";
+
 
   void getAllUsers() async{
-    List<User> dbFriends = await widget.database.getFriends(widget.currentUserId);
+    String currentUserId = Provider.of<User>(context, listen : false ).id;
+    List<User> dbFriends = await widget.database.getFriends(currentUserId);
     List<User> dbUsers = await widget.database.getAllUsers();
     for(User friend in dbFriends){
       dbUsers.removeWhere((user) => user.id == friend.id);
     }
-    dbUsers.removeWhere((user) => user.id == widget.currentUserId);
+    dbUsers.removeWhere((user) => user.id == currentUserId);
     setState((){
       users = dbUsers;
     });
   }
 
   void _addFriends(String userId){
-    widget.database.addFriends(widget.currentUserId, userId);
+    widget.database.addFriends(null, userId);
   }
 
   void _addChat(String userId){
-    widget.database.createChat(widget.currentUserId, userId);
+    widget.database.createChat(null, userId);
   }
 
   void _showSheet() {
@@ -57,74 +62,7 @@ class _ChatsPageState extends State<ChatsPage>{
       isDismissible: false,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState){
-            return Container(
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(25.0),
-                topRight: Radius.circular(25.0)
-              )
-            ),
-            height: MediaQuery.of(context).size.height * 0.75,
-            child: Column( 
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text("Add Friends"),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.35,
-                  child: TextField(
-                    onChanged: (value) => setModalState((){
-                      userSearchResult = value;
-                      }),
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      hintText: "Search users"
-                    ),
-                  ),
-                ),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: users.length,
-                  itemBuilder: (BuildContext context, int i){
-                    //TODO needs some fixing
-                    if(users[i].username.contains(userSearchResult) && userSearchResult != ""){
-                      return Container(
-                        child: Card(
-                          child: ListTile(
-                            leading: Icon(Icons.android),
-                            title: Text(users[i].username),
-                            trailing: IconButton(icon: Icon(Icons.add_box), onPressed: () => {
-                              _addFriends(users[i].id),
-                              _addChat(users[i].id),
-                              setModalState(() {
-                                users.removeWhere((user) => user.id == users[i].id);
-                              })
-                            },),
-                          ),
-                        ),
-                      );
-                    }else{
-                      return Container(
-                        width: 0,
-                        height: 0,
-                      );
-                    }
-                  }
-                ),
-                RaisedButton(
-                  child: Text("Close"),
-                  onPressed: () => {
-                    Navigator.pop(context),
-                    widget.toggleBottomAppBarVisibility()
-                  }
-                )
-              ],
-            )
-          );
-          },
-        );
+        return CustomBottomSheet(database: widget.database, isChat: true, toggleBottomAppBarVisibility: widget.toggleBottomAppBarVisibility);
       },
     );
   }
@@ -132,13 +70,17 @@ class _ChatsPageState extends State<ChatsPage>{
   @override
   void initState(){
     super.initState();
+  }
+
+  void didChangeDependencies(){
     getAllUsers();
-    print(widget.currentUserId);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    this.currentUser = Provider.of<User>(context);
+    if(currentUser != null){
+      return Scaffold(
       resizeToAvoidBottomInset: false, //keybaord resizes widget
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
@@ -150,15 +92,20 @@ class _ChatsPageState extends State<ChatsPage>{
               widget.toggleBottomAppBarVisibility(),
             },
             ),
-            IconButton(
-            icon: Icon(Icons.android),
-            onPressed: () => {
+            GestureDetector(
+            child: Container(
+              child: CircleAvatar(
+                radius: 30,
+                backgroundImage: NetworkImage(currentUser.imageUrl),
+              ),
+            ),
+            onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
                 builder: (context) => AccountPage(
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
-                  userId: widget.currentUserId
+                  userId: currentUser.id
                 ),
               ))
             },
@@ -188,9 +135,9 @@ class _ChatsPageState extends State<ChatsPage>{
                 List<Chat> chats = List<Chat>();
                 Chat chat;
                 map.forEach((key,val) =>{
-                  if(val["participants"].containsKey(widget.currentUserId)){
+                  if(val["participants"].containsKey(currentUser.id)){
                     val["participants"].forEach((id, value) => {
-                        if(id != widget.currentUserId){
+                        if(id != currentUser.id){
                           chat = Chat(
                             id: key,
                             lastMessage: val["lastMessage"],
@@ -218,7 +165,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                   builder: (context)=> MessagePage(
                                     database: widget.database,
                                     user: user,
-                                    senderId: widget.currentUserId,
+                                    sender: currentUser,
                                     typeKey: chats[i].id,
                                     isChat: true,
                                     ))),
@@ -275,5 +222,10 @@ class _ChatsPageState extends State<ChatsPage>{
         ]
       ),
     );
+    }else{
+      return Container(
+        child: CircularProgressIndicator(),
+      );
+    }
   }
 }

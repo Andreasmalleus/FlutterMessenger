@@ -17,7 +17,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: RootPage(auth: new Auth(), database: new Database()),//instatiating auth
+      home: RootPage(
+          auth: new Auth(),
+          database: new Database()
+          ),
     );
   }
 }

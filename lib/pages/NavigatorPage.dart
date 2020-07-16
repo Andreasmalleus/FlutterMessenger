@@ -11,7 +11,8 @@ class NavigatorPage extends StatefulWidget{
   final VoidCallback logOutCallback;
   final BaseDb database;
   final String currentUserId;
-  NavigatorPage({this.auth, this.logOutCallback, this.database, this.currentUserId});
+  final User currentUser;
+  NavigatorPage({this.auth, this.logOutCallback, this.database, this.currentUserId, this.currentUser});
 
   @override
   _NavigatorPageState createState() => _NavigatorPageState();
@@ -49,7 +50,6 @@ class _NavigatorPageState extends State<NavigatorPage>{
                 database: widget.database,
                 logOutCallback: widget.logOutCallback,
                 toggleBottomAppBarVisibility: toggleBottomAppBarVisibility,
-                currentUserId: widget.currentUserId
               )
             ),
           ),
@@ -64,7 +64,6 @@ class _NavigatorPageState extends State<NavigatorPage>{
                 database: widget.database,
                 logOutCallback: widget.logOutCallback,
                 toggleBottomAppBarVisibility: toggleBottomAppBarVisibility,
-                currentUserId: widget.currentUserId
               )),
           ),
         ),

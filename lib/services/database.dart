@@ -62,6 +62,12 @@ abstract class BaseDb{
 
   Future<void> uploadImageToDataBase(String url, String userId);
 
+  Stream<User> streamUser(String id);
+
+  Stream<dynamic> streamUsers();
+
+  Stream<List<Chat>> streamChats();
+
 }
 
 class Database implements BaseDb{
@@ -379,6 +385,18 @@ class Database implements BaseDb{
     await _userRef.child(userId).update({
       "imageUrl" : url
     }).catchError((e) => print("uploadImageToDataBase: $e"));
+  }
+
+  Stream<User> streamUser(String id){
+    return _userRef.child(id).onValue.map((event) => User.fromFirebase(event.snapshot));
+  }
+
+  Stream<dynamic> streamUsers(){
+    return _userRef.onValue.map((list) => list.snapshot.value); //TODO ei tea mis teha siin
+  }
+
+  Stream<List<Chat>> streamChats(){
+    return _chatsRef.onValue.map((event) => event.snapshot.value.map((value) => Chat.fromFirebase(value.snapshot)));
   }
 
 }

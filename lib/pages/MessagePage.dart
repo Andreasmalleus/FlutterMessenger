@@ -12,11 +12,11 @@ class MessagePage extends StatefulWidget{
   final BaseDb database;
   final User user;
   final Group group;
-  final String senderId;
+  final User sender;
   final String typeKey;
   final bool isChat;
   
-  MessagePage({this.database, this.user, this.group, this.senderId, this.typeKey, this.isChat});
+  MessagePage({this.database, this.user, this.group, this.sender, this.typeKey, this.isChat});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -57,7 +57,7 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   void getUser() async {
-    User dbUser = await widget.database.getUserObject(widget.senderId);
+    User dbUser = await widget.database.getUserObject(widget.sender.id);
     setState((){
       user = dbUser;
     });
@@ -154,7 +154,7 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   void _sendMessage(value) async{
-    User sender = await widget.database.getUserObject(widget.senderId);
+    User sender = widget.sender;
     Message message = Message(
       text: value,
       isLiked: false,
@@ -188,18 +188,20 @@ class _MessagePageState extends State<MessagePage>{
 
   @override
   Widget build(BuildContext context){
+    String imageUrl = widget.isChat ? widget.user.imageUrl : widget.group.imageUrl;
+
     return Scaffold(
       bottomNavigationBar: null,
       appBar: AppBar(
-        centerTitle: true,
         title: GestureDetector(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-            widget.user.imageUrl != "" 
-            ? 
+            imageUrl != ""
+            ?
             CircleAvatar(
               radius: 20,
-              backgroundImage: NetworkImage(widget.user.imageUrl),
+              backgroundImage: NetworkImage(imageUrl),
             )
             :
             Icon(Icons.android),
@@ -210,7 +212,7 @@ class _MessagePageState extends State<MessagePage>{
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
               user: widget.user,
               database: widget.database,
-              currentUserId: widget.senderId,
+              currentUserId: widget.sender.id,
               typeKey: widget.typeKey,
               isChat: true,
               ))))
@@ -218,7 +220,7 @@ class _MessagePageState extends State<MessagePage>{
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
               group: widget.group,
               database: widget.database,
-              currentUserId: widget.senderId,
+              currentUserId: widget.sender.id,
               typeKey: widget.typeKey,
               isChat: false,
               ))))
@@ -253,7 +255,7 @@ class _MessagePageState extends State<MessagePage>{
                       itemCount: messages.length,
                       itemBuilder: (BuildContext context, int i){
                         final Message message = messages[i];
-                        final isMe = message.sender.id == widget.senderId; //to differentiate which shows up on which side
+                        final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
                         return _buildMessage(message, isMe);
                       }
                     );
