@@ -23,38 +23,7 @@ class MessagePage extends StatefulWidget{
 }
 
 class _MessagePageState extends State<MessagePage>{
-  List<Message> messages = [];
   User user;
-
-  void mapMessagesToList() async{
-    Map<dynamic, dynamic> dbMessages = await widget.database.getAllMessages(widget.typeKey);
-    if(dbMessages != null){
-      dbMessages.forEach((key, value) {
-        User sender = User(
-          id: value["sender"]["id"],
-          createdAt: value["sender"]["createdAt"],
-          username: value["sender"]["username"],
-          email: value["sender"]["email"]
-          );
-        Message message = Message(
-          time: value["time"],
-          sender: sender,
-          text: value["text"],
-          isLiked: value["isLiked"],
-          isRead: value["isRead"]
-        );
-        setState(() {
-          if(!messages.contains(message)){
-            messages.add(message);
-          }
-        });
-    });
-    }
-    setState(() {
-      //TODO sort messages by time
-      messages.sort((a,b) => b.time.compareTo(a.time));
-    });
-  }
 
   void getUser() async {
     User dbUser = await widget.database.getUserObject(widget.sender.id);
@@ -116,7 +85,8 @@ class _MessagePageState extends State<MessagePage>{
           icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
           color: message.isLiked ? Colors.red : Colors.black,
           iconSize: 25.0,
-          onPressed: (){},
+          onPressed: (){
+          },
         )
       ],
     );
@@ -153,35 +123,22 @@ class _MessagePageState extends State<MessagePage>{
     );
   }
 
-  void _sendMessage(value) async{
+  void _sendMessage(text) async{
     User sender = widget.sender;
-    Message message = Message(
-      text: value,
-      isLiked: false,
-      isRead: false,
-      sender: sender,
-      time: getCurrentDate()
-    );
-    if(value != "" && value != null){
-      setState(() {
-        messages.insert(0,message);
-      });
-    }
     widget.database.addMessage(
-      message.text,
+      text,
       sender,
-      message.isLiked,
-      message.isRead,
+      false,
+      false,
       getCurrentDate(),
       widget.typeKey
       );
-    widget.database.updateLastMessageAndTime(widget.typeKey, message.text, getCurrentDate(), widget.isChat);
+    widget.database.updateLastMessageAndTime(widget.typeKey, text, getCurrentDate(), widget.isChat);
     textField.clear();
   }
 
   @override
   void initState(){
-    mapMessagesToList();
     getUser();
     super.initState();
   }
@@ -244,23 +201,51 @@ class _MessagePageState extends State<MessagePage>{
                 alignment: FractionalOffset.bottomCenter,
                 child: Container(
                   margin: EdgeInsets.only(top: 5.0),
-                  child: ((){
-                    if(messages.isEmpty){
-                      return Container(child: Text("Add your first message"),);
-                    }else{
-                    return ListView.builder(
-                      reverse: true,
-                      padding: EdgeInsets.only(top: 15.0),
-                      shrinkWrap: true,
-                      itemCount: messages.length,
-                      itemBuilder: (BuildContext context, int i){
-                        final Message message = messages[i];
-                        final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
-                        return _buildMessage(message, isMe);
-                      }
-                    );
-                    }
-                  }())
+                  child: StreamBuilder(
+                      stream: widget.database.getMessageRef().child(widget.typeKey).onValue,
+                      builder: (context, snapshot){
+                        if(snapshot.hasData && snapshot.data.snapshot.value != null){
+                          Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
+                          List<Message> messages = List<Message>();
+                          User sender;
+                          Message message;
+                          map.forEach((key, value) {
+                            sender = User(
+                              id: value["sender"]["id"],
+                              createdAt: value["sender"]["createdAt"],
+                              username: value["sender"]["username"],
+                              email: value["sender"]["email"]
+                            );
+                            message = Message(
+                              time: value["time"],
+                              sender: sender,
+                              text: value["text"],
+                              isLiked: value["isLiked"],
+                              isRead: value["isRead"]
+                            );
+                            messages.add(
+                              message
+                            );
+                          });
+                          messages.sort((a,b) => b.time.compareTo(a.time));
+                          return ListView.builder(
+                            reverse: true,
+                            padding: EdgeInsets.only(top: 15.0),
+                            shrinkWrap: true,
+                            itemCount: messages.length,
+                            itemBuilder: (BuildContext context, int i){
+                              final Message message = messages[i];
+                              final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
+                              return _buildMessage(message, isMe);
+                            }
+                          );
+                        }else{
+                          return Container(
+                            child: Text("Add your first message")
+                          );
+                        }
+                      },
+                    )
                 ),
               ),
             ),
