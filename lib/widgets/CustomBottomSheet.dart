@@ -145,7 +145,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
                             return Container(
                               child: Card(
                                 child: ListTile(
-                                  leading: Icon(Icons.android),
+                                  leading: users[i].imageUrl != "" ? CircleAvatar(backgroundImage: NetworkImage(users[i].imageUrl),) : Icon(Icons.android),
                                   title: Text(users[i].username),
                                   trailing: IconButton(icon: Icon(Icons.add_box), onPressed: () => {
                                     widget.isChat ?  _addFriends(users[i].id,currentUser.id) : null,
