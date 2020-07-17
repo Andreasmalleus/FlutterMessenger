@@ -72,7 +72,13 @@ class _MessagePageState extends State<MessagePage>{
     }else{
     return Row(
       children: <Widget>[
-        message.sender.imageUrl != "" && message.sender.id != currentUser.id? CircleAvatar(backgroundImage: NetworkImage(message.sender.imageUrl),) : Icon(Icons.android),
+        message.sender.imageUrl != "" && message.sender.id != currentUser.id
+        ? CircleAvatar(
+          backgroundImage: NetworkImage(
+            message.sender.imageUrl
+            ),
+          ) 
+        : Icon(Icons.android, size: 30,),
         msg,
         IconButton(
           icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),

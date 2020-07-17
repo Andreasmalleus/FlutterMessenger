@@ -168,9 +168,15 @@ class _ChatsPageState extends State<ChatsPage>{
                                     title: Text(user.username),
                                     subtitle: Text(
                                       ((){
-                                        if(chats[i].lastMessage != "" && chats[i].lastMessageTime != ""){
-                                          String formattedDate = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
-                                          return chats[i].lastMessage + " " + formattedDate;
+                                        String message = chats[i].lastMessage;
+                                        String time = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
+                                        if(message != "" && time != ""){
+                                          if(message.length > 22){
+                                            String trimmedMssage = message.substring(0,22);
+                                            return "$trimmedMssage.. $time";
+                                          }else{
+                                            return "$message $time";
+                                          }
                                         }else{
                                           return "";
                                       }
