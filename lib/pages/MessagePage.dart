@@ -23,12 +23,12 @@ class MessagePage extends StatefulWidget{
 }
 
 class _MessagePageState extends State<MessagePage>{
-  User user;
+  User currentUser;
 
   void getUser() async {
     User dbUser = await widget.database.getUserObject(widget.sender.id);
     setState((){
-      user = dbUser;
+      currentUser = dbUser;
     });
   }
 
@@ -39,7 +39,7 @@ class _MessagePageState extends State<MessagePage>{
               ? EdgeInsets.only(
                top: 8.0, 
                bottom: 8.0, 
-               left: 80.0
+               left: 80.0,
               ) 
               : EdgeInsets.only(
                 top: 8.0, 
@@ -48,17 +48,9 @@ class _MessagePageState extends State<MessagePage>{
           padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
           decoration: BoxDecoration(
             color: isMe ? Colors.blueAccent: Colors.grey,
-            borderRadius: isMe 
-                  ? 
-                  BorderRadius.only(
-                    topLeft: Radius.circular(15.0),
-                    bottomLeft: Radius.circular(15.0)
+            borderRadius: BorderRadius.all(
+                    Radius.circular(15.0),
                   ) 
-                  :
-                  BorderRadius.only(
-                    topRight: Radius.circular(15.0),
-                    bottomRight: Radius.circular(15.0)
-                  ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,6 +72,7 @@ class _MessagePageState extends State<MessagePage>{
     }else{
     return Row(
       children: <Widget>[
+        message.sender.imageUrl != "" && message.sender.id != currentUser.id? CircleAvatar(backgroundImage: NetworkImage(message.sender.imageUrl),) : Icon(Icons.android),
         msg,
         IconButton(
           icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
@@ -216,6 +209,7 @@ class _MessagePageState extends State<MessagePage>{
                           map.forEach((key, value) {
                             sender = User(
                               id: value["sender"]["id"],
+                              imageUrl: value["sender"]["imageUrl"],
                               createdAt: value["sender"]["createdAt"],
                               username: value["sender"]["username"],
                               email: value["sender"]["email"]

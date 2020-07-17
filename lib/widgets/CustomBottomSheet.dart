@@ -108,6 +108,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
             ),
           ),
           _groupNameContainer(),
+          //TODO needs a better solution
           StreamBuilder<dynamic>(
             stream: widget.database.streamUsers(),
             builder: (context, snapshot){
@@ -136,7 +137,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
                           //TODO bugged
                         }
                       }
-                      users.removeWhere((user) => user.id == currentUser.id);
+                    }
+                    users.removeWhere((user) => user.id == currentUser.id);
                       return ListView.builder(
                         shrinkWrap: true,
                         itemCount: users.length,
@@ -166,12 +168,6 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
                           }
                         }
                       );
-                    }else{
-                      return Container(
-                        width: 0,
-                        height: 0,
-                      );
-                    }
                   }
                 );
               }else{

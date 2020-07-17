@@ -85,10 +85,13 @@ class _GroupsPageState extends State<GroupsPage>{
             ),
             GestureDetector(
             child: Container(
-              child: CircleAvatar(
+              child: currentUser.imageUrl != "" 
+              ?
+              CircleAvatar(
                 radius: 30,
                 backgroundImage: NetworkImage(currentUser.imageUrl),
-              ),
+              )
+              : Icon(Icons.android, size: 40,)
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(

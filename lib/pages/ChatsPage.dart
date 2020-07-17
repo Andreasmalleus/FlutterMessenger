@@ -33,19 +33,6 @@ class _ChatsPageState extends State<ChatsPage>{
   String id = "";
 
 
-  void getAllUsers() async{
-    String currentUserId = Provider.of<User>(context, listen : false ).id;
-    List<User> dbFriends = await widget.database.getFriends(currentUserId);
-    List<User> dbUsers = await widget.database.getAllUsers();
-    for(User friend in dbFriends){
-      dbUsers.removeWhere((user) => user.id == friend.id);
-    }
-    dbUsers.removeWhere((user) => user.id == currentUserId);
-    setState((){
-      users = dbUsers;
-    });
-  }
-
   void _addFriends(String userId){
     widget.database.addFriends(null, userId);
   }
@@ -72,10 +59,6 @@ class _ChatsPageState extends State<ChatsPage>{
     super.initState();
   }
 
-  void didChangeDependencies(){
-    getAllUsers();
-  }
-
   @override
   Widget build(BuildContext context) {
     this.currentUser = Provider.of<User>(context);
@@ -94,10 +77,13 @@ class _ChatsPageState extends State<ChatsPage>{
             ),
             GestureDetector(
             child: Container(
-              child: CircleAvatar(
+              child: currentUser.imageUrl != "" 
+              ?
+              CircleAvatar(
                 radius: 30,
                 backgroundImage: NetworkImage(currentUser.imageUrl),
-              ),
+              )
+              : Icon(Icons.android, size: 40,)
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
