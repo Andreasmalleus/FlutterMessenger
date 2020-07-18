@@ -34,51 +34,56 @@ class _MessagePageState extends State<MessagePage>{
 
   Widget _buildMessage(Message message, bool isMe){ 
     final msg = Container(
-          width: MediaQuery.of(context).size.width * 0.75,
-          margin: isMe
-              ? EdgeInsets.only(
-               top: 8.0, 
-               bottom: 8.0, 
-               left: 80.0,
+      width: MediaQuery.of(context).size.width * 0.75,
+      margin: isMe
+          ? EdgeInsets.only(
+            top: 8.0, 
+            bottom: 8.0, 
+            left: 80.0,
+          ) 
+          : EdgeInsets.only(
+            top: 8.0, 
+            bottom: 8.0,
+          ),
+      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+      decoration: BoxDecoration(
+        color: isMe ? Colors.blueAccent: Colors.grey,
+        borderRadius: BorderRadius.all(
+                Radius.circular(15.0),
               ) 
-              : EdgeInsets.only(
-                top: 8.0, 
-                bottom: 8.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            formatDateToHoursAndMinutes(message.time),
+            style: TextStyle(
+              color: Colors.black, 
+              fontWeight: FontWeight.bold, 
+              fontSize: 15.0),
               ),
-          padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-          decoration: BoxDecoration(
-            color: isMe ? Colors.blueAccent: Colors.grey,
-            borderRadius: BorderRadius.all(
-                    Radius.circular(15.0),
-                  ) 
+          SizedBox(height: 4.0,),
+          Text(message.text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+        ],
+      ),
+    );
+    final img = Container(
+      child:
+        message.sender.imageUrl != "" && !isMe
+        ? 
+        CircleAvatar(
+          backgroundImage: NetworkImage(
+            message.sender.imageUrl
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                formatDateToHoursAndMinutes(message.time),
-                style: TextStyle(
-                  color: Colors.black, 
-                  fontWeight: FontWeight.bold, 
-                  fontSize: 15.0),
-                  ),
-              SizedBox(height: 4.0,),
-              Text(message.text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-            ],
-          ),
-          );
+        ) 
+        : Icon(Icons.android, size: 30,),
+    );
     if(isMe){
       return msg;
     }else{
     return Row(
       children: <Widget>[
-        message.sender.imageUrl != "" && message.sender.id != currentUser.id
-        ? CircleAvatar(
-          backgroundImage: NetworkImage(
-            message.sender.imageUrl
-            ),
-          ) 
-        : Icon(Icons.android, size: 30,),
+        img,
         msg,
         IconButton(
           icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
@@ -90,9 +95,37 @@ class _MessagePageState extends State<MessagePage>{
             await widget.database.dislikeMessage(widget.typeKey,message.id) 
             : await widget.database.likeMessage(widget.typeKey, message.id);
           },
-        )
+        ),
       ],
     );
+    }
+  }
+
+  //TODO addTime where needed //example if past one day show date
+  Widget addTime(String t, String n){
+    DateTime time = formatStringToDateTime(t);
+    DateTime current = DateTime.now();
+    DateTime next = formatStringToDateTime(n);
+    int differenceToday = current.difference(time).inDays;
+    int differenceNext = time.difference(next).inDays;
+    int differenceNexth = next.difference(time).inHours;
+    int differenceNextm = next.difference(time).inMinutes;
+    int differenceTodayH = current.difference(time).inHours;
+    print("$differenceNextm && $time");
+    if(differenceToday != 0 || differenceTodayH > 12){//if its not todat and its off by 12 hours
+      if(true){
+         return Text(t);
+      }else{
+        return Container(
+          width: 0,
+          height: 0,
+        );
+      }
+    }else{
+      return Container(
+        width: 0,
+        height: 0,
+      );
     }
   }
 
@@ -232,16 +265,27 @@ class _MessagePageState extends State<MessagePage>{
                               message
                             );
                           });
-                          messages.sort((a,b) => b.time.compareTo(a.time));
+                          messages.sort((a,b) => formatStringToDateTime(b.time).compareTo(formatStringToDateTime(a.time)));
+                          print("start");
                           return ListView.builder(
                             reverse: true,
                             padding: EdgeInsets.only(top: 15.0),
                             shrinkWrap: true,
                             itemCount: messages.length,
                             itemBuilder: (BuildContext context, int i){
+                              int nextValue = (i + 1) % messages.length;
                               final Message message = messages[i];
                               final isMe = message.sender.id == widget.sender.id; //to differentiate which shows up on which side
-                              return _buildMessage(message, isMe);
+                              return Column(
+                                children: <Widget>[
+                                  _buildMessage(message, isMe),
+                                  i < messages.length ? 
+                                  
+                                  addTime(message.time, messages[nextValue].time)
+                                  :
+                                  Container(width: 0, height: 0,)
+                                ],
+                                );
                             }
                           );
                         }else{

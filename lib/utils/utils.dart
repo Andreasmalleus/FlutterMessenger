@@ -22,3 +22,7 @@ String formatDateToHoursAndMinutes(String date){
 String formatDate(String date){
   return dateFormat.format(dateFormat.parse(date));
 }
+
+DateTime formatStringToDateTime(String date){
+  return dateFormat.parse(date);
+} 
