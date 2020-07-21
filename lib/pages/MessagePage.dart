@@ -1,8 +1,12 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/widgets/InternalImages.dart';
 import 'package:fluttermessenger/pages/UserGroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -23,7 +27,10 @@ class MessagePage extends StatefulWidget{
 }
 
 class _MessagePageState extends State<MessagePage>{
+
   User currentUser;
+  File file;
+  bool imageSheet;
 
   void getUser() async {
     User dbUser = await widget.database.getUserObject(widget.sender.id);
@@ -101,8 +108,19 @@ class _MessagePageState extends State<MessagePage>{
     }
   }
 
+  Widget _buildImagePicker(){
+    if(imageSheet){
+      return CustomMediaPicker();
+    }else{
+      return Container(
+        width: 0,
+        height: 0,
+      );
+    }
+  }
+
   //TODO addTime where needed //example if past one day show date
-  Widget addTime(String t, String n){
+  Widget timestamp(String t, String n){
     DateTime time = formatStringToDateTime(t);
     DateTime current = DateTime.now();
     DateTime next = formatStringToDateTime(n);
@@ -111,7 +129,6 @@ class _MessagePageState extends State<MessagePage>{
     int differenceNexth = next.difference(time).inHours;
     int differenceNextm = next.difference(time).inMinutes;
     int differenceTodayH = current.difference(time).inHours;
-    print("$differenceNextm && $time");
     if(differenceToday != 0 || differenceTodayH > 12){//if its not todat and its off by 12 hours
       if(true){
          return Text(t);
@@ -129,26 +146,46 @@ class _MessagePageState extends State<MessagePage>{
     }
   }
 
+  Future<String> _uploadFile() async{
+    String url = "";
+    try{
+      file = await FilePicker.getFile();
+      url = await widget.database.uploadChatFileToStorage(file, widget.sender.id);
+    }catch(e){
+      print(e);
+    }
+    return url;
+  }
+
   String text = "";
   final textField = TextEditingController();
   Widget _buildMessageComposer(){
+    String url = "";
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 8.0),
       height: 40,
-      color: Colors.white,
       child: Row(
         children: <Widget>[
           IconButton(
             icon: Icon(Icons.photo),
             iconSize: 25.0,
-            onPressed: (){},
+            onPressed: (){
+              setState(() {
+                imageSheet = !imageSheet;
+              });
+            },
           ),
+          //TODO enlarge container if picutre is chosen
+          url != ""
+          ? 
+          Container(child: Text(url),)
+          :
           Expanded(
             child: TextField(
               controller: textField,
               onChanged: (value) => text = value,
               decoration: InputDecoration.collapsed(hintText: "Send a message..",),
-            )),
+          )),
           IconButton(
             icon: Icon(Icons.send),
             iconSize: 25.0,
@@ -176,6 +213,7 @@ class _MessagePageState extends State<MessagePage>{
   @override
   void initState(){
     getUser();
+    imageSheet = false;
     super.initState();
   }
 
@@ -266,7 +304,6 @@ class _MessagePageState extends State<MessagePage>{
                             );
                           });
                           messages.sort((a,b) => formatStringToDateTime(b.time).compareTo(formatStringToDateTime(a.time)));
-                          print("start");
                           return ListView.builder(
                             reverse: true,
                             padding: EdgeInsets.only(top: 15.0),
@@ -281,7 +318,7 @@ class _MessagePageState extends State<MessagePage>{
                                   _buildMessage(message, isMe),
                                   i < messages.length ? 
                                   
-                                  addTime(message.time, messages[nextValue].time)
+                                  timestamp(message.time, messages[nextValue].time)
                                   :
                                   Container(width: 0, height: 0,)
                                 ],
@@ -299,6 +336,7 @@ class _MessagePageState extends State<MessagePage>{
               ),
             ),
             _buildMessageComposer(),
+            _buildImagePicker()
         ],),
       )
     );

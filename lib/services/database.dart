@@ -62,6 +62,10 @@ abstract class BaseDb{
 
   Future<String> uploadImageToStorage(File file, String userId);
 
+  Future<String> uploadChatFileToStorage(File file, String chatId);
+
+  Future<void> uploadChatImageToDatabase(String url, String chatId, User sender, String time);
+
   Future<String> fetchImageUrl(String userId);
 
   Future<void> uploadImageToDataBase(String url, String userId);
@@ -69,8 +73,6 @@ abstract class BaseDb{
   Stream<User> streamUser(String id);
 
   Stream<dynamic> streamUsers();
-
-  Stream<List<Chat>> streamChats();
 
 }
 
@@ -393,6 +395,31 @@ class Database implements BaseDb{
     return url;
   }
 
+  Future<String> uploadChatFileToStorage(File file, String chatId) async{
+    StorageUploadTask uploadTask = _storageRef.child("chats/$chatId/media/").putFile(file);
+    StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    String url = await downloadUrl.ref.getDownloadURL();
+    print("download url is $url");
+    return url;
+  }
+
+  Future<void> uploadChatImageToDatabase(String url, String chatId, User sender, String time) async {
+    await _messageRef.child(chatId).push().set({
+      "media" : url,
+      "sender" : {
+        "id": sender.id,
+        "email": sender.email,
+        "username": sender.username,
+        "createdAt": sender.createdAt,
+        "imageUrl": sender.imageUrl
+      },
+      "isRead" : false,
+      "isLiked" : false,
+      "time" : time,
+    }).catchError((error) => print("addmessage error: $error"));
+    print("Message added");
+  }
+
   Future<String> fetchImageUrl(String userId) async{
     String url = await _storageRef.child("users/$userId/images/profileImage").getDownloadURL();
     return url;
@@ -410,10 +437,6 @@ class Database implements BaseDb{
 
   Stream<dynamic> streamUsers(){
     return _userRef.onValue.map((list) => list.snapshot.value); //TODO ei tea mis teha siin
-  }
-
-  Stream<List<Chat>> streamChats(){
-    return _chatsRef.onValue.map((event) => event.snapshot.value.map((value) => Chat.fromFirebase(value.snapshot)));
   }
 
 }
