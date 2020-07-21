@@ -33,29 +33,13 @@ class _GroupsPageState extends State<GroupsPage>{
   String groupName = "";
   User currentUser;
 
-
-  void _createGroup(String currentUserId) async{
-    groupParticipants.add(currentUserId);
-    widget.database.createGroup(groupParticipants, groupName);
-  }
-
-  void getAllUsers() async{
-    //TODO needs fixing
-    /*
-    List<User> dbUsers = await widget.database.getAllUsers();
-    dbUsers.removeWhere((user) => user.id ==currentUser.id);
-    setState((){
-      users = dbUsers;
-    });*/
-  }
-
   void _showSheet() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       isDismissible: false,
       backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
+      builder: (context) {
         return CustomBottomSheet(database: widget.database, toggleBottomAppBarVisibility: widget.toggleBottomAppBarVisibility, isChat: false);
       },
     );
@@ -63,7 +47,6 @@ class _GroupsPageState extends State<GroupsPage>{
 
   @override
   void initState(){
-    getAllUsers();
     super.initState();
   }
 
@@ -146,7 +129,7 @@ class _GroupsPageState extends State<GroupsPage>{
               return ListView.builder(
                 shrinkWrap: true,
                 itemCount: groups.length,
-                itemBuilder: (BuildContext context, int i){
+                itemBuilder: (context, i){
                   if(groups[i].id.contains(searchResult)){
                     return GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).push(

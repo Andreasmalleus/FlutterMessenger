@@ -32,15 +32,6 @@ class _ChatsPageState extends State<ChatsPage>{
   User currentUser;
   String id = "";
 
-
-  void _addFriends(String userId){
-    widget.database.addFriends(null, userId);
-  }
-
-  void _addChat(String userId){
-    widget.database.createChat(null, userId);
-  }
-
   void _showSheet() {
     showModalBottomSheet(
       context: context,
@@ -192,11 +183,14 @@ class _ChatsPageState extends State<ChatsPage>{
                                 ),
                               )
                             );             
+                          }else{
+                            Container(
+                              child: CircularProgressIndicator(),
+                            );
                           }
                         }else{
                           return Container(
-                            width: 0,
-                            height: 0,
+                            child: CircularProgressIndicator(),
                           );
                         }
                       }

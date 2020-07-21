@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/widgets/CustomMediaPicker.dart';
 import 'package:fluttermessenger/pages/SignInUpPage.dart';
 
 class CustomDrawer extends StatelessWidget{

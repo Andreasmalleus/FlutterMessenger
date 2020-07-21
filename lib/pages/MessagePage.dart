@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/widgets/InternalImages.dart';
+import 'package:fluttermessenger/widgets/CustomMediaPicker.dart';
 import 'package:fluttermessenger/pages/UserGroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -30,7 +30,7 @@ class _MessagePageState extends State<MessagePage>{
 
   User currentUser;
   File file;
-  bool imageSheet;
+  bool _isVisible;
 
   void getUser() async {
     User dbUser = await widget.database.getUserObject(widget.sender.id);
@@ -109,7 +109,7 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   Widget _buildImagePicker(){
-    if(imageSheet){
+    if(_isVisible){
       return CustomMediaPicker();
     }else{
       return Container(
@@ -123,20 +123,15 @@ class _MessagePageState extends State<MessagePage>{
   Widget timestamp(String t, String n){
     DateTime time = formatStringToDateTime(t);
     DateTime current = DateTime.now();
-    DateTime next = formatStringToDateTime(n);
+    //DateTime next = formatStringToDateTime(n);
     int differenceToday = current.difference(time).inDays;
-    int differenceNext = time.difference(next).inDays;
-    int differenceNexth = next.difference(time).inHours;
-    int differenceNextm = next.difference(time).inMinutes;
+    //int differenceNext = time.difference(next).inDays;
+    //int differenceNexth = next.difference(time).inHours;
+    //int differenceNextm = next.difference(time).inMinutes;
     int differenceTodayH = current.difference(time).inHours;
     if(differenceToday != 0 || differenceTodayH > 12){//if its not todat and its off by 12 hours
       if(true){
          return Text(t);
-      }else{
-        return Container(
-          width: 0,
-          height: 0,
-        );
       }
     }else{
       return Container(
@@ -171,11 +166,10 @@ class _MessagePageState extends State<MessagePage>{
             iconSize: 25.0,
             onPressed: (){
               setState(() {
-                imageSheet = !imageSheet;
+                _isVisible = !_isVisible;
               });
             },
           ),
-          //TODO enlarge container if picutre is chosen
           url != ""
           ? 
           Container(child: Text(url),)
@@ -213,7 +207,7 @@ class _MessagePageState extends State<MessagePage>{
   @override
   void initState(){
     getUser();
-    imageSheet = false;
+    _isVisible = false;
     super.initState();
   }
 

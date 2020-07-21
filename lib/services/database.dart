@@ -436,7 +436,7 @@ class Database implements BaseDb{
   }
 
   Stream<dynamic> streamUsers(){
-    return _userRef.onValue.map((list) => list.snapshot.value); //TODO ei tea mis teha siin
+    return _userRef.onValue.map((list) => list.snapshot.value);
   }
 
 }
