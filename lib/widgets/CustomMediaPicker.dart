@@ -1,11 +1,21 @@
 import 'dart:io';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/services/database.dart';
+import 'package:fluttermessenger/utils/utils.dart';
+import 'package:path/path.dart' as path;
 
 
 class CustomMediaPicker extends StatefulWidget{
 
+  final User sender;
+  final BaseDb database;
+  final String convTypeId;
+  final bool isChat;
 
+  CustomMediaPicker({this.sender, this.database, this.convTypeId, this.isChat});
+  
   @override
   _CustomMediaPickerState createState() =>  _CustomMediaPickerState();
 
@@ -29,10 +39,29 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
     return files;
   }
 
-  Widget isSelected(){
+  String getFileType(String p){
+    return path.basename(p).split('.')[1];
+  }
+  String getFileName(String p){
+    return path.basename(p).split('.')[0];
+  }
+
+  void _addImageToDatabaseAndStorage() async{
+    String message = files[_selectedIndex].path;
+    String time = getCurrentDate();
+    String fileName = getFileName(message);
+    String url;
+    if(widget.isChat){
+      url = await widget.database.uploadFileToChatStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
+    }else{
+      url = await widget.database.uploadFileToGroupStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
+    }
+    await widget.database.addMessage(url, widget.sender, false, false, time, widget.convTypeId, "image");
+  }
+  Widget _sendButton(){
     if(_isSelected){
         return GestureDetector(
-          onTap: () => print("tapped"),
+          onTap: () => _addImageToDatabaseAndStorage(),
           child: Align(
             alignment: Alignment.bottomCenter,
               child: Container(
@@ -52,6 +81,23 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
       );
     }
 
+  }
+
+  Widget image(String filePath, bool selected){
+    if(selected){
+      return ColorFiltered(
+        colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop),
+          child: Image.file(
+            File(filePath),
+            fit: BoxFit.cover,
+          )
+      );
+    }else{
+      return Image.file(
+        File(filePath),
+        fit: BoxFit.cover,
+      );
+    }
   }
 
   void initState(){
@@ -74,9 +120,10 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
                     crossAxisCount: 3,
                   ), 
                   itemBuilder: (context, i){
+                    String file = files[i].path;
                     return GestureDetector(
                       onTap: () => {
-                        print(files[i].path + " selected"),
+                        print(file + " selected"),
                         if(_selectedIndex != i){
                           setState((){
                             _selectedIndex = i;
@@ -93,22 +140,13 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
                         child:
                         _selectedIndex == i
                         ?
-                        ColorFiltered(
-                          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.2), BlendMode.dstATop),
-                            child: Image.file(
-                              File(files[i].path),
-                              fit: BoxFit.cover,
-                            )
-                        )
+                        image(file, true)
                         :
-                        Image.file(
-                          File(files[i].path),
-                          fit: BoxFit.cover,
-                        )
+                        image(file, false)
                       ),
                     );
                   }),
-                  isSelected()
+                  _sendButton()
                 ]
               ),
             ),

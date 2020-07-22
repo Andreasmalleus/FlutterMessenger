@@ -17,10 +17,10 @@ class MessagePage extends StatefulWidget{
   final User user;
   final Group group;
   final User sender;
-  final String typeKey;
+  final String convTypeId;
   final bool isChat;
   
-  MessagePage({this.database, this.user, this.group, this.sender, this.typeKey, this.isChat});
+  MessagePage({this.database, this.user, this.group, this.sender, this.convTypeId, this.isChat});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -40,7 +40,9 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   Widget _buildMessage(Message message, bool isMe){ 
-    final msg = Container(
+    final msg = message.type == "image"
+    ?
+    Container(
       width: MediaQuery.of(context).size.width * 0.75,
       margin: isMe
           ? EdgeInsets.only(
@@ -70,7 +72,42 @@ class _MessagePageState extends State<MessagePage>{
               fontSize: 15.0),
               ),
           SizedBox(height: 4.0,),
-          Text(message.text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+          Image.network(message.message)
+        ],
+      ),
+    )
+    :
+    Container(
+      width: MediaQuery.of(context).size.width * 0.75,
+      margin: isMe
+          ? EdgeInsets.only(
+            top: 8.0, 
+            bottom: 8.0, 
+            left: 80.0,
+          ) 
+          : EdgeInsets.only(
+            top: 8.0, 
+            bottom: 8.0,
+          ),
+      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+      decoration: BoxDecoration(
+        color: isMe ? Colors.blueAccent: Colors.grey,
+        borderRadius: BorderRadius.all(
+                Radius.circular(15.0),
+              ) 
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            formatDateToHoursAndMinutes(message.time),
+            style: TextStyle(
+              color: Colors.black, 
+              fontWeight: FontWeight.bold, 
+              fontSize: 15.0),
+              ),
+          SizedBox(height: 4.0,),
+          Text(message.message.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
         ],
       ),
     );
@@ -99,8 +136,8 @@ class _MessagePageState extends State<MessagePage>{
           onPressed: () async {
             message.isLiked 
             ? 
-            await widget.database.dislikeMessage(widget.typeKey,message.id) 
-            : await widget.database.likeMessage(widget.typeKey, message.id);
+            await widget.database.dislikeMessage(widget.convTypeId,message.id) 
+            : await widget.database.likeMessage(widget.convTypeId, message.id);
           },
         ),
       ],
@@ -110,7 +147,7 @@ class _MessagePageState extends State<MessagePage>{
 
   Widget _buildImagePicker(){
     if(_isVisible){
-      return CustomMediaPicker();
+      return CustomMediaPicker(sender: widget.sender, database: widget.database, convTypeId: widget.convTypeId, isChat : widget.isChat);
     }else{
       return Container(
         width: 0,
@@ -139,17 +176,6 @@ class _MessagePageState extends State<MessagePage>{
         height: 0,
       );
     }
-  }
-
-  Future<String> _uploadFile() async{
-    String url = "";
-    try{
-      file = await FilePicker.getFile();
-      url = await widget.database.uploadChatFileToStorage(file, widget.sender.id);
-    }catch(e){
-      print(e);
-    }
-    return url;
   }
 
   String text = "";
@@ -198,9 +224,10 @@ class _MessagePageState extends State<MessagePage>{
       false,
       false,
       getCurrentDate(),
-      widget.typeKey
+      widget.convTypeId,
+      "text"
       );
-    widget.database.updateLastMessageAndTime(widget.typeKey, text, getCurrentDate(), widget.isChat);
+    widget.database.updateLastMessageAndTime(widget.convTypeId, text, getCurrentDate(), widget.isChat);
     textField.clear();
   }
 
@@ -238,7 +265,7 @@ class _MessagePageState extends State<MessagePage>{
               user: widget.user,
               database: widget.database,
               currentUserId: widget.sender.id,
-              typeKey: widget.typeKey,
+              convTypeId: widget.convTypeId,
               isChat: true,
               ))))
             :
@@ -246,7 +273,7 @@ class _MessagePageState extends State<MessagePage>{
               group: widget.group,
               database: widget.database,
               currentUserId: widget.sender.id,
-              typeKey: widget.typeKey,
+              convTypeId: widget.convTypeId,
               isChat: false,
               ))))
           },
@@ -270,7 +297,7 @@ class _MessagePageState extends State<MessagePage>{
                 child: Container(
                   margin: EdgeInsets.only(top: 5.0),
                   child: StreamBuilder(
-                      stream: widget.database.getMessageRef().child(widget.typeKey).onValue,
+                      stream: widget.database.getMessageRef().child(widget.convTypeId).onValue,
                       builder: (context, snapshot){
                         if(snapshot.hasData && snapshot.data.snapshot.value != null){
                           Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
@@ -287,9 +314,10 @@ class _MessagePageState extends State<MessagePage>{
                             );
                             message = Message(
                               id: key,
+                              type: value["type"],
                               time: value["time"],
                               sender: sender,
-                              text: value["text"],
+                              message: value["message"],
                               isLiked: value["isLiked"],
                               isRead: value["isRead"]
                             );

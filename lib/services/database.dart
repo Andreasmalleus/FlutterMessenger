@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
@@ -24,7 +25,7 @@ abstract class BaseDb{
 
   Future<User> getUserObject(String id);
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key);
+  Future<void> addMessage(String message, User sender, bool isRead, bool isLiked, String time, String key, String type);
 
   Future<Map> getAllMessages(String key);
 
@@ -62,9 +63,9 @@ abstract class BaseDb{
 
   Future<String> uploadImageToStorage(File file, String userId);
 
-  Future<String> uploadChatFileToStorage(File file, String chatId);
+  Future<String> uploadFileToChatStorage(File file, String chatId, String userId,String fileName);
 
-  Future<void> uploadChatImageToDatabase(String url, String chatId, User sender, String time);
+  Future<String> uploadFileToGroupStorage(File file, String chatId, String userId, String fileName);
 
   Future<String> fetchImageUrl(String userId);
 
@@ -145,9 +146,10 @@ class Database implements BaseDb{
     return user;
   }
 
-  Future<void> addMessage(String text, User sender, bool isRead, bool isLiked, String time, String key) async{
+  Future<void> addMessage(String message, User sender, bool isRead, bool isLiked, String time, String key, String type) async{
     await _messageRef.child(key).push().set({
-      "text" : text,
+      "type" : type,
+      "message" : message,
       "sender" : {
         "id": sender.id,
         "email": sender.email,
@@ -395,29 +397,20 @@ class Database implements BaseDb{
     return url;
   }
 
-  Future<String> uploadChatFileToStorage(File file, String chatId) async{
-    StorageUploadTask uploadTask = _storageRef.child("chats/$chatId/media/").putFile(file);
+  Future<String> uploadFileToChatStorage(File file, String chatId, String userId, String fileName) async{
+    StorageUploadTask uploadTask = _storageRef.child("chats/$chatId/media/$userId/$fileName").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
     print("download url is $url");
     return url;
   }
 
-  Future<void> uploadChatImageToDatabase(String url, String chatId, User sender, String time) async {
-    await _messageRef.child(chatId).push().set({
-      "media" : url,
-      "sender" : {
-        "id": sender.id,
-        "email": sender.email,
-        "username": sender.username,
-        "createdAt": sender.createdAt,
-        "imageUrl": sender.imageUrl
-      },
-      "isRead" : false,
-      "isLiked" : false,
-      "time" : time,
-    }).catchError((error) => print("addmessage error: $error"));
-    print("Message added");
+  Future<String> uploadFileToGroupStorage(File file, String groupId, String userId, String fileName) async{
+    StorageUploadTask uploadTask = _storageRef.child("groups/$groupId/media/$userId/$fileName").putFile(file);
+    StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    String url = await downloadUrl.ref.getDownloadURL();
+    print("download url is $url");
+    return url;
   }
 
   Future<String> fetchImageUrl(String userId) async{

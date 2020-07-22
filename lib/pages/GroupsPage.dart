@@ -138,7 +138,7 @@ class _GroupsPageState extends State<GroupsPage>{
                             database: widget.database,
                             group: groups[i],
                             sender: currentUser,
-                            typeKey: groups[i].id,
+                            convTypeId: groups[i].id,
                             isChat: false,
                             ))),
                       child: Container(

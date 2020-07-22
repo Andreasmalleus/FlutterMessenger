@@ -143,7 +143,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                     database: widget.database,
                                     user: user,
                                     sender: currentUser,
-                                    typeKey: chats[i].id,
+                                    convTypeId: chats[i].id,
                                     isChat: true,
                                     ))),
                               child: Container(
