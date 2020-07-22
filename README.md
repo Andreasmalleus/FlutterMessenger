@@ -1,6 +1,6 @@
 # Fluttermessenger
 
-Messenging application made with flutter for both ios and android
+Messenging application made with flutter for android
 
 ## Prototype
 Link:
