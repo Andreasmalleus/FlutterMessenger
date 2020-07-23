@@ -55,13 +55,15 @@ abstract class BaseDb{
 
   Future<void> removeChat(String userId);
 
-  Future<void> createGroup(List<String> ids,String groupName);
+  Future<void> createGroup(List<String> ids,String groupName, String adminId);
 
   Future<List> getGroupsIdsWhereCurrentUserIs(String currentUserId);
   
   Future<List> getGroups(String userId);
 
-  Future<String> uploadImageToStorage(File file, String userId);
+  Future<String> uploadUserImageToStorage(File file, String userId);
+
+  Future<String> uploadGroupImageToStorage(File file, String groupId);
 
   Future<String> uploadFileToChatStorage(File file, String chatId, String userId,String fileName);
 
@@ -69,7 +71,9 @@ abstract class BaseDb{
 
   Future<String> fetchImageUrl(String userId);
 
-  Future<void> uploadImageToDataBase(String url, String userId);
+  Future<void> updateUserImageUrl(String url, String userId);
+
+  Future<void> updateGroupImageUrl(String url, String groupId);
 
   Stream<User> streamUser(String id);
 
@@ -330,7 +334,7 @@ class Database implements BaseDb{
     print("Chat removed");
   } 
 
-  Future<void> createGroup(List<String> ids, String name) async{
+  Future<void> createGroup(List<String> ids, String name, String adminId) async{
     print(ids.toString());
     String key = _groupRef.push().key;
     print(key);
@@ -341,6 +345,9 @@ class Database implements BaseDb{
         "lastMessageTime" : "",
         "imageUrl" : "",
         "createdAt" : getCurrentDate(),
+        "admins" : {
+          adminId : true
+        }
       }
     );
     for(String id in ids){
@@ -378,7 +385,8 @@ class Database implements BaseDb{
                 id: key,
                 lastMessage: val["lastMessage"],
                 lastMessageTime: val["lastMessageTime"],
-                participants: participantIds
+                participants: participantIds,
+                admins: val["admins"]
             ),
           }),
           groups.add(group)
@@ -389,8 +397,16 @@ class Database implements BaseDb{
     return groups;
   } 
 
-  Future<String> uploadImageToStorage(File file, String userId) async{
-    StorageUploadTask uploadTask = _storageRef.child("users/$userId/images/profileImage").putFile(file);
+  Future<String> uploadUserImageToStorage(File file, String userId) async{
+    StorageUploadTask uploadTask = _storageRef.child("users/$userId/media/profileImage").putFile(file);
+    StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    String url = await downloadUrl.ref.getDownloadURL();
+    print("download url is $url");
+    return url;
+  }
+
+  Future<String> uploadGroupImageToStorage(File file, String groupId) async{
+    StorageUploadTask uploadTask = _storageRef.child("groups/$groupId/media/groupImage").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
     print("download url is $url");
@@ -414,12 +430,18 @@ class Database implements BaseDb{
   }
 
   Future<String> fetchImageUrl(String userId) async{
-    String url = await _storageRef.child("users/$userId/images/profileImage").getDownloadURL();
+    String url = await _storageRef.child("users/$userId/media/profileImage").getDownloadURL();
     return url;
   }
 
-  Future<void> uploadImageToDataBase(String url, String userId) async {
+  Future<void> updateUserImageUrl(String url, String userId) async {
     await _userRef.child(userId).update({
+      "imageUrl" : url
+    }).catchError((e) => print("uploadImageToDataBase: $e"));
+  }
+
+  Future<void> updateGroupImageUrl(String url, String groupId) async {
+    await _groupRef.child(groupId).update({
       "imageUrl" : url
     }).catchError((e) => print("uploadImageToDataBase: $e"));
   }

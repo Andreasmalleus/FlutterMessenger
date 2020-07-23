@@ -5,6 +5,7 @@ class Group{
   String lastMessageTime;
   String imageUrl;
   List<String> participants;
+  List<String> admins;
 
   Group({
     this.id,
@@ -13,5 +14,6 @@ class Group{
     this.lastMessageTime,
     this.imageUrl,
     this.participants,
+    this.admins
   });
 }

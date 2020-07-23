@@ -109,11 +109,15 @@ class _GroupsPageState extends State<GroupsPage>{
                 Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
                 List<Group> groups = List<Group>();
                 List<String> participants = List<String>();
+                List<String> admins = List<String>();
                 Group group;
                 map.forEach((key, value) {
                   if(value["participants"].containsKey(currentUser.id)){
                     value["participants"].forEach((participantId, boolean){
                       participants.add(participantId);
+                    });
+                    value["admins"].forEach((adminId, boolean){
+                      admins.add(adminId);
                     });
                     group = Group(
                       id: key,
@@ -121,7 +125,8 @@ class _GroupsPageState extends State<GroupsPage>{
                       lastMessage: value["lastMessage"],
                       lastMessageTime: value["lastMessageTime"],
                       imageUrl: value["imageUrl"],
-                      participants: participants
+                      participants: participants,
+                      admins: admins
                     );
                     groups.add(group);
                     }

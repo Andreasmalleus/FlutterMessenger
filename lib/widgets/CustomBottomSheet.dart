@@ -55,7 +55,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
 
   void _createGroup(String currentUserId) async{
     groupParticipants.add(currentUserId);
-    widget.database.createGroup(groupParticipants, groupName);
+    widget.database.createGroup(groupParticipants, groupName, currentUserId);
   }
 
   Widget _createGroupButton(){

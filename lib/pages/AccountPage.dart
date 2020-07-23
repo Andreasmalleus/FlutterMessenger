@@ -37,8 +37,8 @@ class _AccountPageState extends State<AccountPage>{
     String url = "";
     try{
       file = await FilePicker.getFile(type: FileType.image);
-      url = await widget.database.uploadImageToStorage(file, widget.userId);
-      widget.database.uploadImageToDataBase(url, widget.userId);
+      url = await widget.database.uploadUserImageToStorage(file, widget.userId);
+      widget.database.updateUserImageUrl(url, widget.userId);
     }catch(e){
       print(e);
     }

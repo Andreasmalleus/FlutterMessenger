@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/database.dart';
-
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 //TODO create a page that fits for both groups and chats
 
 class UserGroupPage extends StatefulWidget{
@@ -24,6 +25,8 @@ class UserGroupPage extends StatefulWidget{
 }
 
 class _UserGroupPageState extends State<UserGroupPage>{
+
+  File file;
 
   void _unfriend() async{
     await widget.database.unFriend(widget.currentUserId, widget.user.id);
@@ -97,7 +100,7 @@ class _UserGroupPageState extends State<UserGroupPage>{
               child: Text("Unfriend", style: TextStyle(color: Colors.red),),
             ),
       );
-    }else if(!widget.isChat){
+    }else{
       return Container(
             child: RaisedButton(
               onPressed: () => {
@@ -129,7 +132,7 @@ class _UserGroupPageState extends State<UserGroupPage>{
         )
       ],
       );
-    }else if(!widget.isChat){
+    }else{
       return Row(
         children: <Widget>[
         Container(
@@ -148,6 +151,36 @@ class _UserGroupPageState extends State<UserGroupPage>{
         )
       ],
       );
+    }
+  }
+
+  void _uploadImage() async{
+    String groupId = widget.group.id;
+    String url = "";
+    try{
+      file = await FilePicker.getFile(type: FileType.image);
+      url = await widget.database.uploadGroupImageToStorage(file, groupId);
+      widget.database.updateGroupImageUrl(url, groupId);
+      _navigateToChatsPage();
+    }catch(e){
+      print(e);
+    }
+  }
+
+  Widget _uploadImageButton(){
+    if(!widget.isChat){
+      if(widget.group.admins.contains(widget.currentUserId)){
+        return Container(
+          child: RaisedButton(
+            onPressed: () => _uploadImage(),
+            child: Text("Upload image"),
+          ),
+        );
+      }else{
+        return Container(width: 0, height: 0,);
+      }
+    }else{
+      return Container(width: 0, height: 0,);
     }
   }
 
@@ -180,6 +213,7 @@ class _UserGroupPageState extends State<UserGroupPage>{
           _block(),
           _ignoreMessages(),
           _unFriendOrLeave(),
+          _uploadImageButton(),
       ],),
     );
   }
