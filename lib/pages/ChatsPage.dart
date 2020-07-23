@@ -5,8 +5,7 @@ import 'package:fluttermessenger/pages/AccountPage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
-import 'package:fluttermessenger/widgets/CustomBottomSheet.dart';
-import 'package:fluttermessenger/widgets/CustomDrawer.dart';
+import 'package:fluttermessenger/components/CustomBottomSheet.dart';
 import 'package:provider/provider.dart';
 import 'MessagePage.dart';
 
@@ -57,15 +56,17 @@ class _ChatsPageState extends State<ChatsPage>{
       return Scaffold(
       resizeToAvoidBottomInset: false, //keybaord resizes widget
       appBar: AppBar(
+        title: Text("Chats"),
+        centerTitle: true,
         backgroundColor: Colors.blueAccent,
+        leading: IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => {
+            _showSheet(),
+            widget.toggleBottomAppBarVisibility(),
+          },
+        ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => {
-              _showSheet(),
-              widget.toggleBottomAppBarVisibility(),
-            },
-            ),
             GestureDetector(
             child: Container(
               child: currentUser.imageUrl != "" 
@@ -88,10 +89,7 @@ class _ChatsPageState extends State<ChatsPage>{
             },
             ) 
         ],
-        title: Text("Chats"),
-        centerTitle: true,
       ),
-      drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
           Container(
@@ -184,8 +182,8 @@ class _ChatsPageState extends State<ChatsPage>{
                               )
                             );             
                           }else{
-                            Container(
-                              child: CircularProgressIndicator(),
+                            return Container(
+                              width: 0, height: 0,
                             );
                           }
                         }else{

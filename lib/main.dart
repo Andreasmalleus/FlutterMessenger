@@ -18,8 +18,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: RootPage(
-          auth: new Auth(),
-          database: new Database()
+          auth: Auth(),
+          database: Database()
           ),
     );
   }

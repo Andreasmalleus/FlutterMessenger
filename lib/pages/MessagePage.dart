@@ -1,13 +1,11 @@
 import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/widgets/CustomMediaPicker.dart';
-import 'package:fluttermessenger/pages/UserGroupPage.dart';
+import 'package:fluttermessenger/components/CustomMediaPicker.dart';
+import 'package:fluttermessenger/screens/UserGroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 

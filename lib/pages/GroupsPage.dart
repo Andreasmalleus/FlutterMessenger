@@ -4,8 +4,7 @@ import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
-import 'package:fluttermessenger/widgets/CustomBottomSheet.dart';
-import 'package:fluttermessenger/widgets/CustomDrawer.dart';
+import 'package:fluttermessenger/components/CustomBottomSheet.dart';
 import 'package:provider/provider.dart';
 
 import 'AccountPage.dart';
@@ -56,16 +55,16 @@ class _GroupsPageState extends State<GroupsPage>{
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Groups"),
-        backgroundColor: Colors.blueAccent,
         centerTitle: true,
+        backgroundColor: Colors.blueAccent,
+        leading: IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => {
+            _showSheet(),
+            widget.toggleBottomAppBarVisibility(),
+          },
+        ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () => {
-              _showSheet(),
-              widget.toggleBottomAppBarVisibility()
-            },
-            ),
             GestureDetector(
             child: Container(
               child: currentUser.imageUrl != "" 
@@ -89,7 +88,6 @@ class _GroupsPageState extends State<GroupsPage>{
             )
         ],
       ),
-      drawer: CustomDrawer(),
       body: Column(
         children: <Widget>[
            Container(
@@ -135,7 +133,7 @@ class _GroupsPageState extends State<GroupsPage>{
                 shrinkWrap: true,
                 itemCount: groups.length,
                 itemBuilder: (context, i){
-                  if(groups[i].id.contains(searchResult)){
+                  if(groups[i].name.contains(searchResult)){
                     return GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(
