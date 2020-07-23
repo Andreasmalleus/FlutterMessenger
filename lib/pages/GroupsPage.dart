@@ -74,7 +74,7 @@ class _GroupsPageState extends State<GroupsPage>{
                 radius: 30,
                 backgroundImage: NetworkImage(currentUser.imageUrl),
               )
-              : Icon(Icons.android, size: 40,)
+              : Icon(Icons.account_circle, size: 40)
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
@@ -150,7 +150,7 @@ class _GroupsPageState extends State<GroupsPage>{
                           CircleAvatar(
                             backgroundImage: NetworkImage(groups[i].imageUrl),
                           )
-                          : Icon(Icons.android, size: 35),
+                          : Icon(Icons.supervised_user_circle, size: 35,color: Colors.blueAccent,),
                           title: Text(groups[i].name),
                           subtitle: Text(
                             ((){

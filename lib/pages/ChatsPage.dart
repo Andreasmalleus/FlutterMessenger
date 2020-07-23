@@ -74,7 +74,7 @@ class _ChatsPageState extends State<ChatsPage>{
                 radius: 30,
                 backgroundImage: NetworkImage(currentUser.imageUrl),
               )
-              : Icon(Icons.android, size: 40,)
+              : Icon(Icons.account_circle, size: 40,)
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
@@ -155,7 +155,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                       backgroundImage: NetworkImage(user.imageUrl),
                                     )
                                     :
-                                    Icon(Icons.android, size: 35,),
+                                    Icon(Icons.account_circle, size: 35,color: Colors.blueAccent,),
                                     title: Text(user.username),
                                     subtitle: Text(
                                       ((){

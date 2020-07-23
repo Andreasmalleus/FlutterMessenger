@@ -266,7 +266,7 @@ class _MessagePageState extends State<MessagePage>{
               backgroundImage: NetworkImage(imageUrl),
             )
             :
-            Icon(Icons.android),
+            Icon(Icons.account_circle),
             Text(widget.isChat ? widget.user.username : widget.group.name),
             ],),
           onTap: () => {

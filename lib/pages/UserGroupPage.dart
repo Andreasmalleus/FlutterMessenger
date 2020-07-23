@@ -122,7 +122,7 @@ class _UserGroupPageState extends State<UserGroupPage>{
               backgroundImage: NetworkImage(widget.user.imageUrl),
             )                 
             :
-            Icon(Icons.android, size: 90,)
+            Icon(Icons.account_circle, size: 90,)
           ),
         Container(
           child: Text(widget.user.username),
@@ -141,7 +141,7 @@ class _UserGroupPageState extends State<UserGroupPage>{
               backgroundImage: NetworkImage(widget.group.imageUrl),
             )                 
             :
-            Icon(Icons.android, size: 90,)
+            Icon(Icons.account_circle, size: 90,)
           ),
         Container(
           child: Text(widget.group.name),
