@@ -206,6 +206,16 @@ class _MessagePageState extends State<MessagePage>{
               onChanged: (value) => text = value,
               decoration: InputDecoration.collapsed(hintText: "Send a message..",),
           )),
+          _isVisible
+          ? 
+          IconButton(
+            icon: Icon(Icons.arrow_drop_up),
+            iconSize: 25.0,
+            onPressed: () => setState((){
+              _isVisible = false;
+            }),
+          )
+          :  
           IconButton(
             icon: Icon(Icons.send),
             iconSize: 25.0,
