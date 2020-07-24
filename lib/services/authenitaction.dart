@@ -12,7 +12,7 @@ abstract class BaseAuth{
 
   Future<void> updateEmail(String email,);
 
-  Future<void> reAuthenticate(String password, String email);
+  Future<AuthResult> reAuthenticate(String password, String email);
 }
 
 class Auth implements BaseAuth{
@@ -48,9 +48,11 @@ class Auth implements BaseAuth{
     await user.updateEmail(email).catchError((error) => print("updateEmail error: $error"));
   }
 
-  Future<void> reAuthenticate(String password, String email) async {
-    await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).
+  Future<AuthResult> reAuthenticate(String password, String email) async {
+    print("reAuthenticate");
+    AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).
     catchError((error) => print("reAuthenticate error: $error"));
+    return result;
   }
 
 }

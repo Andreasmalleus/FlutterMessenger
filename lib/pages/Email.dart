@@ -21,76 +21,64 @@ class Email extends StatefulWidget{
 
 class _EmailState extends State<Email> {
   String email = "";
-  bool _isCorrect;
+  bool _isValidated;
   String password = "";
+  bool _isLoading;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
 
-  void _emailValidator(String email) async{
+  void _fieldsValidator(String email, String password) async{
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = new RegExp(pattern);
     if(email == "" || email.length < 5 && !regex.hasMatch(email)){
       showSnackBar("Email should contain @ and cant be empty", _scaffoldKey);
+    }else if(password == ""){
+      showSnackBar("Password should not be empty", _scaffoldKey);
     }else{
       setState(() {
-        _isCorrect = true;
+        _isValidated = true;
+        _isLoading = true;
       });
+      _reAuthenitcateAndUpdateEmail();
     }
   }
+
 
   void _reAuthenitcateAndUpdateEmail() async{
-    try{
-      await widget.auth.reAuthenticate(password, widget.user.email);
-      _updateEmail(email, widget.user.id);
-    }catch(error){
-      print(error);
-    }
+      AuthResult result = await widget.auth.reAuthenticate(password, widget.user.email);
+      if(result == null){
+        showSnackBar("Password is not correct", _scaffoldKey);
+      }else{
+        setState(() {
+          _isLoading = false;
+        });
+        _updateEmail(result.user.uid);
+      }
   }
 
-  void _updateEmail(String email, String userId) async{
+  void _updateEmail(String userId) async{
+    showSnackBar("Email has been updated", _scaffoldKey);
     await widget.auth.updateEmail(email);
     await widget.database.updateEmail(userId, email);
     Navigator.of(context).pop();
   }
 
-  Widget _passwordContainer(){
-    if(_isCorrect){
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.symmetric(vertical: 15),
-            child: Text("Please re-enter your password")
-          ),
-          Row(
-            children: <Widget>[
-              Container(
-                width: MediaQuery.of(context).size.width * 0.5,
-                child: TextField(
-                  onChanged: (value) => setState((){
-                    password = value;
-                  }),
-                  decoration: InputDecoration(hintText: "password")
-                ),
-              ),
-            ],
-          ),
-          RaisedButton(
-              onPressed: () => _reAuthenitcateAndUpdateEmail(),
-              child: Text("Reauthenticate"),
-            )
-        ],
-      );
-    }else{
+  Widget waitingScreen(){
+    if(_isLoading){
       return Container(
-        width: 0, height: 0,
-      );
+        margin: EdgeInsets.only(top: 25),
+        alignment: Alignment.center,
+        child: CircularProgressIndicator()
+        );
+    }else{
+      return Container(width: 0,height: 0,);
     }
   }
 
   void initState(){
-    _isCorrect = false;
+    _isValidated = false;
+    _isLoading = false;
     super.initState();
   }
 
@@ -105,7 +93,8 @@ class _EmailState extends State<Email> {
             margin: EdgeInsets.only(top: 17, right: 15),
             child: GestureDetector(
               child: Text("Done", style: TextStyle(color: Colors.white, fontSize: 20),),
-              onTap: () => _emailValidator(email),
+              onTap: () => 
+              _fieldsValidator(email, password),
             ),
           )
         ],
@@ -124,7 +113,19 @@ class _EmailState extends State<Email> {
                 decoration: InputDecoration(hintText: widget.user.email),
               ),
             ),
-            _passwordContainer()
+            Container(
+              margin: EdgeInsets.symmetric(vertical: 15),
+              child: Text("Please re-enter your password")
+            ),
+            Container(
+              child: TextField(
+                onChanged: (value) => setState((){
+                  password = value;
+                }),
+                decoration: InputDecoration(hintText: "password",)
+              ),
+            ),
+            waitingScreen()
           ],
         ),
       ),
