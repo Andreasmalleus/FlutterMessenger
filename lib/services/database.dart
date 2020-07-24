@@ -21,6 +21,10 @@ abstract class BaseDb{
 
   Future<void> addUser(String userId,String email, String username, String createdAt, String imageUrl);
 
+  Future<void> updateUsername(String userId, String newUsername);
+
+  Future<void> updateEmail(String userId, String newEmail); 
+
   Future<List> getAllUsers();
 
   Future<User> getUserObject(String id);
@@ -82,6 +86,7 @@ abstract class BaseDb{
 }
 
 class Database implements BaseDb{
+  
   final DatabaseReference _userRef = FirebaseDatabase.instance.reference().child("users");
   final DatabaseReference _messageRef = FirebaseDatabase.instance.reference().child("messages");
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
@@ -89,7 +94,6 @@ class Database implements BaseDb{
   final DatabaseReference _groupRef = FirebaseDatabase.instance.reference().child("groups");
   final StorageReference _storageRef = FirebaseStorage.instance.ref();
   
-
   DatabaseReference getGroupRef(){
     return _groupRef;
   }
@@ -114,6 +118,18 @@ class Database implements BaseDb{
       "imageUrl" : imageUrl,
     });
     debugPrint("User added to database");
+  }
+
+  Future<void> updateUsername(String userId, String newUsername) async{
+    await _userRef.child(userId).update({
+      "username" : newUsername
+    }).catchError((error) => print("updateUsername $error"));
+  }
+
+  Future<void> updateEmail(String userId, String newEmail) async{
+    await _userRef.child(userId).update({
+      "email" : newEmail
+    }).catchError((error) => print("updateEmail $error"));
   }
 
   Future<List> getAllUsers() async{

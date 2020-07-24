@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/AccountPage.dart';
+import 'package:fluttermessenger/pages/ProfilePage.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -79,7 +79,7 @@ class _ChatsPageState extends State<ChatsPage>{
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                builder: (context) => AccountPage(
+                builder: (context) => ProfilePage(
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,

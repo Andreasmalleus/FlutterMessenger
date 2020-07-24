@@ -7,7 +7,7 @@ import 'package:fluttermessenger/utils/utils.dart';
 import 'package:fluttermessenger/components/CustomBottomSheet.dart';
 import 'package:provider/provider.dart';
 
-import 'AccountPage.dart';
+import 'ProfilePage.dart';
 import 'MessagePage.dart';
 
 class GroupsPage extends StatefulWidget{
@@ -77,7 +77,7 @@ class _GroupsPageState extends State<GroupsPage>{
             ),
             onTap: () => {
               Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                builder: (context) => AccountPage(
+                builder: (context) => ProfilePage(
                   database: widget.database,
                   auth : widget.auth,
                   logOutCallback: widget.logOutCallback,
@@ -170,6 +170,8 @@ class _GroupsPageState extends State<GroupsPage>{
                           ),
                       )
                     );          
+                  }else{
+                    return Container(width: 0,height: 0,);
                   }
                 }
               );
