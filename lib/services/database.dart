@@ -23,6 +23,8 @@ abstract class BaseDb{
 
   Future<void> updateUsername(String userId, String newUsername);
 
+  Future<bool> checkIfValueAlreadyExists(String newValue, String key);
+
   Future<void> updateEmail(String userId, String newEmail); 
 
   Future<List> getAllUsers();
@@ -126,6 +128,19 @@ class Database implements BaseDb{
     }).catchError((error) => print("updateUsername $error"));
   }
 
+  
+  Future<bool> checkIfValueAlreadyExists(String newValue, String key) async{
+    bool _exists = false;
+    await _userRef.once().then((DataSnapshot snapshot) => {
+       snapshot.value.forEach((key, value) => { 
+         if(value["username"] == newValue){
+           _exists = true
+         }
+      })
+    });
+    return _exists;
+  }
+
   Future<void> updateEmail(String userId, String newEmail) async{
     await _userRef.child(userId).update({
       "email" : newEmail
@@ -134,16 +149,17 @@ class Database implements BaseDb{
 
   Future<List> getAllUsers() async{
     List<User> users = [];
+    User user;
     await _userRef.once().then((DataSnapshot snapshot) => { 
-      snapshot.value.forEach((key, value){ 
-          User user = User(
+      snapshot.value.forEach((key, value) => { 
+          user = User(
             id: key,
             email: value["email"],
             username: value["username"],
             createdAt: value["createdAt"],
             imageUrl: value["imageUrl"]
-            );
-          users.add(user);
+            ),
+          users.add(user)
       })
     }).catchError((error)  => print("getAllUsers error: $error"));
     print("All users received");

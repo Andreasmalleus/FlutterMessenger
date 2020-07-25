@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/services/database.dart';
+import 'package:fluttermessenger/utils/utils.dart';
 
 class Username extends StatefulWidget{
 
@@ -17,11 +18,24 @@ class Username extends StatefulWidget{
 
 class _UsernameState extends State<Username> {
   String username = "";
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   void _updateUsername(String username) async{
     if(username == "" || username.length < 5){
-      print("Cant be empty and must be more than 5 characters long");
+      showSnackBar("Cant be empty and must be more than 5 characters long", _scaffoldKey);
     }else{
+      _checkIfUsernameIsAlreadyInUse();
+    }
+  }
+
+  Future<void> _checkIfUsernameIsAlreadyInUse() async {
+    bool _exists = await widget.database.checkIfValueAlreadyExists(username, "username");
+    print(_exists.toString());
+    if(_exists){
+      showSnackBar("User already in use", _scaffoldKey);
+    }else{
+      showSnackBar("Username updated", _scaffoldKey);
       await widget.database.updateUsername(widget.user.id, username);
       Navigator.of(context).pop();
     }
@@ -29,6 +43,7 @@ class _UsernameState extends State<Username> {
 
   Widget build(BuildContext context){
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text("Username"),
         centerTitle: true,
