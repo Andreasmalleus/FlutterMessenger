@@ -26,7 +26,6 @@ class _EmailState extends State<Email> {
   bool _isLoading;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-
   void _fieldsValidator(String email, String password) async{
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -55,8 +54,6 @@ class _EmailState extends State<Email> {
       _reAuthenitcateAndUpdateEmail();
     }
   }
-
-
 
   void _reAuthenitcateAndUpdateEmail() async{
       AuthResult result = await widget.auth.reAuthenticate(password, widget.user.email);
@@ -138,7 +135,8 @@ class _EmailState extends State<Email> {
                 onChanged: (value) => setState((){
                   password = value;
                 }),
-                decoration: InputDecoration(hintText: "password",)
+                decoration: InputDecoration(hintText: "password",),
+                obscureText: true,
               ),
             ),
             waitingScreen()
