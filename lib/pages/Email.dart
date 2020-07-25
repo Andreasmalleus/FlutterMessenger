@@ -21,7 +21,6 @@ class Email extends StatefulWidget{
 
 class _EmailState extends State<Email> {
   String email = "";
-  bool _isValidated;
   String password = "";
   bool _isLoading;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -36,7 +35,6 @@ class _EmailState extends State<Email> {
       showSnackBar("Password should not be empty", _scaffoldKey);
     }else{
       setState(() {
-        _isValidated = true;
         _isLoading = true;
       });
       _checkIfEmailAlreadyExists();
@@ -90,7 +88,6 @@ class _EmailState extends State<Email> {
   }
 
   void initState(){
-    _isValidated = false;
     _isLoading = false;
     super.initState();
   }
