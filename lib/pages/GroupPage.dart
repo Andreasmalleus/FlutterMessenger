@@ -86,7 +86,7 @@ class _GroupPageState extends State<GroupPage>{
                     backgroundImage: NetworkImage(widget.group.imageUrl),
                   )                 
                   :
-                  Icon(Icons.android, size: 30,)
+                  Icon(Icons.supervised_user_circle, size: 120, color: Colors.blueAccent,)
                 ),
             ],),
           ),
@@ -95,28 +95,38 @@ class _GroupPageState extends State<GroupPage>{
             margin: EdgeInsets.symmetric(horizontal: 25),
             child: Divider(color: Colors.blueAccent,)
           ),
-         Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Row(
-              children: <Widget>[
-                Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
-                SizedBox(width: 5,),
-                Container(
-                  child: Text("Nicknames", style: TextStyle(fontSize: 17),),
+          Container(
+            child: GestureDetector(
+              onTap: () => print("Nicknames"),
+              child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
+                    SizedBox(width: 5,),
+                    Container(
+                      child: Text("Nicknames", style: TextStyle(fontSize: 17),),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.group, color: Colors.blueAccent,),
-                SizedBox(width: 5,),
-                Container(
-                  child: Text("People", style: TextStyle(fontSize: 17),),
+            child: GestureDetector(
+              onTap: () => print("People"),
+                child: Container(
+                  margin: EdgeInsets.only(left: 25, top: 10),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.group, color: Colors.blueAccent,),
+                      SizedBox(width: 5,),
+                      Container(
+                        child: Text("People", style: TextStyle(fontSize: 17),),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
             ),
           ),
           Container(
@@ -128,27 +138,37 @@ class _GroupPageState extends State<GroupPage>{
             child: Text("More actions", style: TextStyle(color: Colors.grey, fontSize: 20),),
           ),
           Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.photo, color: Colors.blueAccent,),
-                SizedBox(width: 5,),
-                Container(
-                  child: Text("View photos and videos", style: TextStyle(fontSize: 17),),
+            child: GestureDetector(
+              onTap: () => print("View photos and videos"),
+              child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.photo, color: Colors.blueAccent,),
+                    SizedBox(width: 5,),
+                    Container(
+                      child: Text("View photos and videos", style: TextStyle(fontSize: 17),),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.search, color: Colors.blueAccent,),
-                SizedBox(width: 5,),
-                Container(
-                  child: Text("Search in conversation", style: TextStyle(fontSize: 17),),
+            child: GestureDetector(
+              onTap: () => print("Search in conversation"),
+              child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.search, color: Colors.blueAccent,),
+                    SizedBox(width: 5,),
+                    Container(
+                      child: Text("Search in conversation", style: TextStyle(fontSize: 17),),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
           Container(
@@ -159,26 +179,33 @@ class _GroupPageState extends State<GroupPage>{
             margin: EdgeInsets.only(left: 25, top: 10),
             child: Text("Privacy", style: TextStyle(color: Colors.grey, fontSize: 20),),
           ),
-          
           Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.speaker_notes_off, color: Colors.redAccent,),
-                SizedBox(width: 5,),
-                Text("Ignore messages", style: TextStyle(fontSize: 17),),
-              ],
+            child: GestureDetector(
+              onTap: () => print("Ignore Messages"),
+              child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.speaker_notes_off, color: Colors.redAccent,),
+                    SizedBox(width: 5,),
+                    Text("Ignore messages", style: TextStyle(fontSize: 17),),
+                  ],
+                ),
+              ),
             ),
           ),
-          GestureDetector(
-            child: Container(
-              margin: EdgeInsets.only(left: 25, top: 10),
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.close, color: Colors.redAccent,),
-                  SizedBox(width: 5,),
-                  Text("Leave", style: TextStyle(fontSize: 17),),
-                ],
+          Container(
+            child: GestureDetector(
+              onTap: () => print("Leave"),
+              child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.close, color: Colors.redAccent,),
+                    SizedBox(width: 5,),
+                    Text("Leave", style: TextStyle(fontSize: 17),),
+                  ],
+                ),
               ),
             ),
           ),

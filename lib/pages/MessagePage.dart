@@ -250,7 +250,6 @@ class _MessagePageState extends State<MessagePage>{
   @override
   Widget build(BuildContext context){
     String imageUrl = widget.isChat ? widget.user.imageUrl : widget.group.imageUrl;
-
     return Scaffold(
       bottomNavigationBar: null,
       appBar: AppBar(
@@ -265,7 +264,7 @@ class _MessagePageState extends State<MessagePage>{
               backgroundImage: NetworkImage(imageUrl),
             )
             :
-            Icon(Icons.account_circle),
+            Icon(widget.isChat ? Icons.account_circle : Icons.supervised_user_circle),
             Text(widget.isChat ? widget.user.username : widget.group.name),
             ],),
           onTap: () => {
