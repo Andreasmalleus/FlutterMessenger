@@ -40,15 +40,31 @@ class _EmailState extends State<Email> {
         _isValidated = true;
         _isLoading = true;
       });
+      _checkIfEmailAlreadyExists();
+    }
+  }
+
+  void _checkIfEmailAlreadyExists() async {
+    bool _exists = await widget.database.checkIfValueAlreadyExists(email, "email");
+    if(_exists){
+      setState(() {
+        _isLoading = false;
+      });
+      showSnackBar("Email already exists", _scaffoldKey);
+    }else{
       _reAuthenitcateAndUpdateEmail();
     }
   }
+
 
 
   void _reAuthenitcateAndUpdateEmail() async{
       AuthResult result = await widget.auth.reAuthenticate(password, widget.user.email);
       if(result == null){
         showSnackBar("Password is not correct", _scaffoldKey);
+        setState(() {
+          _isLoading = false;
+        });
       }else{
         setState(() {
           _isLoading = false;

@@ -132,8 +132,8 @@ class Database implements BaseDb{
   Future<bool> checkIfValueAlreadyExists(String newValue, String key) async{
     bool _exists = false;
     await _userRef.once().then((DataSnapshot snapshot) => {
-       snapshot.value.forEach((key, value) => { 
-         if(value["username"] == newValue){
+       snapshot.value.forEach((_, value) => { 
+         if(value[key] == newValue){
            _exists = true
          }
       })
