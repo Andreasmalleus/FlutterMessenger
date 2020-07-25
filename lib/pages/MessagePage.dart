@@ -5,7 +5,8 @@ import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/components/CustomMediaPicker.dart';
-import 'package:fluttermessenger/pages/UserGroupPage.dart';
+import 'package:fluttermessenger/pages/UserPage.dart';
+import 'package:fluttermessenger/pages/GroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
@@ -269,20 +270,17 @@ class _MessagePageState extends State<MessagePage>{
             ],),
           onTap: () => {
             widget.isChat ? 
-              Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
+              Navigator.push(context, (MaterialPageRoute(builder: (context) => UserPage(
               user: widget.user,
               database: widget.database,
               currentUserId: widget.sender.id,
               convTypeId: widget.convTypeId,
-              isChat: true,
               ))))
             :
-              Navigator.push(context, (MaterialPageRoute(builder: (context) => UserGroupPage(
+              Navigator.push(context, (MaterialPageRoute(builder: (context) => GroupPage(
               group: widget.group,
               database: widget.database,
               currentUserId: widget.sender.id,
-              convTypeId: widget.convTypeId,
-              isChat: false,
               ))))
           },
         ),
