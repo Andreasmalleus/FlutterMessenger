@@ -53,8 +53,10 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
     String url;
     if(widget.isChat){
       url = await widget.database.uploadFileToChatStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
+      await widget.database.fileUrlToDatabase(widget.convTypeId, widget.sender.id, url, fileName);
     }else{
       url = await widget.database.uploadFileToGroupStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
+      await widget.database.fileUrlToDatabase(widget.convTypeId, widget.sender.id, url, fileName);
     }
     await widget.database.addMessage(url, widget.sender, false, false, time, widget.convTypeId, "image");
   }

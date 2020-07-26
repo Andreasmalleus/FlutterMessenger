@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
+import 'package:fluttermessenger/models/storageFile.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
@@ -81,6 +82,10 @@ abstract class BaseDb{
 
   Future<void> updateGroupImageUrl(String url, String groupId);
 
+  Future<List> listAllStorageFilesById(String chatId);
+
+  Future<void> fileUrlToDatabase(String convId, String userId, String url, String fileName);
+
   Stream<User> streamUser(String id);
 
   Stream<dynamic> streamUsers();
@@ -94,6 +99,7 @@ class Database implements BaseDb{
   final DatabaseReference _friendsRef = FirebaseDatabase.instance.reference().child("friends");
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
   final DatabaseReference _groupRef = FirebaseDatabase.instance.reference().child("groups");
+  final DatabaseReference _storageFilesRef = FirebaseDatabase.instance.reference().child("storageFiles");
   final StorageReference _storageRef = FirebaseStorage.instance.ref();
   
   DatabaseReference getGroupRef(){
@@ -433,7 +439,6 @@ class Database implements BaseDb{
     StorageUploadTask uploadTask = _storageRef.child("users/$userId/media/profileImage").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
-    print("download url is $url");
     return url;
   }
 
@@ -441,7 +446,6 @@ class Database implements BaseDb{
     StorageUploadTask uploadTask = _storageRef.child("groups/$groupId/media/groupImage").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
-    print("download url is $url");
     return url;
   }
 
@@ -449,7 +453,6 @@ class Database implements BaseDb{
     StorageUploadTask uploadTask = _storageRef.child("chats/$chatId/media/$userId/$fileName").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
-    print("download url is $url");
     return url;
   }
 
@@ -457,7 +460,6 @@ class Database implements BaseDb{
     StorageUploadTask uploadTask = _storageRef.child("groups/$groupId/media/$userId/$fileName").putFile(file);
     StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     String url = await downloadUrl.ref.getDownloadURL();
-    print("download url is $url");
     return url;
   }
 
@@ -477,6 +479,32 @@ class Database implements BaseDb{
       "imageUrl" : url
     }).catchError((e) => print("uploadImageToDataBase: $e"));
   }
+
+  Future<void> fileUrlToDatabase(String convId, String userId, String url, String fileName) async{
+    await _storageFilesRef.child("$convId/$userId/$fileName").set(url);
+  }
+
+  Future<List> listAllStorageFilesById(String chatId) async{
+    List<StorageFile> files = List<StorageFile>();
+    StorageFile file;
+    DataSnapshot snapshot = await _storageFilesRef.orderByKey().equalTo(chatId).once();
+    if(snapshot != null){
+      snapshot.value.forEach((convId, val) => {
+        val.forEach((userId, value) => {
+          value.forEach((name, url) =>{
+            file = StorageFile(
+              userId: userId,
+              name: name,
+              url: url,
+            ),
+            files.add(file)
+          })
+        })
+      });
+    }
+    return files;
+  }
+
 
   Stream<User> streamUser(String id){
     return _userRef.child(id).onValue.map((event) => User.fromFirebase(event.snapshot));

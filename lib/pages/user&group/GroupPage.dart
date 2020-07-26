@@ -2,6 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
+import 'package:fluttermessenger/pages/user&group/Nicknames.dart';
+import 'package:fluttermessenger/pages/user&group/People.dart';
+import 'package:fluttermessenger/pages/user&group/SearchedMessages.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -48,7 +52,7 @@ class _GroupPageState extends State<GroupPage>{
       return Container(
         alignment: Alignment.center,
         child: GestureDetector(
-            onTap: () => {print("upload image")},
+            onTap: () => _uploadImage(),
             child: Text("Upload a new image", style: TextStyle(fontSize: 15, color: Colors.blueAccent),),
         ),
       );
@@ -97,7 +101,9 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("Nicknames"),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => NickNames())),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -114,7 +120,9 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("People"),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => People())),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
@@ -139,7 +147,9 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("View photos and videos"),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => MediaCollection(database: widget.database, typeId: widget.group.id,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -156,7 +166,9 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("Search in conversation"),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => SearchedMessages())),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(

@@ -5,8 +5,8 @@ import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/components/CustomMediaPicker.dart';
-import 'package:fluttermessenger/pages/UserPage.dart';
-import 'package:fluttermessenger/pages/GroupPage.dart';
+import 'package:fluttermessenger/pages/user&group/UserPage.dart';
+import 'package:fluttermessenger/pages/user&group/GroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
