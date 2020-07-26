@@ -5,6 +5,7 @@ import 'package:fluttermessenger/models/groupModel.dart';
 import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/components/CustomMediaPicker.dart';
+import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
 import 'package:fluttermessenger/pages/user&group/UserPage.dart';
 import 'package:fluttermessenger/pages/user&group/GroupPage.dart';
 import 'package:fluttermessenger/services/database.dart';
@@ -45,7 +46,6 @@ class _MessagePageState extends State<MessagePage>{
       width: MediaQuery.of(context).size.width * 0.75,
       margin: isMe
           ? EdgeInsets.only(
-            top: 8.0, 
             bottom: 8.0, 
             left: 80.0,
           ) 
@@ -53,27 +53,13 @@ class _MessagePageState extends State<MessagePage>{
             top: 8.0, 
             bottom: 8.0,
           ),
-      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
-      decoration: BoxDecoration(
-        color: isMe ? Colors.blueAccent: Colors.grey,
-        borderRadius: BorderRadius.all(
-                Radius.circular(15.0),
-              ) 
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            formatDateToHoursAndMinutes(message.time),
-            style: TextStyle(
-              color: Colors.black, 
-              fontWeight: FontWeight.bold, 
-              fontSize: 15.0),
-              ),
-          SizedBox(height: 4.0,),
-          Image.network(message.message)
-        ],
-      ),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: message.message, name: message.id,))),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(message.message)
+              )
+            )
     )
     :
     Container(

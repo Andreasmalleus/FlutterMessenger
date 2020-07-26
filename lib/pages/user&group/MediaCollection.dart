@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttermessenger/models/storageFile.dart';
 import 'package:fluttermessenger/services/database.dart';
 
@@ -39,7 +40,7 @@ class _MediaCollectionState extends State<MediaCollection> {
             itemBuilder: (BuildContext context, int i){
               return Container(
                 child: GestureDetector(
-                  onTap: () => print("Enlarge picture"),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: files[i].url, name: files[i].name,))),
                   child: Container(
                     child: Image.network(files[i].url, fit: BoxFit.cover,)
                   ),
@@ -58,8 +59,40 @@ class _MediaCollectionState extends State<MediaCollection> {
   }
 }
 
-class DetailScreen extends StatelessWidget{
+class DetailPage extends StatefulWidget{
+
+  DetailPage({this.url, this.name});
+  final String url;
+  final String name;
+
+  @override
+  _DetailPageState createState() => _DetailPageState();
+}
+
+class _DetailPageState extends State<DetailPage> {
+
+  @override
+  initState() {
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    //SystemChrome.restoreSystemUIOverlays();
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.dispose();
+  }
+
   Widget build(BuildContext context){
-    return Container(child: Text("Enlarged"),);
+    return Container(
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).pop(),
+        child: Hero(
+          tag: widget.name,
+          child: Image.network(widget.url),
+        ),
+      ),
+    );
   }
 }
