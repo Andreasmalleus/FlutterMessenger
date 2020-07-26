@@ -107,6 +107,17 @@ class _MessagePageState extends State<MessagePage>{
         ) 
         : Icon(Icons.android, size: 30,),
     );
+    final likeDislikeButton =  IconButton(
+      icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
+      color: message.isLiked ? Colors.red : Colors.black,
+      iconSize: 25.0,
+      onPressed: () async {
+        message.isLiked 
+        ? 
+        await widget.database.dislikeMessage(widget.convTypeId,message.id) 
+        : await widget.database.likeMessage(widget.convTypeId, message.id);
+      },
+    );
     if(isMe){
       return msg;
     }else{
@@ -114,17 +125,7 @@ class _MessagePageState extends State<MessagePage>{
       children: <Widget>[
         img,
         msg,
-        IconButton(
-          icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
-          color: message.isLiked ? Colors.red : Colors.black,
-          iconSize: 25.0,
-          onPressed: () async {
-            message.isLiked 
-            ? 
-            await widget.database.dislikeMessage(widget.convTypeId,message.id) 
-            : await widget.database.likeMessage(widget.convTypeId, message.id);
-          },
-        ),
+        likeDislikeButton
       ],
     );
     }
