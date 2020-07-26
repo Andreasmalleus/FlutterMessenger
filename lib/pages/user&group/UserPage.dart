@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
 import 'package:fluttermessenger/pages/user&group/Nicknames.dart';
-import 'package:fluttermessenger/pages/user&group/SearchedMessages.dart';
+import 'package:fluttermessenger/pages/user&group/SearchMessagesPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
 //TODO create a page that fits for both groups and chats
@@ -126,7 +126,7 @@ class _UserPageState extends State<UserPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => SearchedMessages())),
+                  builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.convTypeId,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(

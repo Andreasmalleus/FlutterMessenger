@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/chatModel.dart';
 import 'package:fluttermessenger/models/groupModel.dart';
+import 'package:fluttermessenger/models/messageModel.dart';
 import 'package:fluttermessenger/models/storageFile.dart';
 import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -34,7 +35,7 @@ abstract class BaseDb{
 
   Future<void> addMessage(String message, User sender, bool isRead, bool isLiked, String time, String key, String type);
 
-  Future<Map> getAllMessages(String key);
+  Future<List> getAllMessages(String key);
 
   Future<String> getLastMessage();
 
@@ -206,10 +207,32 @@ class Database implements BaseDb{
     print("Message added");
   }
 
-  Future<Map> getAllMessages(String key) async{
-    Map<dynamic, dynamic> messages;
+  Future<List> getAllMessages(String key) async{
+    List<Message> messages =List<Message>();
+    User sender;
+    Message message;
     await _messageRef.child(key).once().then((DataSnapshot snapshot) => {
-      messages = snapshot.value
+      snapshot.value.forEach((key,value)=> {
+        sender = User(
+          id: value["sender"]["id"],
+          imageUrl: value["sender"]["imageUrl"],
+          createdAt: value["sender"]["createdAt"],
+          username: value["sender"]["username"],
+          email: value["sender"]["email"]
+        ),
+        message = Message(
+          id: key,
+          type: value["type"],
+          time: value["time"],
+          sender: sender,
+          message: value["message"],
+          isLiked: value["isLiked"],
+          isRead: value["isRead"]
+        ),
+        messages.add(
+          message
+        )
+      })
     }).catchError((error)  => print("getAllMessages error: $error"));
     print("All messages received");
     return messages;

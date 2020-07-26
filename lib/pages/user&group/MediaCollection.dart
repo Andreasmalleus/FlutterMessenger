@@ -73,15 +73,7 @@ class _DetailPageState extends State<DetailPage> {
 
   @override
   initState() {
-    SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    //SystemChrome.restoreSystemUIOverlays();
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    super.dispose();
   }
 
   Widget build(BuildContext context){

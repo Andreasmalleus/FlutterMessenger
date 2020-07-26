@@ -5,7 +5,7 @@ import 'package:fluttermessenger/models/userModel.dart';
 import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
 import 'package:fluttermessenger/pages/user&group/Nicknames.dart';
 import 'package:fluttermessenger/pages/user&group/People.dart';
-import 'package:fluttermessenger/pages/user&group/SearchedMessages.dart';
+import 'package:fluttermessenger/pages/user&group/SearchMessagesPage.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -168,7 +168,11 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => SearchedMessages())),
+                  builder: (BuildContext context) => SearchMessagesPage(
+                    title: widget.group.name,
+                    database: widget.database,
+                    typeId: widget.group.id,)
+                )),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
