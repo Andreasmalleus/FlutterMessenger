@@ -102,7 +102,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => NickNames())),
+                  builder: (BuildContext context) => NickNamesPage())),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -121,7 +121,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => People())),
+                  builder: (BuildContext context) => PeoplePage())),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
@@ -148,7 +148,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => MediaCollection(database: widget.database, typeId: widget.group.id,))),
+                  builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.group.id,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(

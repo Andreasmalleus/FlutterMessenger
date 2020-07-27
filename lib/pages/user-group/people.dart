@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class People extends StatelessWidget{
+class PeoplePage extends StatelessWidget{
 
   Widget build(BuildContext context){
     return Scaffold(

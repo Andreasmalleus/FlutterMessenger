@@ -115,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage>{
                               GestureDetector(
                                 onTap: () => Navigator.push(
                                   context, MaterialPageRoute(
-                                    builder : (context) => Username(
+                                    builder : (context) => UsernamePage(
                                       database: widget.database,
                                       user: user,
                                       ))),
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage>{
                               GestureDetector(
                                 onTap: () =>  Navigator.push(
                                   context, MaterialPageRoute(
-                                    builder : (context) => Email(
+                                    builder : (context) => EmailPage(
                                       database: widget.database,
                                       user: user,
                                       auth: widget.auth

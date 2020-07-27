@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/storage_file.dart';
 import 'package:fluttermessenger/services/database.dart';
 
-class MediaCollection extends StatefulWidget{
+class MediaCollectionPage extends StatefulWidget{
 
-  MediaCollection({this.database, this.typeId});
+  MediaCollectionPage({this.database, this.typeId});
   final BaseDb database;
   final String typeId;
 
   @override
-  _MediaCollectionState createState() => _MediaCollectionState();
+  _MediaCollectionPageState createState() => _MediaCollectionPageState();
 }
 
-class _MediaCollectionState extends State<MediaCollection> {
+class _MediaCollectionPageState extends State<MediaCollectionPage> {
 
 
   List<StorageFile> files = List<StorageFile>();

@@ -6,19 +6,19 @@ import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
-class Email extends StatefulWidget{
+class EmailPage extends StatefulWidget{
 
   final BaseDb database;
   final User user;
   final BaseAuth auth;
 
-  Email({this.database, this.user, this.auth});
+  EmailPage({this.database, this.user, this.auth});
 
   @override
-  _EmailState createState() => _EmailState();
+  _EmailPageState createState() => _EmailPageState();
 }
 
-class _EmailState extends State<Email> {
+class _EmailPageState extends State<EmailPage> {
   String email = "";
   String password = "";
   bool _isLoading;

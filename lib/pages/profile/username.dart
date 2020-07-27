@@ -5,18 +5,18 @@ import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
-class Username extends StatefulWidget{
+class UsernamePage extends StatefulWidget{
 
   final BaseDb database;
   final User user;
 
-  Username({this.database, this.user});
+  UsernamePage({this.database, this.user});
 
   @override
-  _UsernameState createState() => _UsernameState();
+  _UsernamePageState createState() => _UsernamePageState();
 }
 
-class _UsernameState extends State<Username> {
+class _UsernamePageState extends State<UsernamePage> {
   String username = "";
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 

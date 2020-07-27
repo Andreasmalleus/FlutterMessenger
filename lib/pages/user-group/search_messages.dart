@@ -25,7 +25,7 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
     }else{
       print("search $_searchResult");
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => SearchedMessages(
+        MaterialPageRoute(builder: (_) => SearchedMessagesPage(
           title: widget.title,
           database: widget.database,
           searchResult : _searchResult,
@@ -74,9 +74,9 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
   }
 }
 
-class SearchedMessages extends StatelessWidget{
+class SearchedMessagesPage extends StatelessWidget{
 
-  SearchedMessages({this.title, this.database, this.searchResult, this.typeId});
+  SearchedMessagesPage({this.title, this.database, this.searchResult, this.typeId});
   final String title;
   final BaseDb database;
   final String searchResult;

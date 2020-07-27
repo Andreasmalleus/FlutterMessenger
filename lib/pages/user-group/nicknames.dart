@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NickNames extends StatelessWidget{
+class NickNamesPage extends StatelessWidget{
 
   Widget build(BuildContext context){
     return Scaffold(
