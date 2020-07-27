@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/groupModel.dart';
-import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/models/group.dart';
+import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
-import 'package:fluttermessenger/components/CustomBottomSheet.dart';
+import 'package:fluttermessenger/components/custom_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 
-import 'ProfilePage.dart';
-import 'MessagePage.dart';
+import 'profile/profile.dart';
+import 'messages.dart';
 
 class GroupsPage extends StatefulWidget{
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:fluttermessenger/models/storageFile.dart';
+import 'package:fluttermessenger/models/storage_file.dart';
 import 'package:fluttermessenger/services/database.dart';
 
 class MediaCollection extends StatefulWidget{
@@ -74,6 +73,12 @@ class _DetailPageState extends State<DetailPage> {
   @override
   initState() {
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    //SystemChrome.restoreSystemUIOverlays();
+    super.dispose();
   }
 
   Widget build(BuildContext context){

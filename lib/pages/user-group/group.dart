@@ -1,42 +1,63 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
-import 'package:fluttermessenger/pages/user&group/Nicknames.dart';
-import 'package:fluttermessenger/pages/user&group/SearchMessagesPage.dart';
+import 'package:fluttermessenger/models/group.dart';
+import 'package:fluttermessenger/pages/user-group/media_collection.dart';
+import 'package:fluttermessenger/pages/user-group/nicknames.dart';
+import 'package:fluttermessenger/pages/user-group/people.dart';
+import 'package:fluttermessenger/pages/user-group/search_messages.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 //TODO create a page that fits for both groups and chats
 
-class UserPage extends StatefulWidget{
+class GroupPage extends StatefulWidget{
 
-  final User user;
+  final Group group;
   final BaseDb database;
-  final String currentUserId;
-  final String convTypeId;
-  
+  final String currentUserId;  
 
-  UserPage({this.user, this.database,this.currentUserId, this.convTypeId});
+  GroupPage({this.database,this.currentUserId, this.group});
 
   @override
-  _UserPageState createState() => _UserPageState();
+  _GroupPageState createState() => _GroupPageState();
 
 }
 
-class _UserPageState extends State<UserPage>{
+class _GroupPageState extends State<GroupPage>{
 
   File file;
 
-  void _unfriend() async{
-    await widget.database.unFriend(widget.currentUserId, widget.user.id);
-    await widget.database.removeChat(widget.convTypeId);
-    _navigateToChatsPage();
-  }
-
-  void _navigateToChatsPage(){
+  void _navigateToGroupsPage(){
     var nav = Navigator.of(context);
     nav.pop();
     nav.pop();
+  }
+
+  void _uploadImage() async{
+    String groupId = widget.group.id;
+    String url = "";
+    try{
+      file = await FilePicker.getFile(type: FileType.image);
+      url = await widget.database.uploadGroupImageToStorage(file, groupId);
+      widget.database.updateGroupImageUrl(url, groupId);
+      _navigateToGroupsPage();
+    }catch(e){
+      print(e);
+    }
+  }
+
+  Widget _uploadImageButton(){
+    if(widget.group.admins.contains(widget.currentUserId)){
+      return Container(
+        alignment: Alignment.center,
+        child: GestureDetector(
+            onTap: () => _uploadImage(),
+            child: Text("Upload a new image", style: TextStyle(fontSize: 15, color: Colors.blueAccent),),
+        ),
+      );
+    }else{
+      return Container(width: 0, height: 0,);
+    }
   }
 
   void initState(){
@@ -47,7 +68,7 @@ class _UserPageState extends State<UserPage>{
       return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.user.username
+          widget.group.name
           ),
         centerTitle: true,
       ),
@@ -61,17 +82,18 @@ class _UserPageState extends State<UserPage>{
               children: <Widget>[
               Container(
                 child: 
-                  widget.user.imageUrl != ""
+                  widget.group.imageUrl != ""
                   ?  
                   CircleAvatar(
                     radius: 60,
-                    backgroundImage: NetworkImage(widget.user.imageUrl),
+                    backgroundImage: NetworkImage(widget.group.imageUrl),
                   )                 
                   :
-                  Icon(Icons.account_circle, size: 120, color: Colors.blueAccent,)
+                  Icon(Icons.supervised_user_circle, size: 120, color: Colors.blueAccent,)
                 ),
             ],),
           ),
+          _uploadImageButton(),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 25),
             child: Divider(color: Colors.blueAccent,)
@@ -82,13 +104,32 @@ class _UserPageState extends State<UserPage>{
                 MaterialPageRoute(
                   builder: (BuildContext context) => NickNames())),
               child: Container(
+                margin: EdgeInsets.only(left: 25, top: 10),
+                child: Row(
+                  children: <Widget>[
+                    Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
+                    SizedBox(width: 5,),
+                    Container(
+                      child: Text("Nicknames", style: TextStyle(fontSize: 17),),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Container(
+            child: GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (BuildContext context) => People())),
+                child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
                     children: <Widget>[
-                      Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
+                      Icon(Icons.group, color: Colors.blueAccent,),
                       SizedBox(width: 5,),
                       Container(
-                        child: Text("Nicknames", style: TextStyle(fontSize: 17),),
+                        child: Text("People", style: TextStyle(fontSize: 17),),
                       ),
                     ],
                   ),
@@ -107,7 +148,7 @@ class _UserPageState extends State<UserPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => MediaCollection(database: widget.database, typeId: widget.convTypeId,))),
+                  builder: (BuildContext context) => MediaCollection(database: widget.database, typeId: widget.group.id,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -126,7 +167,11 @@ class _UserPageState extends State<UserPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.convTypeId,))),
+                  builder: (BuildContext context) => SearchMessagesPage(
+                    title: widget.group.name,
+                    database: widget.database,
+                    typeId: widget.group.id,)
+                )),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -151,24 +196,7 @@ class _UserPageState extends State<UserPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("Block"),
-              child: Container(
-                margin: EdgeInsets.only(left: 25, top: 10),
-                child: Row(
-                  children: <Widget>[
-                    Icon(Icons.block, color: Colors.redAccent,),
-                    SizedBox(width: 5,),
-                    Container(
-                      child: Text("Block", style: TextStyle(fontSize: 17),),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            child: GestureDetector(
-              onTap: () => print("Ignore messages"),
+              onTap: () => print("Ignore Messages"),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -183,14 +211,14 @@ class _UserPageState extends State<UserPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => _unfriend(),
+              onTap: () => print("Leave"),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
                   children: <Widget>[
                     Icon(Icons.close, color: Colors.redAccent,),
                     SizedBox(width: 5,),
-                    Text("Unfriend", style: TextStyle(fontSize: 17),),
+                    Text("Leave", style: TextStyle(fontSize: 17),),
                   ],
                 ),
               ),

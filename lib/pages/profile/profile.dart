@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/Email.dart';
-import 'package:fluttermessenger/pages/Username.dart';
+import 'package:fluttermessenger/models/user.dart';
+import 'package:fluttermessenger/pages/profile/email.dart';
+import 'package:fluttermessenger/pages/profile/username.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 

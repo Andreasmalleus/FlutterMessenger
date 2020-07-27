@@ -1,4 +1,4 @@
-import 'userModel.dart';
+import 'user.dart';
 
 class Message{
   final String id;

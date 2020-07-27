@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/SignInUpPage.dart';
+import 'package:fluttermessenger/models/user.dart';
+import 'package:fluttermessenger/pages/sign_in_up.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:provider/provider.dart';
 
-import 'NavigatorPage.dart';
+import 'navigator.dart';
 
 enum AuthStatus {
   NOT_DETERMINED,

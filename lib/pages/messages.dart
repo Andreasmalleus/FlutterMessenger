@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/groupModel.dart';
-import 'package:fluttermessenger/models/messageModel.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/components/CustomMediaPicker.dart';
-import 'package:fluttermessenger/pages/user&group/MediaCollection.dart';
-import 'package:fluttermessenger/pages/user&group/UserPage.dart';
-import 'package:fluttermessenger/pages/user&group/GroupPage.dart';
+import 'package:fluttermessenger/models/group.dart';
+import 'package:fluttermessenger/models/message.dart';
+import 'package:fluttermessenger/models/user.dart';
+import 'package:fluttermessenger/components/custom_media_picker.dart';
+import 'package:fluttermessenger/pages/user-group/media_collection.dart';
+import 'package:fluttermessenger/pages/user-group/user.dart';
+import 'package:fluttermessenger/pages/user-group/group.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 

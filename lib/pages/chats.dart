@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/chatModel.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/ProfilePage.dart';
+import 'package:fluttermessenger/models/chat.dart';
+import 'package:fluttermessenger/models/user.dart';
+import 'package:fluttermessenger/pages/profile/profile.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
-import 'package:fluttermessenger/components/CustomBottomSheet.dart';
+import 'package:fluttermessenger/components/custom_bottom_sheet.dart';
 import 'package:provider/provider.dart';
-import 'MessagePage.dart';
+import 'messages.dart';
 
 
 class ChatsPage extends StatefulWidget {

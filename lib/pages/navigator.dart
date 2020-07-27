@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/userModel.dart';
-import 'package:fluttermessenger/pages/GroupsPage.dart';
-import 'package:fluttermessenger/pages/ChatsPage.dart';
+import 'package:fluttermessenger/models/user.dart';
+import 'package:fluttermessenger/pages/groups.dart';
+import 'package:fluttermessenger/pages/chats.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 

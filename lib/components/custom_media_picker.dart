@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 import 'package:path/path.dart' as path;

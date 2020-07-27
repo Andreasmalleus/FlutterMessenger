@@ -1,14 +1,13 @@
 import 'dart:io';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/chatModel.dart';
-import 'package:fluttermessenger/models/groupModel.dart';
-import 'package:fluttermessenger/models/messageModel.dart';
-import 'package:fluttermessenger/models/storageFile.dart';
-import 'package:fluttermessenger/models/userModel.dart';
+import 'package:fluttermessenger/models/chat.dart';
+import 'package:fluttermessenger/models/group.dart';
+import 'package:fluttermessenger/models/message.dart';
+import 'package:fluttermessenger/models/storage_file.dart';
+import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
 abstract class BaseDb{

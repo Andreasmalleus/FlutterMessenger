@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fluttermessenger/models/messageModel.dart';
+import 'package:fluttermessenger/models/message.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
 
