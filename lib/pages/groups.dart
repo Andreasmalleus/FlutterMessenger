@@ -101,38 +101,15 @@ class _GroupsPageState extends State<GroupsPage>{
             ),
           ),
           StreamBuilder(
-            stream: widget.database.getGroupRef().onValue,
+            stream: widget.database.streamGroups(),
             builder: (context, snapshot){
-              if(snapshot.hasData && snapshot.data.snapshot.value != null){
-                Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
-                List<Group> groups = List<Group>();
-                List<String> participants = List<String>();
-                List<String> admins = List<String>();
-                Group group;
-                map.forEach((key, value) {
-                  if(value["participants"].containsKey(currentUser.id)){
-                    value["participants"].forEach((participantId, boolean){
-                      participants.add(participantId);
-                    });
-                    value["admins"].forEach((adminId, boolean){
-                      admins.add(adminId);
-                    });
-                    group = Group(
-                      id: key,
-                      name: value["name"],
-                      lastMessage: value["lastMessage"],
-                      lastMessageTime: value["lastMessageTime"],
-                      imageUrl: value["imageUrl"],
-                      participants: participants,
-                      admins: admins
-                    );
-                    groups.add(group);
-                    }
-                });
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: groups.length,
-                itemBuilder: (context, i){
+              if(snapshot.hasData){
+                List<Group> groups = snapshot.data;
+                groups.removeWhere((group) => !group.participants.contains(currentUser.id));
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: groups.length,
+                  itemBuilder: (context, i){
                   if(groups[i].name.contains(searchResult)){
                     return GestureDetector(
                       onTap: () => Navigator.of(context, rootNavigator: true).push(
@@ -170,11 +147,11 @@ class _GroupsPageState extends State<GroupsPage>{
                           ),
                       )
                     );          
-                  }else{
-                    return Container(width: 0,height: 0,);
+                    }else{
+                      return Container(width: 0,height: 0,);
+                    }
                   }
-                }
-              );
+                );
               }else{
                 return Container(child: Text("No data"),);
               }

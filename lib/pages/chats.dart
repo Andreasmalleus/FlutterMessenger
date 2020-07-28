@@ -103,33 +103,19 @@ class _ChatsPageState extends State<ChatsPage>{
             ),
           ),
           StreamBuilder(
-            stream: widget.database.getChatRef().onValue,
+            stream: widget.database.streamChats(),
             builder: (context, snapshot) {
-              if(snapshot.hasData && snapshot.data.snapshot.value != null){
-                Map<dynamic,dynamic> map = snapshot.data.snapshot.value;
-                List<Chat> chats = List<Chat>();
-                Chat chat;
-                map.forEach((key,val) =>{
-                  if(val["participants"].containsKey(currentUser.id)){
-                    val["participants"].forEach((id, value) => {
-                        if(id != currentUser.id){
-                          chat = Chat(
-                            id: key,
-                            lastMessage: val["lastMessage"],
-                            lastMessageTime: val["lastMessageTime"],
-                            participant: id
-                          ),
-                          chats.add(chat)
-                        },
-                    })
-                  }
-                });
+              if(snapshot.hasData){
+                List<Chat> chats = snapshot.data;
+                chats.removeWhere((chat) => !chat.participants.contains(currentUser.id));//temporary 
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount:  chats.length,
                   itemBuilder: (BuildContext ctx, int i){
+                    int index = chats[i].participants.indexWhere((id) => id != currentUser.id);
+                    String id = chats[i].participants[index];
                     return FutureBuilder<User>(
-                      future: widget.database.getUserObject(chats[i].participant),
+                      future: widget.database.getUserObject(id),
                       builder: (BuildContext ctx, AsyncSnapshot snapshot){
                         if(snapshot.hasData && snapshot.data != null){
                           User user = snapshot.data;
@@ -158,8 +144,8 @@ class _ChatsPageState extends State<ChatsPage>{
                                     subtitle: Text(
                                       ((){
                                         String message = chats[i].lastMessage;
-                                        String time = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
-                                        if(message != "" && time != ""){
+                                        if(message != ""){
+                                          String time = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
                                           if(message.length > 22){
                                             String trimmedMssage = message.substring(0,22);
                                             return "$trimmedMssage.. $time";
@@ -195,7 +181,9 @@ class _ChatsPageState extends State<ChatsPage>{
                     );
                   }
                 );
+
               }else{
+                print("no");
                 return Container(
                   width: 0,
                   height: 0,

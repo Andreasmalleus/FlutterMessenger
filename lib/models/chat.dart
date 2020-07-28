@@ -1,25 +1,27 @@
-import 'package:firebase_database/firebase_database.dart';
-
 class Chat{
   String id;
   String lastMessage;
   String lastMessageTime;
-  String participant;
+  List<String> participants;
 
   Chat({
     this.id,
     this.lastMessage,
     this.lastMessageTime,
-    this.participant,
+    this.participants,
   });
 
-  factory Chat.fromFirebase(DataSnapshot snapshot){
-    Map data = snapshot.value;
-    return Chat(
-      id: snapshot.key,
-      lastMessage: data["lastMessage"],
-      lastMessageTime: data["lastMessageTime"],
-      participant:  data["particpants"]
+  factory Chat.fromFirebase(MapEntry<dynamic, dynamic> data){
+    List<String> ids = List<String>();
+    data.value["participants"].forEach((key, value) => {
+      ids.add(key)
+    });
+      return Chat(
+        id: data.key,
+        lastMessage: data.value["lastMessage"],
+        lastMessageTime: data.value["lastMessageTime"],
+        participants: ids
     );
+
   }
 }

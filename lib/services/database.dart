@@ -90,6 +90,10 @@ abstract class BaseDb{
 
   Stream<dynamic> streamUsers();
 
+  Stream<List> streamChats();
+
+  Stream<List<Group>> streamGroups();
+
 }
 
 class Database implements BaseDb{
@@ -371,16 +375,12 @@ class Database implements BaseDb{
     for(var id in chatIds){
         await _chatsRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
         snapshot.value.forEach((key,val) =>{
-          val["participants"].forEach((id, value) => {
-            if(id != userId){
               chat = Chat(
                 id: key,
                 lastMessage: val["lastMessage"],
                 lastMessageTime: val["lastMessageTime"],
-                participant: id
-            ),
-            }
-          }),
+                participants: val["participants"]
+              ),
           chats.add(chat)
         })
       });
@@ -527,7 +527,6 @@ class Database implements BaseDb{
     return files;
   }
 
-
   Stream<User> streamUser(String id){
     return _userRef.child(id).onValue.map((event) => User.fromFirebase(event.snapshot));
   }
@@ -536,4 +535,12 @@ class Database implements BaseDb{
     return _userRef.onValue.map((list) => list.snapshot.value);
   }
 
+  Stream<List<Chat>> streamChats(){
+    return _chatsRef.onValue.map((list) => list.snapshot.value.entries.map<Chat>((entry) => Chat.fromFirebase(entry)).toList());
+  }
+
+  Stream<List<Group>> streamGroups(){
+    print("worjk");
+    return _groupRef.onValue.map((list) => list.snapshot.value.entries.map<Group>((entry) => Group.fromFirebase(entry)).toList());
+  }
 }
