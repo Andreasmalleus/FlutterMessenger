@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/pages/sign_in_up.dart';
@@ -28,14 +29,13 @@ class _RootPageState extends State<RootPage>{
   AuthStatus status = AuthStatus.NOT_DETERMINED;
   String _userId = "";
 
-  void loginCallBack(){
-    widget.auth.getCurrentUser().then((firebaseUser) => {
-        setState((){
-          status = AuthStatus.LOGGED_IN;
-          _userId = firebaseUser.uid;
-        })
+  void loginCallBack() async{
+    FirebaseUser firebaseUser = await widget.auth.getCurrentUser();
+    setState(() {
+      status = AuthStatus.LOGGED_IN;
+      _userId = firebaseUser.uid;
     });
-  }
+   }
 
   void logOutCallback(){
     setState(() {
@@ -44,18 +44,23 @@ class _RootPageState extends State<RootPage>{
     });
   }
 
+  void checkAuthStatus() async{
+     FirebaseUser firebaseUser = await widget.auth.getCurrentUser();
+     if(firebaseUser != null){
+        setState((){
+          _userId = firebaseUser.uid;
+          status = AuthStatus.LOGGED_IN;
+        });
+      }else{
+        setState((){
+          status = AuthStatus.NOT_LOGGED_IN;
+        });
+      }
+  }
+
   @override
   void initState(){
-    widget.auth.getCurrentUser().then((firebaseUser) => {
-      if(firebaseUser != null){
-          setState((){
-            _userId = firebaseUser.uid;
-          })
-      },
-      setState((){
-        status = firebaseUser?.uid == null ? AuthStatus.NOT_LOGGED_IN : AuthStatus.LOGGED_IN;
-      })
-    });
+    checkAuthStatus();
     super.initState();
   }
   
