@@ -101,7 +101,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => PeoplePage(database: widget.database, group: widget.group,))),
+                  builder: (BuildContext context) => MembersPage(database: widget.database, group: widget.group,))),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
@@ -109,7 +109,7 @@ class _GroupPageState extends State<GroupPage>{
                       Icon(Icons.group, color: Colors.blueAccent,),
                       SizedBox(width: 5,),
                       Container(
-                        child: Text("People", style: TextStyle(fontSize: 17),),
+                        child: Text("See group members", style: TextStyle(fontSize: 17),),
                       ),
                     ],
                   ),
