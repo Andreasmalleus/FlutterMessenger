@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/group.dart';
 import 'package:fluttermessenger/pages/user-group/media_collection.dart';
-import 'package:fluttermessenger/pages/user-group/people.dart';
+import 'package:fluttermessenger/pages/user-group/members.dart';
 import 'package:fluttermessenger/pages/user-group/search_messages.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
@@ -109,7 +109,7 @@ class _GroupPageState extends State<GroupPage>{
                       Icon(Icons.group, color: Colors.blueAccent,),
                       SizedBox(width: 5,),
                       Container(
-                        child: Text("See group members", style: TextStyle(fontSize: 17),),
+                        child: Text("See group", style: TextStyle(fontSize: 17),),
                       ),
                     ],
                   ),
