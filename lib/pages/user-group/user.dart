@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/chat.dart';
 import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/pages/user-group/media_collection.dart';
-import 'package:fluttermessenger/pages/user-group/nicknames.dart';
 import 'package:fluttermessenger/pages/user-group/search_messages.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
@@ -13,10 +13,10 @@ class UserPage extends StatefulWidget{
   final User user;
   final BaseDb database;
   final String currentUserId;
-  final String convTypeId;
+  final Chat chat;
   
 
-  UserPage({this.user, this.database,this.currentUserId, this.convTypeId});
+  UserPage({this.user, this.database,this.currentUserId, this.chat});
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -29,7 +29,7 @@ class _UserPageState extends State<UserPage>{
 
   void _unfriend() async{
     await widget.database.unFriend(widget.currentUserId, widget.user.id);
-    await widget.database.removeChat(widget.convTypeId);
+    await widget.database.removeChat(widget.chat.id);
     _navigateToChatsPage();
   }
 
@@ -80,34 +80,7 @@ class _UserPageState extends State<UserPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => NickNamesPage())),
-              child: Container(
-                  margin: EdgeInsets.only(left: 25, top: 10),
-                  child: Row(
-                    children: <Widget>[
-                      Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
-                      SizedBox(width: 5,),
-                      Container(
-                        child: Text("Nicknames", style: TextStyle(fontSize: 17),),
-                      ),
-                    ],
-                  ),
-                ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 25),
-            child: Divider(color: Colors.blueAccent,)
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 25, top: 10),
-            child: Text("More actions", style: TextStyle(color: Colors.grey, fontSize: 20),),
-          ),
-          Container(
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.convTypeId,))),
+                  builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.chat.id,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -126,7 +99,7 @@ class _UserPageState extends State<UserPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.convTypeId,))),
+                  builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.chat.id,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(

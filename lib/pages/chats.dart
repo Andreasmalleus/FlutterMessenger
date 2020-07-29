@@ -129,6 +129,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                     sender: currentUser,
                                     convTypeId: chats[i].id,
                                     isChat: true,
+                                    chat: chats[i],
                                     ))),
                               child: Container(
                                 height: 75,

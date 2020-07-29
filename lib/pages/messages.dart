@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/chat.dart';
 import 'package:fluttermessenger/models/group.dart';
 import 'package:fluttermessenger/models/message.dart';
 import 'package:fluttermessenger/models/user.dart';
@@ -16,11 +17,12 @@ class MessagePage extends StatefulWidget{
   final BaseDb database;
   final User user;
   final Group group;
+  final Chat chat;
   final User sender;
   final String convTypeId;
   final bool isChat;
   
-  MessagePage({this.database, this.user, this.group, this.sender, this.convTypeId, this.isChat});
+  MessagePage({this.database, this.user, this.group, this.sender, this.convTypeId, this.isChat, this.chat});
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -259,8 +261,7 @@ class _MessagePageState extends State<MessagePage>{
               Navigator.push(context, (MaterialPageRoute(builder: (context) => UserPage(
               user: widget.user,
               database: widget.database,
-              currentUserId: widget.sender.id,
-              convTypeId: widget.convTypeId,
+              chat: widget.chat,
               ))))
             :
               Navigator.push(context, (MaterialPageRoute(builder: (context) => GroupPage(

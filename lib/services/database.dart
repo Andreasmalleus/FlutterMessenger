@@ -540,7 +540,6 @@ class Database implements BaseDb{
   }
 
   Stream<List<Group>> streamGroups(){
-    print("worjk");
     return _groupRef.onValue.map((list) => list.snapshot.value.entries.map<Group>((entry) => Group.fromFirebase(entry)).toList());
   }
 }

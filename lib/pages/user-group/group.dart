@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/group.dart';
 import 'package:fluttermessenger/pages/user-group/media_collection.dart';
-import 'package:fluttermessenger/pages/user-group/nicknames.dart';
 import 'package:fluttermessenger/pages/user-group/people.dart';
 import 'package:fluttermessenger/pages/user-group/search_messages.dart';
 import 'package:fluttermessenger/services/database.dart';
@@ -102,26 +101,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => NickNamesPage())),
-              child: Container(
-                margin: EdgeInsets.only(left: 25, top: 10),
-                child: Row(
-                  children: <Widget>[
-                    Text("Aa", style: TextStyle(color: Colors.blueAccent,fontSize: 18, fontWeight: FontWeight.bold),),
-                    SizedBox(width: 5,),
-                    Container(
-                      child: Text("Nicknames", style: TextStyle(fontSize: 17),),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Container(
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => PeoplePage())),
+                  builder: (BuildContext context) => PeoplePage(database: widget.database, group: widget.group,))),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
