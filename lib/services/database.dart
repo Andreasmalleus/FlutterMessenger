@@ -36,8 +36,6 @@ abstract class BaseDb{
 
   Future<List> getAllMessages(String key);
 
-  Future<String> getLastMessage();
-
   Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck);
 
   Future<void> likeMessage(String chatId, String messageId);
@@ -47,8 +45,6 @@ abstract class BaseDb{
   Future<void> addFriends(String firstUserId, String secondUserId);
 
   Future<void> unFriend(String firstUserId, String secondUserId);
-
-  Future<void> updateFriends(String firstUserId, String secondUserId);
     
   Future<List> getFriendsIds(String userId);
 
@@ -56,18 +52,10 @@ abstract class BaseDb{
 
   Future<void> createChat(String firstUserId, String secondUserId);
 
-  Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId);
-
-  Future<List> getChats(String userId);
-
   Future<void> removeChat(String userId);
 
   Future<void> createGroup(List<String> ids,String groupName, String adminId);
-
-  Future<List> getGroupsIdsWhereCurrentUserIs(String currentUserId);
   
-  Future<List> getGroups(String userId);
-
   Future<String> uploadUserImageToStorage(File file, String userId);
 
   Future<String> uploadGroupImageToStorage(File file, String groupId);
@@ -128,25 +116,25 @@ class Database implements BaseDb{
       "username" : username,
       "createdAt" : createdAt,
       "imageUrl" : imageUrl,
-    });
-    debugPrint("User added to database");
+    }).whenComplete(() => print("User $username added"))
+    .catchError((error) => print("addUser $error"));
   }
 
   Future<void> updateUsername(String userId, String newUsername) async{
     await _userRef.child(userId).update({
       "username" : newUsername
-    }).catchError((error) => print("updateUsername $error"));
+    }).whenComplete(() => print("Username updated"))
+    .catchError((error) => print("updateUsername $error"));
   }
 
   
   Future<bool> checkIfValueAlreadyExists(String newValue, String key) async{
     bool _exists = false;
-    await _userRef.once().then((DataSnapshot snapshot) => {
-       snapshot.value.forEach((_, value) => { 
-         if(value[key] == newValue){
-           _exists = true
-         }
-      })
+    DataSnapshot snapshot = await _userRef.once();
+    snapshot.value.forEach((_, value) => { 
+      if(value[key] == newValue){
+        _exists = true
+      }
     });
     return _exists;
   }
@@ -154,32 +142,35 @@ class Database implements BaseDb{
   Future<void> updateEmail(String userId, String newEmail) async{
     await _userRef.child(userId).update({
       "email" : newEmail
-    }).catchError((error) => print("updateEmail $error"));
+    }).whenComplete(() => ("Email updated"))
+    .catchError((error) => print("updateEmail $error"));
   }
 
   Future<List> getAllUsers() async{
     List<User> users = [];
     User user;
-    await _userRef.once().then((DataSnapshot snapshot) => { 
+    DataSnapshot snapshot = await _userRef.once();
+    if(snapshot != null){
       snapshot.value.forEach((key, value) => { 
-          user = User(
-            id: key,
-            email: value["email"],
-            username: value["username"],
-            createdAt: value["createdAt"],
-            imageUrl: value["imageUrl"]
-            ),
-          users.add(user)
-      })
-    }).catchError((error)  => print("getAllUsers error: $error"));
+        user = User(
+          id: key,
+          email: value["email"],
+          username: value["username"],
+          createdAt: value["createdAt"],
+          imageUrl: value["imageUrl"]
+          ),
+        users.add(user)
+      });
+    }
     print("All users received");
     return users;
   }
 
   Future<User> getUserObject(String id)async{
     User user;
-    await _userRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) =>{
-      snapshot.value.forEach((key,value)=> {
+    DataSnapshot snapshot = await _userRef.orderByKey().equalTo(id).once();
+    if(snapshot != null){
+       snapshot.value.forEach((key,value)=> {
         user = User(
           id: key,
           imageUrl: value["imageUrl"],
@@ -187,8 +178,8 @@ class Database implements BaseDb{
           username: value["username"],
           email: value["email"]
           )
-      })
-    });
+      });
+    } 
     return user;
   }
 
@@ -206,7 +197,8 @@ class Database implements BaseDb{
       "isRead" : isRead,
       "isLiked" : isLiked,
       "time" : time,
-    }).catchError((error) => print("addmessage error: $error"));
+    }).whenComplete(() => print("Message added"))
+    .catchError((error) => print("addmessage error: $error"));
     print("Message added");
   }
 
@@ -214,7 +206,8 @@ class Database implements BaseDb{
     List<Message> messages =List<Message>();
     User sender;
     Message message;
-    await _messageRef.child(key).once().then((DataSnapshot snapshot) => {
+    DataSnapshot snapshot = await _messageRef.child(key).once();
+    if(snapshot != null){
       snapshot.value.forEach((key,value)=> {
         sender = User(
           id: value["sender"]["id"],
@@ -235,18 +228,10 @@ class Database implements BaseDb{
         messages.add(
           message
         )
-      })
-    }).catchError((error)  => print("getAllMessages error: $error"));
+      });
+    }
     print("All messages received");
     return messages;
-  }
-
-  Future<String> getLastMessage() async {
-    String message = "";
-    await _messageRef.orderByKey().limitToLast(1).once().then((DataSnapshot snapshot) => {
-      snapshot.value.forEach((key, value) => message = value["message"])
-    });
-    return message;
   }
 
   Future<void> updateLastMessageAndTime(String key, String message, String time, bool typeCheck) async{
@@ -254,29 +239,31 @@ class Database implements BaseDb{
       await _chatsRef.child(key).update({
         "lastMessage" : message,
         "lastMessageTime" : time
-      }).catchError((error) => print("updateLastMessageAndTime: $error"));
+      }).whenComplete(() => "Message updated")
+      .catchError((error) => print("updateLastMessageAndTime: $error"));
       print("Chat updated");
     }else{
       await _groupRef.child(key).update({
         "lastMessage" : message,
         "lastMessageTime" : time
-      }).catchError((error) => print("updateLastMessageAndTime: $error"));
-      print("Group updated");
+      }).whenComplete(() => "Message updated")
+      .catchError((error) => print("updateLastMessageAndTime: $error"));
     }
   }
 
   Future<void> likeMessage(String chatId, String messageId) async{
     await _messageRef.child(chatId).child(messageId).update({
       "isLiked" : true
-    });
+    }).whenComplete(() => print("Message liked"))
+    .catchError((error) => print("likeMessage errror: $error"));
   }
 
   Future<void> dislikeMessage(String chatId, String messageId) async {
     await _messageRef.child(chatId).child(messageId).update({
       "isLiked" : false
-    });
+    }).whenComplete(() => print("Message disliked"))
+    .catchError((error) => print("dislikeMessage errror: $error"));
   }
-
 
   Future<void> addFriends(String firstUserId, String secondUserId)async{
     String first = firstUserId;
@@ -301,19 +288,16 @@ class Database implements BaseDb{
     print("Friend removed");
   }
 
-  Future<void> updateFriends(String firstUserId, String secondUserId)async{
-    
-  }
-
   Future<List> getFriendsIds(String userId)async{
     List<String> ids =List<String>();
-    await _friendsRef.orderByKey().equalTo(userId).once().then((DataSnapshot snapshot) => {
+    DataSnapshot snapshot = await _friendsRef.orderByKey().equalTo(userId).once();
+    if(snapshot != null){
       snapshot.value.forEach((key,value) => {
         value.forEach((id,value) => {
             ids.add(id),
         }),
-      }),
     });
+    }
     return ids;
   }
 
@@ -322,18 +306,19 @@ class Database implements BaseDb{
     List<String> ids = await getFriendsIds(userId);
     User user;
     for(var id in ids){
-      await _userRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
+      DataSnapshot snapshot = await _userRef.orderByKey().equalTo(id).once();
+      if(snapshot != null){
         snapshot.value.forEach((key,value) =>{
-          user = User(
-            id: key,
-            username: value["username"],
-            email: value["email"],
-            createdAt: value["createdAt"],
-            imageUrl: value["imageUrl"]
-           ),
-           friends.add(user)
-        })
+        user = User(
+          id: key,
+          username: value["username"],
+          email: value["email"],
+          createdAt: value["createdAt"],
+          imageUrl: value["imageUrl"]
+          ),
+        friends.add(user)
       });
+      }
     }
     return friends;
   }
@@ -347,51 +332,14 @@ class Database implements BaseDb{
         firstUserId : true,
         secondUserId : true
       }
-    });
-    print("created $key");
+    }).whenComplete(() => "Chat created")
+    .catchError((error) => print("createChat error: $error"));
   }
-
-  Future<List> getChatsIdsWhereCurrentUserIs(String currentUserId) async{
-    List<String> chatIds = List<String>();
-    await _chatsRef.once().then((DataSnapshot snapshot) => {
-      snapshot.value.forEach((id, value) => {
-        value["participants"].forEach((key, value) => {
-          if(key == currentUserId){
-            print("found $id"),
-            chatIds.add(id)
-          }
-        })
-      })
-    });
-    return chatIds;
-  }
-
-  
-
-  Future<List> getChats(String userId) async{
-    List<String> chatIds = await getChatsIdsWhereCurrentUserIs(userId);
-    List<Chat> chats = List<Chat>();
-    Chat chat;
-    for(var id in chatIds){
-        await _chatsRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
-        snapshot.value.forEach((key,val) =>{
-              chat = Chat(
-                id: key,
-                lastMessage: val["lastMessage"],
-                lastMessageTime: val["lastMessageTime"],
-                participants: val["participants"]
-              ),
-          chats.add(chat)
-        })
-      });
-    }
-    print("All chats received");
-    return chats;
-  } 
 
   Future<void> removeChat(String chatId) async{
-    await _chatsRef.child(chatId).remove().catchError((e) => print("removeChat error: $e"));
-    print("Chat removed");
+    await _chatsRef.child(chatId).remove()
+    .whenComplete(() => "Chat removed")
+    .catchError((error) => print("removeChat error: $error"));
   } 
 
   Future<void> createGroup(List<String> ids, String name, String adminId) async{
@@ -417,45 +365,6 @@ class Database implements BaseDb{
     }
     print("Group created");
   }
-
-    Future<List> getGroupsIdsWhereCurrentUserIs(String currentUserId) async{
-    List<String> groupIds = List<String>();
-    await _groupRef.once().then((DataSnapshot snapshot) => {
-      snapshot.value.forEach((id, value) => {
-        value["participants"].forEach((key, value) => {
-            print("found $id"),
-            groupIds.add(id)
-        })
-      })
-    });
-    return groupIds;
-  }
-
-  Future<List> getGroups(String userId) async{
-    List<String> groupIds = await getGroupsIdsWhereCurrentUserIs(userId);
-    List<String> participantIds = List<String>();
-    List<Group> groups = List<Group>();
-    Group group;
-    for(var id in groupIds){
-        await _chatsRef.orderByKey().equalTo(id).once().then((DataSnapshot snapshot) => {
-        snapshot.value.forEach((key,val) =>{
-          val["participants"].forEach((id, value) => {
-            participantIds.add(id),
-              group = Group(
-                id: key,
-                lastMessage: val["lastMessage"],
-                lastMessageTime: val["lastMessageTime"],
-                participants: participantIds,
-                admins: val["admins"]
-            ),
-          }),
-          groups.add(group)
-        })
-      });
-    }
-    print("All chats received");
-    return groups;
-  } 
 
   Future<String> uploadUserImageToStorage(File file, String userId) async{
     StorageUploadTask uploadTask = _storageRef.child("users/$userId/media/profileImage").putFile(file);
@@ -493,17 +402,21 @@ class Database implements BaseDb{
   Future<void> updateUserImageUrl(String url, String userId) async {
     await _userRef.child(userId).update({
       "imageUrl" : url
-    }).catchError((e) => print("uploadImageToDataBase: $e"));
+    }).catchError((e) => print("uploadImageToDataBase error: $e"))
+    .whenComplete(() => print("$userId imageUrl updated"));
   }
 
   Future<void> updateGroupImageUrl(String url, String groupId) async {
     await _groupRef.child(groupId).update({
       "imageUrl" : url
-    }).catchError((e) => print("uploadImageToDataBase: $e"));
+    }).catchError((e) => print("uploadImageToDataBase error: $e"))
+    .whenComplete(() => print("$groupId imageUrl updated"));
   }
 
   Future<void> fileUrlToDatabase(String convId, String userId, String url, String fileName) async{
-    await _storageFilesRef.child("$convId/$userId/$fileName").set(url);
+    await _storageFilesRef.child("$convId/$userId/$fileName").set(url)
+    .catchError((e) => print("fileUrlToDatabase error: $e"))
+    .whenComplete(() => print("$fileName added to Database"));
   }
 
   Future<List> listAllStorageFilesById(String chatId) async{
