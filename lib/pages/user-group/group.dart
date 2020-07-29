@@ -7,7 +7,7 @@ import 'package:fluttermessenger/pages/user-group/search_messages.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-//TODO create a page that fits for both groups and chats
+//TODO create a page that fits for both groups and chat
 
 class GroupPage extends StatefulWidget{
 
