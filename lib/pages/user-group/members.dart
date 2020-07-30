@@ -3,18 +3,25 @@ import 'package:fluttermessenger/models/group.dart';
 import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/database.dart';
 
-class MembersPage extends StatelessWidget{
+class MembersPage extends StatefulWidget{
 
-  MembersPage({this.database, this.group});
+  MembersPage({this.database, this.group, this.currentUserId});
 
   final BaseDb database;
   final Group group;
+  final String currentUserId;
 
-  void _setNickname(String userId){
-    print("set Nickname to $userId");
+  @override
+  _MembersPageState createState() => _MembersPageState();
+}
+
+class _MembersPageState extends State<MembersPage> {
+  void _kickMember(String userId) async{
+    await widget.database.kickMember(widget.group.id,userId);
+    widget.group.participants.removeWhere((id) => userId == id);
+    Navigator.pop(context);
   }
 
-  //TODO add tabs /one for people one for admins
   Widget build(BuildContext context){
     return DefaultTabController(
         length: 2,
@@ -36,10 +43,10 @@ class MembersPage extends StatelessWidget{
               Container(
                 margin: EdgeInsets.symmetric(vertical: 10),
                 child: ListView.builder(
-                itemCount: group.participants.length,
+                itemCount: widget.group.participants.length,
                 itemBuilder: (BuildContext context, int i){
                   return FutureBuilder(
-                    future: database.getUserObject(group.participants[i]),
+                    future: widget.database.getUserObject(widget.group.participants[i]),
                     builder: (BuildContext context, AsyncSnapshot snapshot){
                       User user = snapshot.data;
                       if(snapshot.hasData){
@@ -55,6 +62,15 @@ class MembersPage extends StatelessWidget{
                                 :
                                 Icon(Icons.account_circle, size: 40, color: Colors.white,),
                               title: Text(user.username, style: TextStyle(color: Colors.white),),
+                              trailing:
+                              widget.group.admins.contains(widget.currentUserId) && user.id != widget.currentUserId
+                              ?
+                              IconButton(
+                                onPressed: () => _kickMember(user.id),
+                                icon: Icon(Icons.remove),
+                                color: Colors.white,)
+                              :
+                              Container(width: 0, height: 0,)
                             ),
                           ),
                         );
@@ -68,10 +84,10 @@ class MembersPage extends StatelessWidget{
             Container(
               margin: EdgeInsets.symmetric(vertical: 10),
               child: ListView.builder(
-                itemCount: group.admins.length,
+                itemCount: widget.group.admins.length,
                 itemBuilder: (BuildContext context, int i){
                   return FutureBuilder(
-                    future: database.getUserObject(group.admins[i]),
+                    future: widget.database.getUserObject(widget.group.admins[i]),
                     builder: (BuildContext context, AsyncSnapshot snapshot){
                       User user = snapshot.data;
                       if(snapshot.hasData){

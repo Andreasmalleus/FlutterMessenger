@@ -55,6 +55,12 @@ abstract class BaseDb{
   Future<void> removeChat(String userId);
 
   Future<void> createGroup(List<String> ids,String groupName, String adminId);
+
+  Future<void> leaveGroup(String groupId, String userId);
+
+  Future<void> removeGroup(String groupId);
+
+  Future<void> kickMember(String groupId, String userId);
   
   Future<String> uploadUserImageToStorage(File file, String userId);
 
@@ -92,6 +98,7 @@ class Database implements BaseDb{
   final DatabaseReference _chatsRef = FirebaseDatabase.instance.reference().child("chats");
   final DatabaseReference _groupRef = FirebaseDatabase.instance.reference().child("groups");
   final DatabaseReference _storageFilesRef = FirebaseDatabase.instance.reference().child("storageFiles");
+  final DatabaseReference _channelsRef = FirebaseDatabase.instance.reference().child("channels");
   final StorageReference _storageRef = FirebaseStorage.instance.ref();
   
   DatabaseReference getGroupRef(){
@@ -364,6 +371,24 @@ class Database implements BaseDb{
       );
     }
     print("Group created");
+  }
+
+  Future<void> leaveGroup(String groupId, String userId) async{
+     await _groupRef.child(groupId).child("participants").child(userId).remove()
+     .whenComplete(() => "$userId left from group")
+    .catchError((error) => print("leaveGroup error: $error"));
+  }
+
+  Future<void> removeGroup(String groupId) async{
+    await _groupRef.child(groupId).remove()
+    .whenComplete(() => "$groupId removed")
+    .catchError((error) => print("removeGroup error: $error"));
+  }
+
+  Future<void> kickMember(String groupId, String userId) async{
+     await _groupRef.child(groupId).child("participants").child(userId).remove()
+     .whenComplete(() => "$userId kicked from group")
+    .catchError((error) => print("kickMember error: $error"));
   }
 
   Future<String> uploadUserImageToStorage(File file, String userId) async{

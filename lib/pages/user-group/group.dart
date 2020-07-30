@@ -45,6 +45,16 @@ class _GroupPageState extends State<GroupPage>{
     }
   }
 
+  void _leaveGroup() async{
+    await widget.database.leaveGroup(widget.group.id, widget.currentUserId);
+    _navigateToGroupsPage();
+  }
+
+  void _removeGroup() async{
+    await widget.database.removeGroup(widget.group.id);
+    _navigateToGroupsPage();
+  }
+
   Widget _uploadImageButton(){
     if(widget.group.admins.contains(widget.currentUserId)){
       return Container(
@@ -53,6 +63,28 @@ class _GroupPageState extends State<GroupPage>{
             onTap: () => _uploadImage(),
             child: Text("Upload a new image", style: TextStyle(fontSize: 15, color: Colors.white),),
         ),
+      );
+    }else{
+      return Container(width: 0, height: 0,);
+    }
+  }
+
+  Widget _removeGroupButton(){
+    if(widget.group.admins.contains(widget.currentUserId)){
+      return Container(
+        child: GestureDetector(
+          onTap: () => _removeGroup(),
+          child: Container(
+            margin: EdgeInsets.only(left: 25, top: 10),
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.remove, color: Colors.redAccent,),
+                SizedBox(width: 5,),
+                Text("Remove group", style: TextStyle(fontSize: 17, color: Colors.white),),
+              ],
+            ),
+          ),
+        )
       );
     }else{
       return Container(width: 0, height: 0,);
@@ -103,7 +135,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => MembersPage(database: widget.database, group: widget.group,))),
+                  builder: (BuildContext context) => MembersPage(database: widget.database, group: widget.group, currentUserId: widget.currentUserId,))),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
@@ -193,7 +225,7 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             child: GestureDetector(
-              onTap: () => print("Leave"),
+              onTap: () => _leaveGroup(),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -206,6 +238,7 @@ class _GroupPageState extends State<GroupPage>{
               ),
             ),
           ),
+          _removeGroupButton()
       ],),
     );
   }
