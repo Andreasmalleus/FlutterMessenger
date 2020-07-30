@@ -54,11 +54,12 @@ class _ChatsPageState extends State<ChatsPage>{
     this.currentUser = Provider.of<User>(context);
     if(currentUser != null){
       return Scaffold(
+      backgroundColor: Color(0xff121212),
       resizeToAvoidBottomInset: false, //keybaord resizes widget
       appBar: AppBar(
         title: Text("Chats"),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Color(0xff2b2a2a),
         leading: IconButton(
           icon: Icon(Icons.add),
           onPressed: () => {
@@ -93,10 +94,18 @@ class _ChatsPageState extends State<ChatsPage>{
       body: Column(
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black))),
+            margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             child: TextField(
               textAlign: TextAlign.center,
-              decoration: InputDecoration.collapsed(hintText: "Search chats here..."),
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: "Search chats here...",
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
+              ),
               onChanged: (value) => setState((){
                 searchResult = value;
               })
@@ -132,37 +141,37 @@ class _ChatsPageState extends State<ChatsPage>{
                                     chat: chats[i],
                                     ))),
                               child: Container(
+                                margin: EdgeInsets.symmetric(horizontal: 5),
                                 height: 75,
                                 child: Card(
-                                  child: ListTile(
-                                    leading: user.imageUrl != "" ? 
-                                    CircleAvatar(
-                                      backgroundImage: NetworkImage(user.imageUrl),
-                                    )
-                                    :
-                                    Icon(Icons.account_circle, size: 35,color: Colors.blueAccent,),
-                                    title: Text(user.username),
-                                    subtitle: Text(
-                                      ((){
-                                        String message = chats[i].lastMessage;
-                                        if(message != ""){
-                                          String time = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
-                                          if(message.length > 22){
-                                            String trimmedMssage = message.substring(0,22);
-                                            return "$trimmedMssage.. $time";
+                                  color: Color(0xff2b2a2a),
+                                  child: Container(
+                                    child: ListTile(
+                                      
+                                      leading: user.imageUrl != "" ? 
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(user.imageUrl),
+                                      )
+                                      :
+                                      Icon(Icons.account_circle, size: 35,color: Colors.white,),
+                                      title: Text(user.username, style: TextStyle(color: Colors.white),),
+                                      subtitle: Text(
+                                        ((){
+                                          String message = chats[i].lastMessage;
+                                          if(message != ""){
+                                            String time = formatDateToHoursAndMinutes(chats[i].lastMessageTime);
+                                            if(message.length > 22){
+                                              String trimmedMssage = message.substring(0,22);
+                                              return "$trimmedMssage.. $time";
+                                            }else{
+                                              return "$message $time";
+                                            }
                                           }else{
-                                            return "$message $time";
-                                          }
-                                        }else{
-                                          return "";
-                                      }
-                                    }())
-                                      ),
-                                    trailing: IconButton(
-                                      icon: Icon(
-                                        Icons.more_vert
-                                      ), 
-                                      onPressed: () =>{ }
+                                            return "";
+                                        }
+                                      }()),
+                                      style: TextStyle(color: Colors.grey),
+                                        ),
                                     ),
                                   ),
                                 ),

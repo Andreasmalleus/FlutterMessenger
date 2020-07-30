@@ -22,7 +22,9 @@ class _MediaCollectionPageState extends State<MediaCollectionPage> {
 
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text("Photos and videos"),
         centerTitle: true,
       ),

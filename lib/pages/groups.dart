@@ -52,11 +52,12 @@ class _GroupsPageState extends State<GroupsPage>{
   Widget build(BuildContext context){
     this.currentUser = Provider.of<User>(context);
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text("Groups"),
         centerTitle: true,
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Color(0xff2b2a2a),
         leading: IconButton(
           icon: Icon(Icons.add),
           onPressed: () => {
@@ -91,10 +92,19 @@ class _GroupsPageState extends State<GroupsPage>{
       body: Column(
         children: <Widget>[
            Container(
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black))),
+            margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             child: TextField(
               textAlign: TextAlign.center,
-              decoration: InputDecoration.collapsed(hintText: "Search groups here..."),
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: "Search groups here...",
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
+              ),
               onChanged: (value) => setState((){
                 searchResult = value;
               })
@@ -122,16 +132,18 @@ class _GroupsPageState extends State<GroupsPage>{
                             isChat: false,
                             ))),
                       child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 5),
                         height: 75,
                         child: Card(
+                          color: Color(0xff2b2a2a),
                           child: ListTile(
                           leading: groups[i].imageUrl != "" 
                           ? 
                           CircleAvatar(
                             backgroundImage: NetworkImage(groups[i].imageUrl),
                           )
-                          : Icon(Icons.supervised_user_circle, size: 35,color: Colors.blueAccent,),
-                          title: Text(groups[i].name),
+                          : Icon(Icons.supervised_user_circle, size: 35,color: Colors.white,),
+                          title: Text(groups[i].name, style: TextStyle(color: Colors.white),),
                           subtitle: Text(
                             ((){
                               if(groups[i].lastMessage !=  "" && groups[i].lastMessageTime != ""){
@@ -140,9 +152,9 @@ class _GroupsPageState extends State<GroupsPage>{
                               }else{
                                 return "";
                               }
-                            }())
+                            }()),
+                            style: TextStyle(color: Colors.grey),
                             ),
-                          trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: () {  },),
                           ),
                           ),
                       )

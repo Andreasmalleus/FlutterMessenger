@@ -93,8 +93,10 @@ class _EmailPageState extends State<EmailPage> {
 
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       key: _scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text("Email"),
         centerTitle: true,
         actions: <Widget>[
@@ -114,27 +116,49 @@ class _EmailPageState extends State<EmailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              child: Text("Email")
+              child: Text("Email", style: TextStyle(color: Colors.white),)
             ),
             Container(
-              child: TextField(
-                onChanged: (value) => email = value,
-                decoration: InputDecoration(hintText: widget.user.email),
+            margin: EdgeInsets.only(top: 5),
+            child: TextField(
+              textAlign: TextAlign.center,
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: widget.user.email,
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
               ),
+                onChanged: (value) => setState((){
+                  email = value;
+                }),
             ),
+          ),
             Container(
               margin: EdgeInsets.symmetric(vertical: 15),
-              child: Text("Please re-enter your password")
+              child: Text("Please re-enter your password", style: TextStyle(color: Colors.white),)
             ),
             Container(
-              child: TextField(
+            margin: EdgeInsets.only(top: 5),
+            child: TextField(
+              obscureText: true,
+              textAlign: TextAlign.center,
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: "Password",
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
+              ),
                 onChanged: (value) => setState((){
                   password = value;
                 }),
-                decoration: InputDecoration(hintText: "password",),
-                obscureText: true,
-              ),
             ),
+          ),
             waitingScreen()
           ],
         ),

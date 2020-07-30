@@ -66,7 +66,9 @@ class _ProfilePageState extends State<ProfilePage>{
                   email: dbUser["email"]
                 );
                   return Scaffold(
+                    backgroundColor: Color(0xff121212),
                     appBar: AppBar(
+                      backgroundColor: Color(0xff2b2a2a),
                       title: Text("Profile"),
                       centerTitle: true, 
                     ),
@@ -93,16 +95,16 @@ class _ProfilePageState extends State<ProfilePage>{
                         GestureDetector(
                           onTap: () => _uploadProfileImage(),
                           child: Container(
-                            child: Text("Change profile photo", style: TextStyle(fontSize: 15, color: Colors.blue),),
+                            child: Text("Change profile photo", style: TextStyle(fontSize: 15, color: Colors.white),),
                           ),
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 25),
-                          child: Divider(color: Colors.blueAccent,)
+                          child: Divider(color: Colors.grey,)
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 25),
-                          child: Text("Edit profile", style: TextStyle(fontSize: 20),),
+                          child: Text("Edit profile", style: TextStyle(fontSize: 20, color: Colors.white),),
                           alignment: Alignment.topLeft,),
                         Container(
                           margin: EdgeInsets.only(top: 10),
@@ -110,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage>{
                             children: <Widget>[
                               Container(
                                 margin: EdgeInsets.only(left: 25),
-                                child: Text("Username", style: TextStyle(fontSize: 17),),
+                                child: Text("Username", style: TextStyle(fontSize: 17, color: Colors.white),),
                                 ),
                               GestureDetector(
                                 onTap: () => Navigator.push(
@@ -121,7 +123,7 @@ class _ProfilePageState extends State<ProfilePage>{
                                       ))),
                                 child: Container(
                                   margin: EdgeInsets.only(left: 25),
-                                  child: Text(user.username, style: TextStyle(fontSize: 17),)
+                                  child: Text(user.username, style: TextStyle(fontSize: 17, color: Colors.white),)
                                 ),
                               ),
                             ],
@@ -133,7 +135,7 @@ class _ProfilePageState extends State<ProfilePage>{
                             children: <Widget>[
                               Container(
                                 margin: EdgeInsets.only(left: 25),
-                                child: Text("Email address", style: TextStyle(fontSize: 14),),
+                                child: Text("Email address", style: TextStyle(fontSize: 14, color: Colors.white),),
                                 ),
                               GestureDetector(
                                 onTap: () =>  Navigator.push(
@@ -145,7 +147,7 @@ class _ProfilePageState extends State<ProfilePage>{
                                       ))),
                                 child: Container(
                                   margin: EdgeInsets.only(left: 14),
-                                  child: Text(user.email, style: TextStyle(fontSize: 17),)
+                                  child: Text(user.email, style: TextStyle(fontSize: 17, color: Colors.white),)
                                 ),
                               ),
                             ],
@@ -153,11 +155,11 @@ class _ProfilePageState extends State<ProfilePage>{
                         ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 25),
-                          child: Divider(color: Colors.blueAccent,)
+                          child: Divider(color: Colors.grey,)
                         ),
                         Container(
                           child: RaisedButton(
-                            color: Colors.blueAccent,
+                            color: Color(0xff2b2a2a),
                             child: Text("Sign out", style: TextStyle(color: Colors.white),),
                             onPressed: () => _signOut()
                             ),

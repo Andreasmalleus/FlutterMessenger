@@ -43,8 +43,10 @@ class _UsernamePageState extends State<UsernamePage> {
 
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       key: _scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text("Username"),
         centerTitle: true,
         actions: <Widget>[
@@ -63,12 +65,26 @@ class _UsernamePageState extends State<UsernamePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              child: Text("Username")
+              child: Text("Username", style: TextStyle(color: Colors.white),)
             ),
-            TextField(
-              onChanged: (value) => username = value,
-              decoration: InputDecoration(hintText: widget.user.username),
+            Container(
+            margin: EdgeInsets.only(top: 5),
+            child: TextField(
+              textAlign: TextAlign.center,
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: widget.user.username,
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
+              ),
+                onChanged: (value) => setState((){
+                  username = value;
+                }),
             ),
+          ),
           ],
         ),
       ),

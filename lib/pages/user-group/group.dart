@@ -51,7 +51,7 @@ class _GroupPageState extends State<GroupPage>{
         alignment: Alignment.center,
         child: GestureDetector(
             onTap: () => _uploadImage(),
-            child: Text("Upload a new image", style: TextStyle(fontSize: 15, color: Colors.blueAccent),),
+            child: Text("Upload a new image", style: TextStyle(fontSize: 15, color: Colors.white),),
         ),
       );
     }else{
@@ -65,7 +65,9 @@ class _GroupPageState extends State<GroupPage>{
 
   Widget build(BuildContext context){
       return Scaffold(
+        backgroundColor: Color(0xff121212),
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text(
           widget.group.name
           ),
@@ -88,14 +90,14 @@ class _GroupPageState extends State<GroupPage>{
                     backgroundImage: NetworkImage(widget.group.imageUrl),
                   )                 
                   :
-                  Icon(Icons.supervised_user_circle, size: 120, color: Colors.blueAccent,)
+                  Icon(Icons.supervised_user_circle, size: 120, color: Colors.white,)
                 ),
             ],),
           ),
           _uploadImageButton(),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 25),
-            child: Divider(color: Colors.blueAccent,)
+            child: Divider(color: Colors.grey,)
           ),
           Container(
             child: GestureDetector(
@@ -106,10 +108,10 @@ class _GroupPageState extends State<GroupPage>{
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
                     children: <Widget>[
-                      Icon(Icons.group, color: Colors.blueAccent,),
+                      Icon(Icons.group, color: Colors.white,),
                       SizedBox(width: 5,),
                       Container(
-                        child: Text("See group", style: TextStyle(fontSize: 17),),
+                        child: Text("See group members", style: TextStyle(fontSize: 17, color: Colors.white),),
                       ),
                     ],
                   ),
@@ -118,11 +120,11 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 25),
-            child: Divider(color: Colors.blueAccent,)
+            child: Divider(color: Colors.grey,)
           ),
           Container(
             margin: EdgeInsets.only(left: 25, top: 10),
-            child: Text("More actions", style: TextStyle(color: Colors.grey, fontSize: 20),),
+            child: Text("More actions", style: TextStyle(color: Colors.white, fontSize: 20),),
           ),
           Container(
             child: GestureDetector(
@@ -133,10 +135,10 @@ class _GroupPageState extends State<GroupPage>{
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.photo, color: Colors.blueAccent,),
+                    Icon(Icons.photo, color: Colors.white,),
                     SizedBox(width: 5,),
                     Container(
-                      child: Text("View photos and videos", style: TextStyle(fontSize: 17),),
+                      child: Text("View photos and videos", style: TextStyle(fontSize: 17, color: Colors.white),),
                     ),
                   ],
                 ),
@@ -156,10 +158,10 @@ class _GroupPageState extends State<GroupPage>{
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.search, color: Colors.blueAccent,),
+                    Icon(Icons.search, color: Colors.white,),
                     SizedBox(width: 5,),
                     Container(
-                      child: Text("Search in conversation", style: TextStyle(fontSize: 17),),
+                      child: Text("Search in conversation", style: TextStyle(fontSize: 17, color: Colors.white),),
                     ),
                   ],
                 ),
@@ -168,11 +170,11 @@ class _GroupPageState extends State<GroupPage>{
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 25),
-            child: Divider(color: Colors.blueAccent,)
+            child: Divider(color: Colors.grey,)
           ),
           Container(
             margin: EdgeInsets.only(left: 25, top: 10),
-            child: Text("Privacy", style: TextStyle(color: Colors.grey, fontSize: 20),),
+            child: Text("Privacy", style: TextStyle(color: Colors.white, fontSize: 20),),
           ),
           Container(
             child: GestureDetector(
@@ -183,7 +185,7 @@ class _GroupPageState extends State<GroupPage>{
                   children: <Widget>[
                     Icon(Icons.speaker_notes_off, color: Colors.redAccent,),
                     SizedBox(width: 5,),
-                    Text("Ignore messages", style: TextStyle(fontSize: 17),),
+                    Text("Ignore messages", style: TextStyle(fontSize: 17, color: Colors.white),),
                   ],
                 ),
               ),
@@ -198,7 +200,7 @@ class _GroupPageState extends State<GroupPage>{
                   children: <Widget>[
                     Icon(Icons.close, color: Colors.redAccent,),
                     SizedBox(width: 5,),
-                    Text("Leave", style: TextStyle(fontSize: 17),),
+                    Text("Leave", style: TextStyle(fontSize: 17, color: Colors.white),),
                   ],
                 ),
               ),

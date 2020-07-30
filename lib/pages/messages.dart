@@ -76,7 +76,7 @@ class _MessagePageState extends State<MessagePage>{
             top: 8.0, 
             bottom: 8.0,
           ),
-      padding: EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
+      padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
       decoration: BoxDecoration(
         color: isMe ? Colors.blueAccent: Colors.grey,
         borderRadius: BorderRadius.all(
@@ -87,18 +87,13 @@ class _MessagePageState extends State<MessagePage>{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            formatDateToHoursAndMinutes(message.time),
-            style: TextStyle(
-              color: Colors.black, 
-              fontWeight: FontWeight.bold, 
-              fontSize: 15.0),
-              ),
-          SizedBox(height: 4.0,),
-          Text(message.message.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+            message.message.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
     final img = Container(
+      margin: EdgeInsets.only(right: 5),
       child:
         message.sender.imageUrl != "" && !isMe
         ? 
@@ -111,7 +106,7 @@ class _MessagePageState extends State<MessagePage>{
     );
     final likeDislikeButton =  IconButton(
       icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
-      color: message.isLiked ? Colors.red : Colors.black,
+      color: message.isLiked ? Colors.red : Colors.white,
       iconSize: 25.0,
       onPressed: () async {
         message.isLiked 
@@ -156,7 +151,7 @@ class _MessagePageState extends State<MessagePage>{
     int differenceTodayH = current.difference(time).inHours;
     if(differenceToday != 0 || differenceTodayH > 12){//if its not todat and its off by 12 hours
       if(true){
-         return Text(t);
+         return Text(t, style: TextStyle(color: Colors.white),);
       }
     }else{
       return Container(
@@ -176,7 +171,7 @@ class _MessagePageState extends State<MessagePage>{
       child: Row(
         children: <Widget>[
           IconButton(
-            icon: Icon(Icons.photo),
+            icon: Icon(Icons.photo, color: Colors.white,),
             iconSize: 25.0,
             onPressed: (){
               setState(() {
@@ -192,12 +187,12 @@ class _MessagePageState extends State<MessagePage>{
             child: TextField(
               controller: textField,
               onChanged: (value) => text = value,
-              decoration: InputDecoration.collapsed(hintText: "Send a message..",),
+              decoration: InputDecoration.collapsed(hintText: "Send a message..", hintStyle: TextStyle(color: Colors.white)),
           )),
           _isVisible
           ? 
           IconButton(
-            icon: Icon(Icons.arrow_drop_up),
+            icon: Icon(Icons.arrow_drop_up, color: Colors.white,),
             iconSize: 25.0,
             onPressed: () => setState((){
               _isVisible = false;
@@ -205,7 +200,7 @@ class _MessagePageState extends State<MessagePage>{
           )
           :  
           IconButton(
-            icon: Icon(Icons.send),
+            icon: Icon(Icons.send, color: Colors.white,),
             iconSize: 25.0,
             onPressed: () => _sendMessage(text),
           )
@@ -240,8 +235,10 @@ class _MessagePageState extends State<MessagePage>{
   Widget build(BuildContext context){
     String imageUrl = widget.isChat ? widget.user.imageUrl : widget.group.imageUrl;
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       bottomNavigationBar: null,
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: GestureDetector(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -253,8 +250,13 @@ class _MessagePageState extends State<MessagePage>{
               backgroundImage: NetworkImage(imageUrl),
             )
             :
-            Icon(widget.isChat ? Icons.account_circle : Icons.supervised_user_circle),
-            Text(widget.isChat ? widget.user.username : widget.group.name),
+            Icon(widget.isChat ? Icons.account_circle : Icons.supervised_user_circle, size: 40,),
+            Container(
+              margin: EdgeInsets.only(left: 5),
+              child: Text(
+                widget.isChat ? widget.user.username : widget.group.name
+                )
+            ),
             ],),
           onTap: () => {
             widget.isChat ? 
@@ -342,7 +344,7 @@ class _MessagePageState extends State<MessagePage>{
                           );
                         }else{
                           return Container(
-                            child: Text("Add your first message")
+                            child: Text("Add your first message",style: TextStyle(color: Colors.white),)
                           );
                         }
                       },

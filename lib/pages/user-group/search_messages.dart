@@ -37,8 +37,10 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
 
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       key: _scaffoldKey,
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text(widget.title),
         centerTitle: true,
         actions: <Widget>[
@@ -57,13 +59,20 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              child: Text("Write your message here"),
+              margin: EdgeInsets.only(bottom: 5),
+              child: Text("Write your message here", style: TextStyle(color: Colors.white),),
             ),
             Container(
               child: TextField(
                 onChanged: (value) => _searchResult = value,
                 decoration: InputDecoration(
-                  hintText: "..."
+                  hintText: "...",
+                  hintStyle: TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: Color(0xff2b2a2a),
+                  border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
                 ),
               ),
             )
@@ -90,7 +99,9 @@ class SearchedMessagesPage extends StatelessWidget{
 
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Color(0xff121212),
       appBar: AppBar(
+        backgroundColor: Color(0xff2b2a2a),
         title: Text(title),
         centerTitle: true,
       ),

@@ -87,9 +87,9 @@ class _NavigatorPageState extends State<NavigatorPage>{
             ],
             currentIndex: _selectedIndex,
             selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.black,
+            unselectedItemColor: Colors.grey,
             onTap: _onTap,
-            backgroundColor: Colors.blueAccent,
+            backgroundColor: Color(0xff2b2a2a),
         ),
             ]
           ),

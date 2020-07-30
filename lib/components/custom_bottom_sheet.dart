@@ -34,15 +34,21 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
   Widget _groupNameContainer(){
     if(!widget.isChat){
       return Container(
-        width: MediaQuery.of(context).size.width * 0.35,
+        margin: EdgeInsets.all(5),
         child: TextField(
-          onChanged: (value) => setState((){
-            groupName = value;
-            }),
           textAlign: TextAlign.center,
-          decoration: InputDecoration(
-            hintText: "Group name"
+          decoration: InputDecoration.collapsed(
+            filled: true,
+            hintText: "Group name",
+            fillColor: Color(0xff2b2a2a),
+            hintStyle: TextStyle(color: Colors.grey),
+            border: OutlineInputBorder( 
+              borderRadius : BorderRadius.all(Radius.circular(10))
+            )
           ),
+            onChanged: (value) => setState((){
+              groupName = value;
+            }),
         ),
       );
     }else{
@@ -61,7 +67,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
   Widget _createGroupButton(){
     if(!widget.isChat){
       return RaisedButton(
-        child: Text("Create a group"),
+        color:  Color(0xff2b2a2a),
+        child: Text("Create a group", style: TextStyle(color: Colors.white),),
         onPressed: () => {
           _createGroup(currentUser.id)
         },
@@ -83,7 +90,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
     this.currentUser = Provider.of<User>(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.blueAccent,
+        color: Color(0xff121212),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25.0),
           topRight: Radius.circular(25.0)
@@ -93,17 +100,23 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
       child: Column( 
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          widget.isChat ? Text("Add Friends") : Text("Create a group"),
-          Container(
-            width: MediaQuery.of(context).size.width * 0.35,
+          widget.isChat ? Text("Add Friends", style: TextStyle(color: Colors.white),) : Text("Create a group", style: TextStyle(color: Colors.white),),
+         Container(
+            margin: EdgeInsets.all(5),
             child: TextField(
-              onChanged: (value) => setState((){
-                searchResult = value;
-                }),
               textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                hintText: "Search users"
+              decoration: InputDecoration.collapsed(
+                filled: true,
+                hintText: "Search users",
+                fillColor: Color(0xff2b2a2a),
+                hintStyle: TextStyle(color: Colors.grey),
+                border: OutlineInputBorder( 
+                  borderRadius : BorderRadius.all(Radius.circular(10))
+                )
               ),
+                onChanged: (value) => setState((){
+                  searchResult = value;
+                }),
             ),
           ),
           _groupNameContainer(),
@@ -145,10 +158,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
                           if(users[i].username.contains(searchResult) && searchResult != ""){
                             return Container(
                               child: Card(
+                                color: Color(0xff2b2a2a),
                                 child: ListTile(
-                                  leading: users[i].imageUrl != "" ? CircleAvatar(backgroundImage: NetworkImage(users[i].imageUrl),) : Icon(Icons.android),
-                                  title: Text(users[i].username),
-                                  trailing: IconButton(icon: Icon(Icons.add_box), onPressed: () => {
+                                  leading: users[i].imageUrl != "" ? CircleAvatar(backgroundImage: NetworkImage(users[i].imageUrl),) : Icon(Icons.android, color: Colors.white,),
+                                  title: Text(users[i].username, style: TextStyle(color: Colors.white),),
+                                  trailing: IconButton(icon: Icon(Icons.add_box, color: Colors.white,), onPressed: () => {
                                     widget.isChat ?  _addFriends(users[i].id,currentUser.id) : null,
                                     widget.isChat ? _addChat(users[i].id,currentUser.id) : null,
                                     !widget.isChat ? groupParticipants.add(users[i].id):  null,
@@ -179,7 +193,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
           ), 
           _createGroupButton(),
           RaisedButton(
-            child: Text("Close"),
+            child: Text("Close", style: TextStyle(color: Colors.white),),
+            color: Color(0xff2b2a2a),
             onPressed: () => {
               Navigator.pop(context),
               widget.toggleBottomAppBarVisibility(),
