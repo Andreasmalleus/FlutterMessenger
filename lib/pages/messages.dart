@@ -43,56 +43,40 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   Widget _buildMessage(Message message, bool isMe){ 
-    final msg = message.type == "image"
-    ?
-    Container(
-      width: MediaQuery.of(context).size.width * 0.75,
-      margin: isMe
-          ? EdgeInsets.only(
-            bottom: 8.0, 
-            left: 80.0,
+    var msg;
+    
+    switch (message.type) {
+      case "image":
+        msg = Container(
+          width: MediaQuery.of(context).size.width * 0.75,
+          margin: EdgeInsets.symmetric(vertical: 5),
+              child: GestureDetector(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: message.content, name: message.id,))),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.network(message.content)
+                  )
+                )
+        );
+        break;
+      case "text":
+        msg = Container(
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.80),
+        margin: EdgeInsets.symmetric(vertical: 5),
+        padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.blueAccent: Colors.grey,
+          borderRadius: BorderRadius.all(
+            Radius.circular(15.0),
           ) 
-          : EdgeInsets.only(
-            top: 8.0, 
-            bottom: 8.0,
-          ),
-          child: GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: message.content, name: message.id,))),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(message.content)
-              )
-            )
-    )
-    :
-    Container(
-      width: MediaQuery.of(context).size.width * 0.75,
-      margin: isMe
-          ? EdgeInsets.only(
-            top: 8.0, 
-            bottom: 8.0, 
-            left: 80.0,
-          ) 
-          : EdgeInsets.only(
-            top: 8.0, 
-            bottom: 8.0,
-          ),
-      padding: EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-      decoration: BoxDecoration(
-        color: isMe ? Colors.blueAccent: Colors.grey,
-        borderRadius: BorderRadius.all(
-                Radius.circular(15.0),
-              ) 
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            message.content.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    );
+        ),
+        child: Text(
+          message.content, style: TextStyle(color: Colors.white),
+        ),
+      );
+      break;
+    }
+
     final img = Container(
       margin: EdgeInsets.only(right: 5),
       child:
@@ -105,6 +89,7 @@ class _MessagePageState extends State<MessagePage>{
         ) 
         : Icon(Icons.android, size: 30,),
     );
+
     final likeDislikeButton =  IconButton(
       icon: message.isLiked ? Icon(Icons.favorite) : Icon(Icons.favorite_border),
       color: message.isLiked ? Colors.red : Colors.white,
@@ -113,13 +98,24 @@ class _MessagePageState extends State<MessagePage>{
         message.isLiked 
         ? 
         await widget.database.dislikeMessage(widget.convTypeId,message.id, widget.isChat) 
-        : await widget.database.likeMessage(widget.convTypeId, message.id, widget.isChat);
+        : 
+        await widget.database.likeMessage(widget.convTypeId, message.id, widget.isChat);
       },
     );
+
     if(isMe){
-      return msg;
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
+          Flexible(
+            child: Container(
+              child: msg,
+            ),
+          ),
+      ]);
     }else{
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         img,
         msg,
