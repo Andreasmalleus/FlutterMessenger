@@ -59,13 +59,16 @@ class _SignInUpPageState extends State<SignInUpPage>{
               margin: EdgeInsets.all(10),
               width: 400,
               child: TextFormField(
+                style: TextStyle(color: Colors.white),
                 obscureText: false,
                 validator: _usernameValidator,
                 onSaved: (value) => _username = value.trim(),
                 decoration: InputDecoration(
                     labelText: "Username", hintText: "john.wick",
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.grey),
                     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                    fillColor: Color(0xfff3f3f4),
+                    fillColor: Color(0xff2b2a2a),
                     filled: true,
                 )
               ),
@@ -84,13 +87,16 @@ class _SignInUpPageState extends State<SignInUpPage>{
               margin: EdgeInsets.all(10),
               width: 400,
               child: TextFormField(
+                style: TextStyle(color: Colors.white),
                 obscureText: true,
                 validator: _passwordValidator,
                 onSaved: (value) => _cfmPassword = value.trim(),
                 decoration: InputDecoration(
                     labelText: "Confirm password", hintText: "********",
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.grey),
                     border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                    fillColor: Color(0xfff3f3f4),
+                    fillColor: Color(0xff2b2a2a),
                     filled: true,
                 )
               ),
@@ -163,13 +169,7 @@ class _SignInUpPageState extends State<SignInUpPage>{
   Widget build(BuildContext context){
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Color(0xff1A1A1A),
-      appBar: AppBar(
-        title: Text(_signUpForm ? "Sign up" : "Sign in", style: TextStyle(color: Colors.black),),
-        backgroundColor: Colors.white,
-        iconTheme: IconThemeData(color: Colors.black),
-        ),
-        
+      backgroundColor: Color(0xff121212),
       body: Form(
         key: _formKey,
         child: Container(
@@ -186,14 +186,20 @@ class _SignInUpPageState extends State<SignInUpPage>{
                 margin: EdgeInsets.all(10),
                 width: 400,
                 child: TextFormField(
+                  style: TextStyle(color: Colors.white),
                   validator: _emailValidator,
                   onSaved: (value) => _email = value.trim(),
                   decoration: InputDecoration(
-                      labelText: "Email", hintText: "john.wick@gmail.com",
-                      border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                      fillColor: Color(0xfff3f3f4),
-                      filled: true,
-                  )
+                    labelText: "Email",
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintText: "john.wick@gmail.com",
+                    filled: true,
+                    fillColor: Color(0xff2b2a2a),
+                    hintStyle: TextStyle(color: Colors.grey),
+                    border: OutlineInputBorder( 
+                      borderRadius : BorderRadius.all(Radius.circular(10))
+                    )
+                  ),
                 ),
               ),
               _usernameContainer(),
@@ -201,14 +207,18 @@ class _SignInUpPageState extends State<SignInUpPage>{
                 margin: EdgeInsets.all(10),
                 width: 400,
                 child: TextFormField(
+                  style: TextStyle(color: Colors.white),
                     validator: _passwordValidator,
                     onSaved: (value) => _password = value.trim(),
                     obscureText: true,
                     decoration: InputDecoration(
                         labelText: "Password", hintText: "********",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
-                        fillColor: Color(0xfff3f3f4),
+                        labelStyle: TextStyle(color: Colors.grey),
+                        hintStyle: TextStyle(color: Colors.grey),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
                         filled: true,
+                        fillColor: Color(0xff2b2a2a),
                     )
                 ),
               ),
@@ -222,8 +232,8 @@ class _SignInUpPageState extends State<SignInUpPage>{
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(_signUpForm ? "Sign up" : "Sign in", 
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
-                  color: Colors.white,
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),),
+                  color: Color(0xff2b2a2a),
                   onPressed: () => {
                     if(_formKey.currentState.validate()){
                       _formKey.currentState.save(),
