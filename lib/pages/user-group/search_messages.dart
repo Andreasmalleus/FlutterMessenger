@@ -66,6 +66,7 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
             ),
             Container(
               child: TextField(
+                style: TextStyle(color: Colors.white),
                 onChanged: (value) => _searchResult = value,
                 decoration: InputDecoration(
                   hintText: "...",
