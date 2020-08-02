@@ -32,7 +32,8 @@ class _MessagePageState extends State<MessagePage>{
 
   User currentUser;
   File file;
-  bool _isVisible;
+  bool _showMediaPicker;
+  String text = "";
 
   void getUser() async {
     User dbUser = await widget.database.getUser(widget.sender.id);
@@ -129,7 +130,7 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   Widget _buildImagePicker(){
-    if(_isVisible){
+    if(_showMediaPicker){
       return CustomMediaPicker(sender: widget.sender, database: widget.database, convTypeId: widget.convTypeId, isChat : widget.isChat);
     }else{
       return Container(
@@ -160,8 +161,7 @@ class _MessagePageState extends State<MessagePage>{
       );
     }
   }
-
-  String text = "";
+  
   final textField = TextEditingController();
   Widget _buildMessageComposer(){
     String url = "";
@@ -175,7 +175,7 @@ class _MessagePageState extends State<MessagePage>{
             iconSize: 25.0,
             onPressed: (){
               setState(() {
-                _isVisible = !_isVisible;
+                _showMediaPicker = !_showMediaPicker;
               });
             },
           ),
@@ -184,18 +184,32 @@ class _MessagePageState extends State<MessagePage>{
           Container(child: Text(url),)
           :
           Expanded(
-            child: TextField(
-              controller: textField,
-              onChanged: (value) => text = value,
-              decoration: InputDecoration.collapsed(hintText: "Send a message..", hintStyle: TextStyle(color: Colors.white)),
-          )),
-          _isVisible
+            child: Container(
+              height: 35,
+              child: TextField(
+                textAlign: TextAlign.center,
+                readOnly: _showMediaPicker ? true : false,
+                style: TextStyle(color: Colors.white, fontFamily: 'EmojiOne'),
+                controller: textField,
+                onChanged: (value) => text = value,
+                decoration: InputDecoration.collapsed(
+                  filled: true,
+                  hintText: "Write your message here..",
+                  fillColor: Color(0xff2b2a2a),
+                  hintStyle: TextStyle(color: Colors.grey),
+                  border: OutlineInputBorder( 
+                    borderRadius : BorderRadius.all(Radius.circular(10))
+                  )
+                ),
+          ),
+            )),
+          _showMediaPicker
           ? 
           IconButton(
             icon: Icon(Icons.arrow_drop_up, color: Colors.white,),
             iconSize: 25.0,
             onPressed: () => setState((){
-              _isVisible = false;
+              _showMediaPicker = false;
             }),
           )
           :  
@@ -210,24 +224,28 @@ class _MessagePageState extends State<MessagePage>{
   }
 
   void _sendMessage(text) async{
-    User sender = widget.sender;
-    Message message = Message(
-      content: text,
-      sender: sender,
-      isLiked: false,
-      isRead: false,
-      time: getCurrentDate(),
-      type: "text"
-    );
-    widget.database.addMessage(widget.convTypeId, message, widget.isChat);
-    widget.database.updateLastMessageAndTime(widget.convTypeId, text, getCurrentDate(), widget.isChat);
-    textField.clear();
+    if(text != ""){
+      User sender = widget.sender;
+      Message message = Message(
+        content: text,
+        sender: sender,
+        isLiked: false,
+        isRead: false,
+        time: getCurrentDate(),
+        type: "text"
+      );
+      widget.database.addMessage(widget.convTypeId, message, widget.isChat);
+      widget.database.updateLastMessageAndTime(widget.convTypeId, text, getCurrentDate(), widget.isChat);
+      textField.clear();
+    }else{
+      print("cant be empty");
+    }
   }
 
   @override
   void initState(){
     getUser();
-    _isVisible = false;
+    _showMediaPicker = false;
     super.initState();
   }
 
@@ -329,7 +347,7 @@ class _MessagePageState extends State<MessagePage>{
               ),
             ),
             _buildMessageComposer(),
-            _buildImagePicker()
+            _buildImagePicker(),
         ],),
       )
     );
