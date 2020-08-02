@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/chat.dart';
+import 'package:fluttermessenger/models/group.dart';
 import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +30,14 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
   }
 
   void _addChat(String userId,String currentUserId){
-    widget.database.createChat(currentUserId, userId);
+    Chat chat = Chat(
+      lastMessage: "",
+      lastMessageTime: "",
+      participants: [
+        userId, currentUserId
+      ]
+    );
+    widget.database.createChat(chat);
   }
 
   Widget _groupNameContainer(){
@@ -36,6 +45,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
       return Container(
         margin: EdgeInsets.all(5),
         child: TextField(
+          style: TextStyle(color: Colors.white),
           textAlign: TextAlign.center,
           decoration: InputDecoration.collapsed(
             filled: true,
@@ -61,7 +71,15 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
 
   void _createGroup(String currentUserId) async{
     groupParticipants.add(currentUserId);
-    widget.database.createGroup(groupParticipants, groupName, currentUserId);
+    Group group = Group(
+      name: groupName,
+      participants: groupParticipants,
+      admins: [currentUserId],
+      imageUrl: "",
+      lastMessage: "",
+      lastMessageTime: "",
+    );
+    widget.database.createGroup(group);
   }
 
   Widget _createGroupButton(){
@@ -104,6 +122,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
          Container(
             margin: EdgeInsets.all(5),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 filled: true,
@@ -121,23 +140,11 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
           ),
           _groupNameContainer(),
           //TODO needs a better solution
-          StreamBuilder<dynamic>(
+          StreamBuilder<List<User>>(
             stream: widget.database.streamUsers(),
             builder: (context, snapshot){
               if(snapshot.hasData && snapshot.data != null){
-                Map<dynamic,dynamic> map = snapshot.data;
-                List<User> users =List<User>();
-                map.forEach((key, value) {
-                  users.add(
-                    User(
-                      id: key,
-                      username: value["username"],
-                      email: value["email"],
-                      createdAt: value["createdAt"],
-                      imageUrl: value["imageUrl"]
-                    )
-                  );
-                });
+                List<User> users = snapshot.data;
                 return FutureBuilder(
                   future: widget.database.getFriends(currentUser.id),
                   builder: (BuildContext ctx, AsyncSnapshot snapshot){

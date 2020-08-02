@@ -5,10 +5,11 @@ import 'package:fluttermessenger/utils/utils.dart';
 
 class SearchMessagesPage extends StatefulWidget{
 
-  SearchMessagesPage({this.title, this.database, this.typeId});
+  SearchMessagesPage({this.title, this.database, this.typeId, this.isChat});
   final String title;
   final BaseDb database;
   final String typeId;
+  final bool isChat;
 
   @override
   _SearchMessagesPageState createState() => _SearchMessagesPageState();
@@ -29,7 +30,8 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
           title: widget.title,
           database: widget.database,
           searchResult : _searchResult,
-          typeId : widget.typeId
+          typeId : widget.typeId,
+          isChat : widget.isChat
         ))
       );
     }
@@ -85,15 +87,16 @@ class _SearchMessagesPageState extends State<SearchMessagesPage> {
 
 class SearchedMessagesPage extends StatelessWidget{
 
-  SearchedMessagesPage({this.title, this.database, this.searchResult, this.typeId});
+  SearchedMessagesPage({this.title, this.database, this.searchResult, this.typeId, this.isChat});
   final String title;
   final BaseDb database;
   final String searchResult;
   final String typeId;
+  final bool isChat;
 
   List filterList(List messages){
     messages.removeWhere((message) => message.type == "image");
-    messages.removeWhere((message) => !message.message.contains(searchResult));
+    messages.removeWhere((message) => !message.content.contains(searchResult));
     return messages;
   }
 
@@ -107,28 +110,32 @@ class SearchedMessagesPage extends StatelessWidget{
       ),
       body: Container(
         child: FutureBuilder(
-          future: database.getAllMessages(typeId),
+          future: database.getAllMessages(typeId, isChat),
           builder: (BuildContext context, AsyncSnapshot snapshot){
             if(snapshot.hasData){
               List<Message> messages = filterList(snapshot.data);
               return ListView.builder(
                 itemCount: messages.length,
                 itemBuilder: (BuildContext context, int i){
-                  return Card(
-                    child: ListTile(
-                      leading: messages[i].sender.imageUrl != "" 
-                      ?
-                      CircleAvatar(backgroundImage: NetworkImage(messages[i].sender.imageUrl))
-                      :
-                      Icon(Icons.account_circle)
-                      ,
-                      title: Text(messages[i].sender.username),
-                      subtitle: Text(messages[i].message),
-                    )
+                  return Container(
+                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                    child: Card(
+                      color: Color(0xff2b2a2a),
+                      child: ListTile(
+                        leading: messages[i].sender.imageUrl != "" 
+                        ?
+                        CircleAvatar(backgroundImage: NetworkImage(messages[i].sender.imageUrl))
+                        :
+                        Icon(Icons.account_circle, color: Colors.white, size: 50,)
+                        ,
+                        title: Text(messages[i].sender.username, style: TextStyle(color: Colors.white),),
+                        subtitle: Text(messages[i].content, style: TextStyle(color: Colors.grey),),
+                      )
+                    ),
                   );
                 });
             }else{
-              Container(
+              return Container(
                 child: Text("Sorry no such messages"),
               );
             }

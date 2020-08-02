@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Chat{
   String id;
   String lastMessage;
@@ -11,17 +13,20 @@ class Chat{
     this.participants,
   });
 
-  factory Chat.fromFirebase(MapEntry<dynamic, dynamic> data){
-    List<String> ids = List<String>();
-    data.value["participants"].forEach((key, value) => {
-      ids.add(key)
-    });
-      return Chat(
-        id: data.key,
-        lastMessage: data.value["lastMessage"],
-        lastMessageTime: data.value["lastMessageTime"],
-        participants: ids
+  factory Chat.fromFirestore(DocumentSnapshot data){
+    return  Chat(
+      id: data.documentID,
+      lastMessage: data["lastMessage"] ?? '',
+      lastMessageTime: data["lastMessageTime"] ?? '',
+      participants: List.from(data["participants"]) ?? '',
     );
-
   }
+
+  toJson(){
+      return {
+        "lastMessage" : lastMessage,
+        "lastMessageTime" : lastMessageTime,
+        "participants" : participants
+      };
+    }
 }

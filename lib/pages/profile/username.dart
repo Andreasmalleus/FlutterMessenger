@@ -70,6 +70,7 @@ class _UsernamePageState extends State<UsernamePage> {
             Container(
             margin: EdgeInsets.only(top: 5),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 filled: true,

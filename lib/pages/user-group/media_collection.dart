@@ -4,9 +4,10 @@ import 'package:fluttermessenger/services/database.dart';
 
 class MediaCollectionPage extends StatefulWidget{
 
-  MediaCollectionPage({this.database, this.typeId});
+  MediaCollectionPage({this.database, this.typeId, this.isChat});
   final BaseDb database;
   final String typeId;
+  final bool isChat;
 
   @override
   _MediaCollectionPageState createState() => _MediaCollectionPageState();
@@ -29,7 +30,7 @@ class _MediaCollectionPageState extends State<MediaCollectionPage> {
         centerTitle: true,
       ),
       body: FutureBuilder(
-        future: widget.database.listAllStorageFilesById(widget.typeId),
+        future: widget.database.listAllStorageFilesById(widget.typeId, widget.isChat),
         builder: (BuildContext context, AsyncSnapshot snapshot){
           if(snapshot.hasData){
           files = snapshot.data;

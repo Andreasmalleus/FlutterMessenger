@@ -121,6 +121,7 @@ class _EmailPageState extends State<EmailPage> {
             Container(
             margin: EdgeInsets.only(top: 5),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 filled: true,
@@ -143,6 +144,7 @@ class _EmailPageState extends State<EmailPage> {
             Container(
             margin: EdgeInsets.only(top: 5),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               obscureText: true,
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(

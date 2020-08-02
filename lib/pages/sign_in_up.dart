@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/authenitaction.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -126,13 +127,19 @@ class _SignInUpPageState extends State<SignInUpPage>{
   }
 
   void _addCreatedUserToDatabase(String userId, String email, String username, String createdAt, String imageUrl){
-    widget.database.addUser(userId, email, username, createdAt, imageUrl);
+    User user = User(
+      id: userId,
+      email: email,
+      username: username,
+      createdAt: createdAt,
+      imageUrl: imageUrl
+    );
+    widget.database.createUser(user);
   }
 
   void _handleSignUp() async{
     String createdAt = DateTime.now().toString();
     String userId = "";
-    print("andmed: $_email, $_password");
     userId = await widget.auth.signUp(_email, _password);
     print('Signed up user: $userId');
     showSnackBar("User signed up", _scaffoldKey);

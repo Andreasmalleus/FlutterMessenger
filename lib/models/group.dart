@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Group{
   String id;
   String name;
@@ -17,24 +19,27 @@ class Group{
     this.admins
   });
 
-  factory Group.fromFirebase(MapEntry<dynamic, dynamic> data){
-    List<String> participants = List<String>();
-    List<String> admins = List<String>();
-    data.value["participants"].forEach((participantId, boolean){
-      participants.add(participantId);
-    });
-    data.value["admins"].forEach((adminId, boolean){
-      admins.add(adminId);
-    });
-    return Group(
-      id: data.key,
-      name: data.value["name"],
-      lastMessage: data.value["lastMessage"],
-      lastMessageTime: data.value["lastMessageTime"],
-      imageUrl: data.value["imageUrl"],
-      participants: participants,
-      admins: admins
+  factory Group.fromFirestore(DocumentSnapshot data){
+    return  Group(
+      id: data.documentID,
+      name: data["name"] ?? '',
+      lastMessage: data["lastMessage"] ?? '',
+      lastMessageTime: data["lastMessageTime"] ?? '',
+      imageUrl: data["imageUrl"] ?? '',
+      participants: List.from(data["participants"]) ?? '',
+      admins: List.from(data["admins"]) ?? '',
     );
   }
+
+  toJson(){
+      return {
+        "name" : name,
+        "lastMessage" : lastMessage,
+        "lastMessageTime" : lastMessageTime,
+        "imageUrl" : imageUrl,
+        "participants" : participants,
+        "admins" : admins
+      };
+    }
 
 }

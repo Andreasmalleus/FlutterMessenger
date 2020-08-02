@@ -30,6 +30,7 @@ class _ChatsPageState extends State<ChatsPage>{
   List<User> friends = List<User>();
   User currentUser;
   String id = "";
+  String urlll = "https://firebasestorage.googleapis.com/v0/b/flutter-messenger-a7479.appspot.com/o/users%2Fh6RTagwDUnhoH4O5k1V3yoXrjhF3%2Fmedia%2FprofileImage?alt=media&token=5bea6cc6-511c-4660-ad77-1539a2b35b16";
 
   void _showSheet() {
     showModalBottomSheet(
@@ -96,6 +97,7 @@ class _ChatsPageState extends State<ChatsPage>{
           Container(
             margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 filled: true,
@@ -111,12 +113,11 @@ class _ChatsPageState extends State<ChatsPage>{
               })
             ),
           ),
-          StreamBuilder(
-            stream: widget.database.streamChats(),
+          StreamBuilder<List<Chat>>(
+            stream: widget.database.streamChats(currentUser.id),
             builder: (context, snapshot) {
               if(snapshot.hasData){
                 List<Chat> chats = snapshot.data;
-                chats.removeWhere((chat) => !chat.participants.contains(currentUser.id));//temporary 
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount:  chats.length,
@@ -124,7 +125,7 @@ class _ChatsPageState extends State<ChatsPage>{
                     int index = chats[i].participants.indexWhere((id) => id != currentUser.id);
                     String id = chats[i].participants[index];
                     return FutureBuilder<User>(
-                      future: widget.database.getUserObject(id),
+                      future: widget.database.getUser(id),
                       builder: (BuildContext ctx, AsyncSnapshot snapshot){
                         if(snapshot.hasData && snapshot.data != null){
                           User user = snapshot.data;
@@ -194,8 +195,7 @@ class _ChatsPageState extends State<ChatsPage>{
 
               }else{
                 return Container(
-                  width: 0,
-                  height: 0,
+                  child: Text(snapshot.toString() , style:TextStyle(color: Colors.white)),
                 );
               }
             },

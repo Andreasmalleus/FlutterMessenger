@@ -94,6 +94,7 @@ class _GroupsPageState extends State<GroupsPage>{
            Container(
             margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
             child: TextField(
+              style: TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
               decoration: InputDecoration.collapsed(
                 filled: true,
@@ -111,11 +112,10 @@ class _GroupsPageState extends State<GroupsPage>{
             ),
           ),
           StreamBuilder(
-            stream: widget.database.streamGroups(),
+            stream: widget.database.streamGroups(currentUser.id),
             builder: (context, snapshot){
               if(snapshot.hasData){
                 List<Group> groups = snapshot.data;
-                groups.removeWhere((group) => !group.participants.contains(currentUser.id));
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: groups.length,

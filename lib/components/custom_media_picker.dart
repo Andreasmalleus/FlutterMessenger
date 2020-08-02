@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:ext_storage/ext_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttermessenger/models/message.dart';
+import 'package:fluttermessenger/models/storage_file.dart';
 import 'package:fluttermessenger/models/user.dart';
 import 'package:fluttermessenger/services/database.dart';
 import 'package:fluttermessenger/utils/utils.dart';
@@ -47,18 +49,37 @@ class _CustomMediaPickerState extends State<CustomMediaPicker>{
   }
 
   void _addImageToDatabaseAndStorage() async{
-    String message = files[_selectedIndex].path;
+    String path = files[_selectedIndex].path;
     String time = getCurrentDate();
-    String fileName = getFileName(message);
+    String fileName = getFileName(path);
     String url;
+    StorageFile storageFile;
     if(widget.isChat){
-      url = await widget.database.uploadFileToChatStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
-      await widget.database.fileUrlToDatabase(widget.convTypeId, widget.sender.id, url, fileName);
+      url = await widget.database.uploadFileToChatStorage(File(path), widget.convTypeId, widget.sender.id, fileName);
+      storageFile = StorageFile(
+        userId: widget.sender.id,
+        name: fileName,
+        url: url
+      );
+      await widget.database.fileUrlToDatabase(widget.convTypeId, storageFile, widget.isChat);
     }else{
-      url = await widget.database.uploadFileToGroupStorage(File(message), widget.convTypeId, widget.sender.id, fileName);
-      await widget.database.fileUrlToDatabase(widget.convTypeId, widget.sender.id, url, fileName);
+      url = await widget.database.uploadFileToGroupStorage(File(path), widget.convTypeId, widget.sender.id, fileName);
+      storageFile = StorageFile(
+        userId: widget.sender.id,
+        name: fileName,
+        url: url
+      );
+      await widget.database.fileUrlToDatabase(widget.convTypeId, storageFile, widget.isChat);
     }
-    await widget.database.addMessage(url, widget.sender, false, false, time, widget.convTypeId, "image");
+    Message message = Message(
+      content: url,
+      sender: widget.sender,
+      isLiked: false,
+      isRead: false,
+      time: time,
+      type: "image"
+    );
+    await widget.database.addMessage(widget.convTypeId, message, widget.isChat);
   }
   Widget _sendButton(){
     if(_isSelected){

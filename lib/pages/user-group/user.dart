@@ -82,7 +82,7 @@ class _UserPageState extends State<UserPage>{
               child: GestureDetector(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.chat.id,))),
+                    builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.chat.id, isChat: true,))),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(
@@ -101,7 +101,7 @@ class _UserPageState extends State<UserPage>{
               child: GestureDetector(
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.chat.id,))),
+                    builder: (BuildContext context) => SearchMessagesPage(title: widget.user.username, database: widget.database, typeId: widget.chat.id, isChat: true,))),
                 child: Container(
                   margin: EdgeInsets.only(left: 25, top: 10),
                   child: Row(

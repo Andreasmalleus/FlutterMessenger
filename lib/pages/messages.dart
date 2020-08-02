@@ -35,7 +35,7 @@ class _MessagePageState extends State<MessagePage>{
   bool _isVisible;
 
   void getUser() async {
-    User dbUser = await widget.database.getUserObject(widget.sender.id);
+    User dbUser = await widget.database.getUser(widget.sender.id);
     setState((){
       currentUser = dbUser;
     });
@@ -56,10 +56,10 @@ class _MessagePageState extends State<MessagePage>{
             bottom: 8.0,
           ),
           child: GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: message.message, name: message.id,))),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => DetailPage(url: message.content, name: message.id,))),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(message.message)
+              child: Image.network(message.content)
               )
             )
     )
@@ -87,7 +87,7 @@ class _MessagePageState extends State<MessagePage>{
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            message.message.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            message.content.toString(), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -111,8 +111,8 @@ class _MessagePageState extends State<MessagePage>{
       onPressed: () async {
         message.isLiked 
         ? 
-        await widget.database.dislikeMessage(widget.convTypeId,message.id) 
-        : await widget.database.likeMessage(widget.convTypeId, message.id);
+        await widget.database.dislikeMessage(widget.convTypeId,message.id, widget.isChat) 
+        : await widget.database.likeMessage(widget.convTypeId, message.id, widget.isChat);
       },
     );
     if(isMe){
@@ -211,15 +211,15 @@ class _MessagePageState extends State<MessagePage>{
 
   void _sendMessage(text) async{
     User sender = widget.sender;
-    widget.database.addMessage(
-      text,
-      sender,
-      false,
-      false,
-      getCurrentDate(),
-      widget.convTypeId,
-      "text"
-      );
+    Message message = Message(
+      content: text,
+      sender: sender,
+      isLiked: false,
+      isRead: false,
+      time: getCurrentDate(),
+      type: "text"
+    );
+    widget.database.addMessage(widget.convTypeId, message, widget.isChat);
     widget.database.updateLastMessageAndTime(widget.convTypeId, text, getCurrentDate(), widget.isChat);
     textField.clear();
   }
@@ -292,34 +292,10 @@ class _MessagePageState extends State<MessagePage>{
                 child: Container(
                   margin: EdgeInsets.only(top: 5.0),
                   child: StreamBuilder(
-                      stream: widget.database.getMessageRef().child(widget.convTypeId).onValue,
+                      stream: widget.database.streamMessages(widget.convTypeId, widget.isChat),
                       builder: (context, snapshot){
-                        if(snapshot.hasData && snapshot.data.snapshot.value != null){
-                          Map<dynamic, dynamic> map = snapshot.data.snapshot.value;
-                          List<Message> messages = List<Message>();
-                          User sender;
-                          Message message;
-                          map.forEach((key, value) {
-                            sender = User(
-                              id: value["sender"]["id"],
-                              imageUrl: value["sender"]["imageUrl"],
-                              createdAt: value["sender"]["createdAt"],
-                              username: value["sender"]["username"],
-                              email: value["sender"]["email"]
-                            );
-                            message = Message(
-                              id: key,
-                              type: value["type"],
-                              time: value["time"],
-                              sender: sender,
-                              message: value["message"],
-                              isLiked: value["isLiked"],
-                              isRead: value["isRead"]
-                            );
-                            messages.add(
-                              message
-                            );
-                          });
+                        if(snapshot.hasData){
+                          List<Message> messages = snapshot.data;
                           messages.sort((a,b) => formatStringToDateTime(b.time).compareTo(formatStringToDateTime(a.time)));
                           return ListView.builder(
                             reverse: true,

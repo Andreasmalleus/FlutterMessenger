@@ -46,7 +46,7 @@ class _MembersPageState extends State<MembersPage> {
                 itemCount: widget.group.participants.length,
                 itemBuilder: (BuildContext context, int i){
                   return FutureBuilder(
-                    future: widget.database.getUserObject(widget.group.participants[i]),
+                    future: widget.database.getUser(widget.group.participants[i]),
                     builder: (BuildContext context, AsyncSnapshot snapshot){
                       User user = snapshot.data;
                       if(snapshot.hasData){
@@ -87,7 +87,7 @@ class _MembersPageState extends State<MembersPage> {
                 itemCount: widget.group.admins.length,
                 itemBuilder: (BuildContext context, int i){
                   return FutureBuilder(
-                    future: widget.database.getUserObject(widget.group.admins[i]),
+                    future: widget.database.getUser(widget.group.admins[i]),
                     builder: (BuildContext context, AsyncSnapshot snapshot){
                       User user = snapshot.data;
                       if(snapshot.hasData){
@@ -101,7 +101,7 @@ class _MembersPageState extends State<MembersPage> {
                                   backgroundImage: NetworkImage(user.imageUrl),
                                 )
                                 :
-                                Icon(Icons.account_circle, size: 40,),
+                                Icon(Icons.account_circle, size: 40, color: Colors.white,),
                               title: Text(user.username, style: TextStyle(color: Colors.white),),
                             ),
                           ),

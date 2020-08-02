@@ -40,7 +40,8 @@ class _ProfilePageState extends State<ProfilePage>{
     try{
       file = await FilePicker.getFile(type: FileType.image);
       url = await widget.database.uploadUserImageToStorage(file, widget.userId);
-      widget.database.updateUserImageUrl(url, widget.userId);
+      
+      widget.database.updateUserImageUrl(widget.userId, url);
     }catch(e){
       print(e);
     }
@@ -54,17 +55,10 @@ class _ProfilePageState extends State<ProfilePage>{
   Widget build(BuildContext context){
     if(widget.userId != null){
       return StreamBuilder(
-            stream: widget.database.getUserRef().child(widget.userId).onValue,
+            stream: widget.database.streamUser(widget.userId),
             builder: (context, snapshot){
-              if(snapshot.hasData && snapshot.data.snapshot.value != null){
-                dynamic dbUser = snapshot.data.snapshot.value;
-                User user = User(
-                  id: widget.userId,
-                  imageUrl: dbUser["imageUrl"],
-                  createdAt: dbUser["createdAt"],
-                  username: dbUser["username"],
-                  email: dbUser["email"]
-                );
+              if(snapshot.hasData){
+                User user = snapshot.data;
                   return Scaffold(
                     backgroundColor: Color(0xff121212),
                     appBar: AppBar(
@@ -88,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage>{
                                   backgroundImage: NetworkImage(user.imageUrl),
                                 )                 
                                 :
-                                Icon(Icons.android, size: 30,)
+                                Icon(Icons.account_circle, size: 120, color: Colors.white,)
                               ),
                           ],),
                         ),

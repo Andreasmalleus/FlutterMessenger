@@ -1,4 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class User{
   final String id;
@@ -15,15 +15,23 @@ class User{
     this.imageUrl
   });
 
-  factory User.fromFirebase(DataSnapshot snapshot){
-    Map data = snapshot.value;
+  factory User.fromFirestore(DocumentSnapshot snapshot){
     return User(
-      id: snapshot.key,
-      imageUrl: data["imageUrl"],
-      createdAt: data["createdAt"],
-      username: data["username"],
-      email: data["email"]
+      id: snapshot.documentID ?? '',
+      imageUrl: snapshot["imageUrl"] ?? '',
+      createdAt: snapshot["createdAt"]?? '',
+      username: snapshot["username"]?? '',
+      email: snapshot["email"]?? ''
     );
+  }
+
+  toJson(){
+    return {
+      "imageUrl" : imageUrl,
+      "createdAt": createdAt,
+      "username": username,
+      "email": email
+    };
   }
 
 }

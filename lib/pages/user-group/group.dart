@@ -51,7 +51,7 @@ class _GroupPageState extends State<GroupPage>{
   }
 
   void _removeGroup() async{
-    await widget.database.removeGroup(widget.group.id);
+    await widget.database.deleteGroup(widget.group.id);
     _navigateToGroupsPage();
   }
 
@@ -162,7 +162,7 @@ class _GroupPageState extends State<GroupPage>{
             child: GestureDetector(
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute(
-                  builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.group.id,))),
+                  builder: (BuildContext context) => MediaCollectionPage(database: widget.database, typeId: widget.group.id, isChat: false,))),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
                 child: Row(
@@ -184,7 +184,9 @@ class _GroupPageState extends State<GroupPage>{
                   builder: (BuildContext context) => SearchMessagesPage(
                     title: widget.group.name,
                     database: widget.database,
-                    typeId: widget.group.id,)
+                    typeId: widget.group.id,
+                    isChat: false,
+                    )
                 )),
               child: Container(
                 margin: EdgeInsets.only(left: 25, top: 10),
