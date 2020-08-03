@@ -119,18 +119,19 @@ class _ChatsPageState extends State<ChatsPage>{
         body: Column(
           children: <Widget>[
             Container(
+              height: 50,
               margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: TextField(
                 style: TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
-                decoration: InputDecoration.collapsed(
+                decoration: InputDecoration(
                   filled: true,
                   hintText: "Search chats here...",
                   fillColor: Color(0xff2b2a2a),
                   hintStyle: TextStyle(color: Colors.grey),
                   border: OutlineInputBorder( 
                     borderRadius : BorderRadius.all(Radius.circular(10))
-                  )
+                  ),
+                  suffixIcon: Icon(Icons.search),
                 ),
                 onChanged: (value) => setState((){
                   searchResult = value;
@@ -178,7 +179,7 @@ class _ChatsPageState extends State<ChatsPage>{
                                           backgroundImage: NetworkImage(user.imageUrl),
                                         )
                                         :
-                                        Icon(Icons.account_circle, size: 35,color: Colors.white,),
+                                        Icon(Icons.account_circle, size: 45,color: Colors.white,),
                                         title: Text(user.username, style: TextStyle(color: Colors.white),),
                                         subtitle: Text(
                                           ((){

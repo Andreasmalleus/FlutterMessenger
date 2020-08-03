@@ -77,6 +77,10 @@ abstract class BaseDb{
 
   Stream<List<Message>> streamMessages(String id, bool isChat);
 
+  Future<List<User>> searchUsers(String searchResult, String currentUserId);
+
+  Future<List<User>> searchFriends(String searchResult, String currentUserId);
+
 }
 
 class Database implements BaseDb{
@@ -344,5 +348,29 @@ class Database implements BaseDb{
     }else{
       return _groupRef.document(id).collection("messages").snapshots().map((querySnap) =>querySnap.documents.map((doc) => Message.fromFirestore(doc)).toList());
     }
+  }
+
+  Future<List<User>> searchUsers(String searchResult, String currentUserId) async{
+    final snap =  await _userRef.where("username", isEqualTo: searchResult).getDocuments();
+    List<User> friends = await getFriends(currentUserId);
+    List<User> users = snap.documents.map((doc) => User.fromFirestore(doc)).toList();
+    for(User friend in friends){
+      users.removeWhere((user) => user.id == friend.id);
+      users.removeWhere((user) => user.id == currentUserId);
+    }
+    return users;
+  }
+
+  Future<List<User>> searchFriends(String searchResult, String currentUserId) async{
+    List<User> friends = List<User>();
+    User friend;
+    final snap =  await _userRef.document(currentUserId).collection("friends").getDocuments();
+    for(DocumentSnapshot doc in snap.documents){
+      friend = User.fromFirestore(await doc["ref"].get());
+      if(friend.username == searchResult){
+        friends.add(friend);
+      }
+    }
+    return friends;
   }
 }

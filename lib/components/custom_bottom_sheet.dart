@@ -23,6 +23,8 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
   User currentUser;
   String groupName = "";
   List<String> groupParticipants = List<String>();
+  List<User> users;
+  bool _isLoading;
 
 
   void _addFriends(String userId, String currentUserId){
@@ -46,15 +48,15 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
         margin: EdgeInsets.all(5),
         child: TextField(
           style: TextStyle(color: Colors.white),
-          textAlign: TextAlign.center,
-          decoration: InputDecoration.collapsed(
+          decoration: InputDecoration(
             filled: true,
             hintText: "Group name",
             fillColor: Color(0xff2b2a2a),
             hintStyle: TextStyle(color: Colors.grey),
             border: OutlineInputBorder( 
               borderRadius : BorderRadius.all(Radius.circular(10))
-            )
+            ),
+            suffixIcon: Icon(Icons.text_fields)
           ),
             onChanged: (value) => setState((){
               groupName = value;
@@ -84,12 +86,14 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
 
   Widget _createGroupButton(){
     if(!widget.isChat){
-      return RaisedButton(
-        color:  Color(0xff2b2a2a),
-        child: Text("Create a group", style: TextStyle(color: Colors.white),),
-        onPressed: () => {
-          _createGroup(currentUser.id)
-        },
+      return GestureDetector(
+        onTap: () => _createGroup(currentUser.id),
+         child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+          color: Color(0xff2b2a2a),
+          margin: EdgeInsets.only(top: 10),
+          child: Text("Create", style: TextStyle(color: Colors.greenAccent, fontSize: 18),)
+        ),
       );
     }else{
       return Container(
@@ -99,8 +103,62 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
     }
   }
 
+  Future<void> _searchUsers() async {
+    List<User> dbUsers = await widget.database.searchUsers(searchResult, currentUser.id);
+    if(dbUsers != null){
+      setState(() {
+        users = dbUsers;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _searchFriends() async {
+    List<User> dbUsers = await widget.database.searchFriends(searchResult, currentUser.id);
+    if(dbUsers != null){
+      setState(() {
+        users = dbUsers;
+        _isLoading = false;
+      });
+    }
+  }
+
+  Widget showSearchedUsers(){
+    if(users.isNotEmpty){
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: users.length,
+        itemBuilder: (BuildContext context, int i){
+          return Container(
+            child: Card(
+              color: Color(0xff2b2a2a),
+              child: ListTile(
+                leading: users[i].imageUrl != "" ? CircleAvatar(backgroundImage: NetworkImage(users[i].imageUrl),) : Icon(Icons.android, color: Colors.white,),
+                title: Text(users[i].username, style: TextStyle(color: Colors.white),),
+                trailing: IconButton(icon: Icon(Icons.add_box, color: Colors.white,), onPressed: () => {
+                  widget.isChat ?  _addFriends(users[i].id,currentUser.id) : null,
+                  widget.isChat ? _addChat(users[i].id,currentUser.id) : null,
+                  !widget.isChat ? groupParticipants.add(users[i].id):  null,
+                  setState(() {
+                    users.removeWhere((user) => user.id == users[i].id);
+                  })
+                },),
+              ),
+            ),
+          );
+        }
+      );
+    }else if(_isLoading){
+      return Container(child: CircularProgressIndicator(),);
+    }else{
+      return Container(width: 0,height: 0,);
+    }
+  }
+
   @override
   void initState(){
+    users = List<User>();
+    _isLoading = false;
     super.initState();
   }
 
@@ -112,105 +170,63 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(25.0),
           topRight: Radius.circular(25.0)
-        )
+        ),
+        border: Border.all(width: 3, color: Color(0xff121212))
       ),
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.6,
       child: Column( 
-        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(bottom: 30),
+            alignment: Alignment.topRight,
+            child: IconButton(
+              icon: Icon(Icons.close, color: Colors.redAccent,),
+              color: Color(0xff2b2a2a),
+              onPressed: () => {
+                Navigator.pop(context),
+                widget.toggleBottomAppBarVisibility(),
+                groupParticipants.clear()
+              }
+            ),
+          ),
           widget.isChat ? Text("Add Friends", style: TextStyle(color: Colors.white),) : Text("Create a group", style: TextStyle(color: Colors.white),),
-         Container(
+          Container(
             margin: EdgeInsets.all(5),
             child: TextField(
               style: TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-              decoration: InputDecoration.collapsed(
+              decoration: InputDecoration(
                 filled: true,
                 hintText: "Search users",
                 fillColor: Color(0xff2b2a2a),
                 hintStyle: TextStyle(color: Colors.grey),
                 border: OutlineInputBorder( 
                   borderRadius : BorderRadius.all(Radius.circular(10))
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () => {
+                    FocusScope.of(context).unfocus(),
+                    setState((){
+                      _isLoading = true;
+                    }),
+                    widget.isChat
+                    ?
+                    _searchUsers()
+                    :
+                    _searchFriends(),
+                    groupParticipants.clear()
+                  }
                 )
               ),
-                onChanged: (value) => setState((){
-                  searchResult = value;
-                }),
+              onChanged: (value) => setState((){
+                searchResult = value;
+              }),
             ),
           ),
           _groupNameContainer(),
+          showSearchedUsers(),
           //TODO needs a better solution
-          StreamBuilder<List<User>>(
-            stream: widget.database.streamUsers(),
-            builder: (context, snapshot){
-              if(snapshot.hasData && snapshot.data != null){
-                List<User> users = snapshot.data;
-                return FutureBuilder(
-                  future: widget.database.getFriends(currentUser.id),
-                  builder: (BuildContext ctx, AsyncSnapshot snapshot){
-                    if(snapshot.hasData && snapshot != null){
-                      List<User> friends = snapshot.data;
-                      if(widget.isChat){
-                        for(User friend in friends){
-                        users.removeWhere((user) => user.id == friend.id);
-                        }
-                      }else{
-                        for(User friend in friends){
-                        users.removeWhere((user) => user.id != friend.id);
-                        }
-                      }
-                    }
-                    users.removeWhere((user) => user.id == currentUser.id);
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: users.length,
-                        itemBuilder: (BuildContext context, int i){
-                          if(users[i].username.contains(searchResult) && searchResult != ""){
-                            return Container(
-                              child: Card(
-                                color: Color(0xff2b2a2a),
-                                child: ListTile(
-                                  leading: users[i].imageUrl != "" ? CircleAvatar(backgroundImage: NetworkImage(users[i].imageUrl),) : Icon(Icons.android, color: Colors.white,),
-                                  title: Text(users[i].username, style: TextStyle(color: Colors.white),),
-                                  trailing: IconButton(icon: Icon(Icons.add_box, color: Colors.white,), onPressed: () => {
-                                    widget.isChat ?  _addFriends(users[i].id,currentUser.id) : null,
-                                    widget.isChat ? _addChat(users[i].id,currentUser.id) : null,
-                                    !widget.isChat ? groupParticipants.add(users[i].id):  null,
-                                    setState(() {
-                                      users.removeWhere((user) => user.id == users[i].id);
-                                    })
-                                  },),
-                                ),
-                              ),
-                            );
-                          }else{
-                            return Container(
-                              width: 0,
-                              height: 0,
-                            );
-                          }
-                        }
-                      );
-                  }
-                );
-              }else{
-                return Container(
-                  width: 0,
-                  height: 0,
-                );
-              }
-            }
-          ), 
           _createGroupButton(),
-          RaisedButton(
-            child: Text("Close", style: TextStyle(color: Colors.white),),
-            color: Color(0xff2b2a2a),
-            onPressed: () => {
-              Navigator.pop(context),
-              widget.toggleBottomAppBarVisibility(),
-              groupParticipants.clear()
-            }
-          )
         ],
       )
     );

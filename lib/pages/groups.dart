@@ -34,6 +34,7 @@ class _GroupsPageState extends State<GroupsPage>{
   void _showSheet() {
     showModalBottomSheet(
       context: context,
+      enableDrag: false,
       isScrollControlled: true,
       isDismissible: false,
       backgroundColor: Colors.transparent,
@@ -116,11 +117,11 @@ class _GroupsPageState extends State<GroupsPage>{
         body: Column(
           children: <Widget>[
             Container(
+              height: 50,
               margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
               child: TextField(
                 style: TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
-                decoration: InputDecoration.collapsed(
+                decoration: InputDecoration(
                   filled: true,
                   hintText: "Search groups here...",
                   fillColor: Color(0xff2b2a2a),
@@ -128,7 +129,8 @@ class _GroupsPageState extends State<GroupsPage>{
                   border: OutlineInputBorder( 
                     
                     borderRadius : BorderRadius.all(Radius.circular(10))
-                  )
+                  ),
+                  suffixIcon: Icon(Icons.search),
                 ),
                 onChanged: (value) => setState((){
                   searchResult = value;
@@ -168,7 +170,7 @@ class _GroupsPageState extends State<GroupsPage>{
                             CircleAvatar(
                               backgroundImage: NetworkImage(groups[i].imageUrl),
                             )
-                            : Icon(Icons.supervised_user_circle, size: 35,color: Colors.white,),
+                            : Icon(Icons.supervised_user_circle, size: 45,color: Colors.white,),
                             title: Text(groups[i].name, style: TextStyle(color: Colors.white),),
                             subtitle: Text(
                               ((){
