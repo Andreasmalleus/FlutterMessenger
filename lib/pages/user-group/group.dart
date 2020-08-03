@@ -38,7 +38,7 @@ class _GroupPageState extends State<GroupPage>{
     try{
       file = await FilePicker.getFile(type: FileType.image);
       url = await widget.database.uploadGroupImageToStorage(file, groupId);
-      widget.database.updateGroupImageUrl(url, groupId);
+      widget.database.updateGroupImageUrl(groupId, url);
       _navigateToGroupsPage();
     }catch(e){
       print(e);

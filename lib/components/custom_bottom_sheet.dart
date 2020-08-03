@@ -153,7 +153,10 @@ class _CustomBottomSheetState extends State<CustomBottomSheet>{
                       if(widget.isChat){
                         for(User friend in friends){
                         users.removeWhere((user) => user.id == friend.id);
-                          //TODO bugged
+                        }
+                      }else{
+                        for(User friend in friends){
+                        users.removeWhere((user) => user.id != friend.id);
                         }
                       }
                     }

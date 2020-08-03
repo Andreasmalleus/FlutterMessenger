@@ -199,10 +199,10 @@ class Database implements BaseDb{
     List<User> friends = List<User>();
     User friend;
     final snap = await _userRef.document(userId).collection("friends").getDocuments();
-    snap.documents.map((doc) => {
-      friend = User.fromFirestore(doc["ref"].get()),
-      friends.add(friend)
-    });
+    for(DocumentSnapshot doc in snap.documents){
+      friend = User.fromFirestore(await doc["ref"].get());
+      friends.add(friend);
+    }
     return friends;
   }
 
@@ -288,7 +288,7 @@ class Database implements BaseDb{
 
   Future<void> updateGroupImageUrl(String groupId, String imageUrl) async{
     await _groupRef.document(groupId).updateData({
-      "imageUrl" : imageUrl.split('/').join('-')
+      "imageUrl" : imageUrl
     }).whenComplete(() => "ImageUrl updated");
   }
 
