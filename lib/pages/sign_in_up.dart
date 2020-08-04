@@ -122,14 +122,16 @@ class _SignInUpPageState extends State<SignInUpPage>{
 
   void _handleSignIn() async{
     String userId = "";
-    userId = await widget.auth.signIn(_email, _password);
-    print('Signed in user: $userId');
-    if(userId.length > 0 && userId != null){
+    try{
+      userId = await widget.auth.signIn(_email, _password);
+      print('Signed in user: $userId');
       widget.loginCallback();
+    }catch(error){
+      showSnackBar(error, _scaffoldKey);
+       setState(() {
+        _isLoading = false;
+      });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _addCreatedUserToDatabase(String userId, String email, String username, String createdAt, String imageUrl){
@@ -146,16 +148,22 @@ class _SignInUpPageState extends State<SignInUpPage>{
   void _handleSignUp() async{
     String createdAt = DateTime.now().toString();
     String userId = "";
-    userId = await widget.auth.signUp(_email, _password);
-    print('Signed up user: $userId');
-    showSnackBar("User signed up", _scaffoldKey);
-    _addCreatedUserToDatabase(userId, _email, _username, createdAt, "");
-    setState((){
-      _isLoading = false;
-      _signUpForm = false;
-    });
-    _resetForm();
-
+    try{
+      userId = await widget.auth.signUp(_email, _password);
+      print('Signed up user: $userId');
+      showSnackBar("User signed up", _scaffoldKey);
+      _addCreatedUserToDatabase(userId, _email, _username, createdAt, "");
+      setState((){
+        _isLoading = false;
+        _signUpForm = false;
+      });
+      _resetForm();
+    }catch(error){
+      showSnackBar(error, _scaffoldKey);
+      setState((){
+        _isLoading = false;
+      });
+    }
   }
 
   @override
