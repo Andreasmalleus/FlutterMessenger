@@ -10,9 +10,8 @@ abstract class BaseAuth{
 
   Future<void> signOut();
 
-  Future<void> updateEmail(String email,);
+  Future<void> updateEmail(String email);
 
-  Future<AuthResult> reAuthenticate(String password, String email);
 }
 
 class Auth implements BaseAuth{
@@ -105,15 +104,26 @@ class Auth implements BaseAuth{
   }
 
   Future<void> updateEmail(String email) async{
-    FirebaseUser user = await _firebaseAuth.currentUser();
-    await user.updateEmail(email).catchError((error) => print("updateEmail error: $error"));
-  }
+    FirebaseUser user;
+    String errorMessage;
+    try{
+      FirebaseUser user = await _firebaseAuth.currentUser();
+      await user.updateEmail(email);
+    }catch(error){
+      switch (error.code) {
+        case "ERROR_EMAIL_ALREADY_IN_USE":
+          errorMessage = "Email is already in use on different account";
+          break;
+        default:
+          errorMessage = "An undefined Error happened.";
+      }
+    }
+    
+    if(errorMessage != null){
+      return Future.error(errorMessage);
+    }
+    return user;
 
-  Future<AuthResult> reAuthenticate(String password, String email) async {
-    print("reAuthenticate");
-    AuthResult result = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password).
-    catchError((error) => print("reAuthenticate error: $error"));
-    return result;
   }
 
 }

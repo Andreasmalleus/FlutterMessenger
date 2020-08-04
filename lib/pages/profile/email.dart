@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttermessenger/models/user.dart';
@@ -53,25 +52,30 @@ class _EmailPageState extends State<EmailPage> {
   }
 
   void _reAuthenitcateAndUpdateEmail() async{
-      AuthResult result = await widget.auth.reAuthenticate(password, widget.user.email);
-      if(result == null){
-        showSnackBar("Password is not correct", _scaffoldKey);
+      String userId;
+      try{
+        userId = await widget.auth.signIn(widget.user.email, password);
+        _updateEmail(userId);
+      }catch(error){
+        showSnackBar(error, _scaffoldKey);
         setState(() {
           _isLoading = false;
         });
-      }else{
-        setState(() {
-          _isLoading = false;
-        });
-        _updateEmail(result.user.uid);
       }
   }
 
   void _updateEmail(String userId) async{
-    showSnackBar("Email has been updated", _scaffoldKey);
-    await widget.auth.updateEmail(email);
-    await widget.database.updateEmail(userId, email);
-    Navigator.of(context).pop();
+    try{
+      await widget.auth.updateEmail(email);
+      await widget.database.updateEmail(userId, email);
+      showSnackBar("Email has been updated", _scaffoldKey);
+      Navigator.of(context).pop();
+    }catch(error){
+      showSnackBar(error, _scaffoldKey);
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Widget waitingScreen(){
